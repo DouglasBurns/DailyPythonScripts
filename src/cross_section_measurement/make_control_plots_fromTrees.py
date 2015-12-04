@@ -175,7 +175,8 @@ def make_plot( channel, x_axis_title, y_axis_title,
               y_limits = [],
               y_max_scale = 1.3,
               rebin = 1,
-              legend_location = ( 0.98, 0.78 ), cms_logo_location = 'right',
+              legend_location = ( 0.98, 0.78 ), 
+              cms_logo_location = 'right',
               log_y = False,
               legend_color = False,
               ratio_y_limits = [0.5, 1.5],
@@ -192,6 +193,7 @@ def make_plot( channel, x_axis_title, y_axis_title,
     weightBranchSignalRegion = 'EventWeight'
     if not "_NPUNoWeight" in name_prefix:
         weightBranchSignalRegion += ' * PUWeight'
+
     if not "_NBJetsNoWeight" in name_prefix:
         if 'NBJetsUp' in name_prefix:
             weightBranchSignalRegion += ' * BJetUpWeight'
@@ -212,6 +214,7 @@ def make_plot( channel, x_axis_title, y_axis_title,
                           signal_region_hists['V+Jets'],
                           signal_region_hists['SingleTop'],
                           signal_region_hists['TTJet']]
+
     histogram_lables = ['data',
                         'QCD', 
                         'V+Jets', 
@@ -225,6 +228,7 @@ def make_plot( channel, x_axis_title, y_axis_title,
 
 
     # Printout on normalisation of different samples
+
     print 'Normalisation after selection'
     print 'Data :',signal_region_hists['data'].integral(overflow=True)
     print 'TTJet :',signal_region_hists['TTJet'].integral(overflow=True)
@@ -343,13 +347,14 @@ if __name__ == '__main__':
 
     # Leftover from run1, when fit method was used
     # Leave implementation for now
+
     normalisations_electron = {
             }
     normalisations_muon = {
             }
 
     preliminary = True
-    useQCDControl = True
+    useQCDControl = True #QCD shape frmo control region and add in
     showErrorBandOnRatio = False
     b_tag_bin = '2orMoreBtags'
     norm_variable = 'MET'
@@ -368,13 +373,13 @@ if __name__ == '__main__':
                         'NBJetsNoWeight',
                         'NBJetsUp',
                         'NBJetsDown',
-                        # # # # # # # # 'Mjj',
-                        # # # # # # # # 'M3',
-                        # # # # # # # # 'angle_bl',
-                        # 'JetPt',
+                        # # # # # # # # # 'Mjj',
+                        # # # # # # # # # 'M3',
+                        # # # # # # # # # 'angle_bl',
+                        'JetPt',
                         # 'AbsLeptonEta',
-                        # 'RelIso',
-                        # 'sigmaietaieta'
+                        # # 'RelIso',
+                        # # 'sigmaietaieta'
                         ]
 
     additional_qcd_plots = [
@@ -402,7 +407,7 @@ if __name__ == '__main__':
         b_tag_bin = '2orMoreBtags'
 
         # Set folder for this batch of plots
-        output_folder = output_folder_base + "/Variables/"
+        output_folder = output_folder_base + "Variables/"
         make_folder_if_not_exists(output_folder)
 
         ###################################################
@@ -439,27 +444,6 @@ if __name__ == '__main__':
                       control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/FitVariables' % label,
                       branchName = 'MET',
                       name_prefix = '%s_MET_' % label,
-                      x_limits = control_plots_bins['MET'],
-                      nBins = len(control_plots_bins['MET'])-1,
-                      rebin = 1,
-                      legend_location = ( 0.9, 0.73 ),
-                      cms_logo_location = 'left',
-                      use_qcd_data_region = useQCDControl,
-                      )
-
-        ###################################################
-        # MET
-        ###################################################
-        norm_variable = 'MET'
-        if 'METNoHF' in include_plots:
-            print '---> METNoHF'
-            make_plot( channel,
-                      x_axis_title = '$%s$ [GeV]' % variables_latex['MET'],
-                      y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['MET']),
-                      signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/FitVariables' % label,
-                      control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/FitVariables' % label,
-                      branchName = 'METNoHF',
-                      name_prefix = '%s_METNoHF_' % label,
                       x_limits = control_plots_bins['MET'],
                       nBins = len(control_plots_bins['MET'])-1,
                       rebin = 1,
@@ -554,7 +538,7 @@ if __name__ == '__main__':
                       rebin = 1,
                       legend_location = ( 0.9, 0.73 ),
                       cms_logo_location = 'right',
-                      use_qcd_data_region = False,
+                      use_qcd_data_region = useQCDControl,
                       )
 
         ###################################################
@@ -617,7 +601,7 @@ if __name__ == '__main__':
                       )
 
         # Set folder for this batch of plots
-        output_folder =  output_folder_base + "/FitVariables/"
+        output_folder =  output_folder_base + "FitVariables/"
         make_folder_if_not_exists(output_folder)
 
         ###################################################
@@ -680,9 +664,8 @@ if __name__ == '__main__':
                       )
 
         # Set folder for this batch of plots
-        output_folder =  output_folder_base + "/Control/"
+        output_folder =  output_folder_base + "Control/"
         make_folder_if_not_exists(output_folder)
-
 
         ###################################################
         # NBJets
@@ -781,16 +764,12 @@ if __name__ == '__main__':
         ###################################################
         if 'JetPt' in include_plots:
             print '---> Jet Pt'
-            treeName = 'Electron/Electrons'
-            if channel == 'muon':
-                treeName = 'Muon/Muons'
-
             make_plot( channel,
                       x_axis_title = '$%s$' % control_plots_latex['pt'],
                       y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                      signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/Jets/Jets' % ( label ),
-                      control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/Jets/Jets' % (label ),
-                      branchName = 'pt',
+                      signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/FitVariables' % ( label ),
+                      control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection/FitVariables' % (label ),
+                      branchName = 'jet_pt',
                       name_prefix = '%s_JetPt_' % label,
                       x_limits = control_plots_bins['JetPt'],
                       nBins = len(control_plots_bins['JetPt'])-1,
@@ -816,7 +795,7 @@ if __name__ == '__main__':
                       rebin = 1,
                       legend_location = ( 0.95, 0.78 ),
                       cms_logo_location = 'right',
-                      use_qcd_data_region = False,
+                      use_qcd_data_region = useQCDControl,
                       )
 
         if 'NVertexNoWeight' in include_plots:
@@ -833,9 +812,8 @@ if __name__ == '__main__':
                       rebin = 1,
                       legend_location = ( 0.95, 0.78 ),
                       cms_logo_location = 'right',
-                      use_qcd_data_region = False,
+                      use_qcd_data_region = useQCDControl,
                       )
-        
 
         ###################################################
         # Rel iso
