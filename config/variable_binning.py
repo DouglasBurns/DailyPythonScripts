@@ -5,6 +5,7 @@ fit_variable_bin_edges = {
                           'angle_bl' : [round( i * 0.2, 2 ) for i in range ( int( 4 / 0.2 ) + 1 )],
                           'Mjj' : [i * 25 for i in range ( int( 500 / 25 ) + 1 )],
                           }
+
 bin_edges = {
 'MET' : [0.0, 42.0, 100.0, 260.0, 1030.0],
 'WPT' : [0.0, 44.0, 87.0, 134.0, 194.0, 271.0, 366.0, 841.0],
