@@ -1,3 +1,15 @@
+def produce_reco_bin_edges( gen_bin_edges ):
+  reco_bin_edges = {}
+  for variable in gen_bin_edges:
+    edges = gen_bin_edges[variable]
+    reco_bin_edges[variable] = []
+    for i in range(0,len(edges)-1):
+      reco_bin_edges[variable].append( edges[i])
+      reco_bin_edges[variable].append( round ( edges[i] + ( edges[i+1] - edges[i] ) / 2, 1 ) )
+    reco_bin_edges[variable].append(edges[-1])
+  return reco_bin_edges
+
+
 fit_variable_bin_edges = {
                           'absolute_eta' : [round( i * 0.2, 2 ) for i in range ( int( 3 / 0.2 ) + 1 )],
                           'M3' : [i * 25 for i in range ( int( 1000 / 25 ) + 1 )],
@@ -6,9 +18,9 @@ fit_variable_bin_edges = {
                           'Mjj' : [i * 25 for i in range ( int( 500 / 25 ) + 1 )],
                           }
 
-bin_edges = {
-'MET' : [0.0, 34.0, 64.0, 119.0, 183.0, 503.0],
-'WPT' : [0.0, 42.0, 84.0, 129.0, 185.0, 255.0, 605.0],
+bin_edges_full = {
+'MET' : [0.0, 42.0, 100.0, 260.0, 1030.0],
+'WPT' : [0.0, 44.0, 87.0, 134.0, 194.0, 271.0, 366.0, 841.0],
 'NJets' : [3.5, 4.5, 5.5, 6.5, 7.5, 17.5],
 'HT' : [100.0, 200.0, 241.0, 289.0, 343.0, 403.0, 468.0, 539.0, 617.0, 700.0, 788.0, 900.0, 1460.0],
 'ST' : [123.0, 296.0, 356.0, 422.0, 495.0, 577.0, 667.0, 767.0, 875.0, 994.0, 1121.0, 1756.0],
@@ -25,6 +37,9 @@ bin_edges_vis = {
 'lepton_pt' : [23.0, 34.0, 45.0, 56.0, 67.0, 78.0, 89.0, 100.0, 111.0, 125.0, 148.0, 263.0],
 'abs_lepton_eta' : [0.0, 0.2, 0.41, 0.61, 0.82, 1.02, 1.22, 1.43, 1.68, 2.94],
 }
+
+reco_bin_edges_vis = produce_reco_bin_edges( bin_edges_vis )
+reco_bin_edges_full = produce_reco_bin_edges( bin_edges_full )
 
 minimum_bin_width = {
   'MET' : 20.,
