@@ -23,7 +23,7 @@ class channel:
     pass
 
 def calculateTopPtWeight( lepTopPt, hadTopPt ):
-    return max ( ( 1 + ( branch('lepTopPt_parton') - 100 ) / 500 ) * ( 1 + ( branch('hadTopPt_parton') - 100 ) / 500 ) , 0.1 )
+    return max ( ( 1 + ( lepTopPt - 100 ) / 500 ) * ( 1 + ( hadTopPt - 100 ) / 500 ) , 0.1 )
 
 def getFileName( com, sample, measurementConfig ) :
 
@@ -32,7 +32,8 @@ def getFileName( com, sample, measurementConfig ) :
                         'central' : measurementConfig.ttbar_category_templates_trees['central'],
                         'amcatnlo' : measurementConfig.ttbar_amc_category_templates_trees,
                         'madgraph' : measurementConfig.ttbar_madgraph_category_templates_trees,
-                        'herwigpp' : measurementConfig.ttbar_herwigpp_category_templates_trees,
+                        'powhegherwigpp' : measurementConfig.ttbar_powhegherwigpp_category_templates_trees,
+                        'amcatnloherwigpp' : measurementConfig.ttbar_amcatnloherwigpp_category_templates_trees,
                         'scaleup' : measurementConfig.ttbar_scaleup_category_templates_trees,
                         'scaledown' : measurementConfig.ttbar_scaledown_category_templates_trees,
                         'massdown' : measurementConfig.ttbar_mtop1695_category_templates_trees,
@@ -43,8 +44,14 @@ def getFileName( com, sample, measurementConfig ) :
                         'jerup' : measurementConfig.ttbar_jerup_category_templates_trees,
                         'bjetdown' : measurementConfig.ttbar_category_templates_trees['central'],
                         'bjetup' : measurementConfig.ttbar_category_templates_trees['central'],
-                        # 'lightjetdown' : measurementConfig.ttbar_category_templates_trees['central'],
-                        # 'lightjetup' : measurementConfig.ttbar_category_templates_trees['central'],
+
+
+                        # 'bjetdown_had_sf' : measurementConfig.ttbar_category_templates_trees['central'],
+                        # 'bjetup_had_sf' : measurementConfig.ttbar_category_templates_trees['central'],
+
+
+                        'lightjetdown' : measurementConfig.ttbar_category_templates_trees['central'],
+                        'lightjetup' : measurementConfig.ttbar_category_templates_trees['central'],
                         'leptondown' : measurementConfig.ttbar_category_templates_trees['central'],
                         'leptonup' : measurementConfig.ttbar_category_templates_trees['central'],
                         'pileupSystematic' : measurementConfig.ttbar_category_templates_trees['central'],
@@ -104,7 +111,7 @@ def main():
 
     # Output file name
     outputFileName = 'crap.root'
-    outputFileDir = 'unfolding/%sTeV/' % options.centreOfMassEnergy
+    outputFileDir = 'unfolding/%sTeV/BTagRescaled' % options.centreOfMassEnergy
     make_folder_if_not_exists(outputFileDir)
    
     energySuffix = '%sTeV' % ( options.centreOfMassEnergy )
@@ -319,12 +326,10 @@ def main():
                         bjetWeight = event.BJetUpWeight
                     elif options.sample == "bjetdown":
                         bjetWeight = event.BJetDownWeight
-
-                    # # lightjetWeight = "LightJetWeight"
-                    # # if options.sample == "lightjetup":
-                    # #     lightjetWeight = "LightJetUpWeight"
-                    # # elif options.sample == "lightjetdown":
-                    # #     lightjetWeight = "LightJetDownWeight"
+                    elif options.sample == "lightjetup":
+                        bjetWeight = event.LightJetUpWeight
+                    elif options.sample == "lightjetdown":
+                        bjetWeight = event.LightJetDownWeight
 
                     offlineWeight = event.EventWeight * measurement_config.luminosity_scale
                     offlineWeight *= pileupWeight

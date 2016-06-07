@@ -206,14 +206,15 @@ class XSectionConfig():
             'Muon_up':'MuonUp',
             'BJet_down':'BJetDown',
             'BJet_up':'BJetUp',
+            'LightJet_down':'LightJetDown',
+            'LightJet_up':'LightJetUp',
             'JES_down':'_JESDown',
             'JES_up':'_JESUp',
             # 'JES_down_alphaCorr':'_JESDown_alphaCorr',
             # 'JES_up_alphaCorr':'_JESUp_alphaCorr',
             'JER_down':'_JERDown',
             'JER_up':'_JERUp',
-            # 'LightJet_down':'_minusLightJet',
-            # 'LightJet_up':'_plusLightJet',
+
 
             'PileUpSystematic' : '',
 
@@ -342,8 +343,8 @@ class XSectionConfig():
         self.unfolding_powheg_pythia8_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV.root' % self.centre_of_mass_energy
         self.unfolding_amcatnlo_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_amcatnlo.root' % self.centre_of_mass_energy
         self.unfolding_madgraphMLM_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_madgraph.root' % self.centre_of_mass_energy
-        self.unfolding_powheg_herwig_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_herwigpp.root' % self.centre_of_mass_energy
-        self.unfolding_amcatnlo_herwig_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_herwigpp.root' % self.centre_of_mass_energy
+        self.unfolding_powheg_herwig_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_powhegherwigpp.root' % self.centre_of_mass_energy
+        self.unfolding_amcatnlo_herwig_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_amcatnloherwigpp.root' % self.centre_of_mass_energy
 
         # Choose central MC Sample
         self.unfolding_central_raw = self.unfolding_powheg_pythia8_raw
@@ -378,6 +379,8 @@ class XSectionConfig():
         self.unfolding_jer_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_jerup_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_bjet_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_bjetdown_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_bjet_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_bjetup_asymmetric.root' % self.centre_of_mass_energy
+        self.unfolding_lightjet_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_lightjetdown_asymmetric.root' % self.centre_of_mass_energy
+        self.unfolding_lightjet_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_lightjetup_asymmetric.root' % self.centre_of_mass_energy
 
         self.unfolding_ElectronEn_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_ElectronEnDown_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_ElectronEn_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_ElectronEnUp_asymmetric.root' % self.centre_of_mass_energy
@@ -439,7 +442,8 @@ class XSectionConfig():
                 ('JES_down', 'JES_up', 'JER_down', 'JER_up')
             ],
             'B-tagging' : [
-                ('BJet_down', 'BJet_up')
+                ('BJet_down', 'BJet_up'),
+                ('LightJet_down', 'LightJet_up')
             ],
             '\met' : [
                 ('ElectronEnDown', 'ElectronEnUp'), 
@@ -564,13 +568,21 @@ class XSectionConfig():
                    }
 
         self.tau_values_electron = {
-"NJets" : 7.01709784152e-05,
-"WPT" : 0.00405221546909,
-"lepton_pt" : 0.0018018584057,
-"abs_lepton_eta" : 9.04882514124e-06,
-"ST" : 0.00819214840909,
-"MET" : 0.00251365428441,
-"HT" : 0.00598912536223,
+# "NJets" : 7.40294908943e-05,
+# "WPT" : 0.00430340758474,
+# "lepton_pt" : 0.00190573521649,
+# "abs_lepton_eta" : 9.17390335498e-06,
+# "ST" : 0.00862392757898,
+# "MET" : 0.00265102161031,
+# "HT" : 0.00627751099561,
+"NJets" : 7.14796891782e-05,
+"WPT" : 0.00412139982544,
+"lepton_pt" : 0.00180610492182,
+"abs_lepton_eta" : 9.22789295178e-06,
+"ST" : 0.00831731550316,
+"MET" : 0.00256070232044,
+"HT" : 0.00602354830601,
+
             'bjets_pt': 0.,
             'bjets_eta': 0.,
             'lepton_eta': 0.,
@@ -585,13 +597,20 @@ class XSectionConfig():
            }
 
         self.tau_values_muon = {
-"NJets" : 7.80818061768e-05,
-"WPT" : 0.00456749598096,
-"lepton_pt" : 0.0023203738699,
-"abs_lepton_eta" : 9.34057573916e-06,
-"ST" : 0.00949131291812,
-"MET" : 0.0027781136603,
-"HT" : 0.00723438444419,
+# "NJets" : 7.95438745354e-05,
+# "WPT" : 0.00466092806338,
+# "lepton_pt" : 0.0024749208784,
+# "abs_lepton_eta" : 9.12565206983e-06,
+# "ST" : 0.00962164972273,
+# "MET" : 0.00282487006595,
+# "HT" : 0.00731972861341,
+"NJets" : 8.02178221371e-05,
+"WPT" : 0.00476273555468,
+"lepton_pt" : 0.00242388359583,
+"abs_lepton_eta" : 9.66084137028e-06,
+"ST" : 0.00973999311445,
+"MET" : 0.00290502443043,
+"HT" : 0.00741623015566,
             'bjets_pt': 0.,
             'bjets_eta': 0.,
             'lepton_eta': 0.,
@@ -605,15 +624,20 @@ class XSectionConfig():
             "ttbarRap" : 236.448941265,
         }
         self.tau_values_combined = {
-"NJets" : 5.25335153942e-05,
-"WPT" : 0.00305416528307,
-"lepton_pt" : 0.00144311408625,
-"abs_lepton_eta" : 6.65419197707e-06,
-"ST" : 0.00626425547204,
-"MET" : 0.000143301257024,
-"HT" : 0.00468724990318,
-
-
+# "NJets" : 5.25335153942e-05,
+# "WPT" : 0.00305416528307,
+# "lepton_pt" : 0.00144311408625,
+# "abs_lepton_eta" : 6.65419197707e-06,
+# "ST" : 0.00626425547204,
+# "MET" : 0.000143301257024,
+# "HT" : 0.00468724990318,
+"NJets" : 5.36781510284e-05,
+"WPT" : 0.00314803040726,
+"lepton_pt" : 0.00147703865562,
+"abs_lepton_eta" : 6.81805935741e-06,
+"ST" : 0.0063988883469,
+"MET" : 0.00193312822587,
+"HT" : 0.00475881927497,
             'bjets_pt': 0.,
             'bjets_eta': 0.,
             'lepton_eta': 0.,
