@@ -240,6 +240,17 @@ def make_plot( channel, x_axis_title, y_axis_title,
 
     mcSum = signal_region_hists['TTJet'].integral(overflow=True) + signal_region_hists['SingleTop'].integral(overflow=True) + signal_region_hists['V+Jets'].integral(overflow=True) + qcd_from_data.integral(overflow=True)
     print 'Total MC :',mcSum
+    print y_limits
+
+    maxData = max( list(signal_region_hists['data'].y()) )
+    y_limits = [0, maxData * 1.4]
+    if log_y:
+        y_limits = [0.1, maxData * 10 ]
+    # for i in range(0,signal_region_hists['data'].GetNbinsX()):
+    #     print signal_region_hists['data'].GetBinContent()
+    #     print i
+    #     for h in signal_region_hists:
+    #         print signal_region_hists[h].GetBinContent(i)
 
     # More histogram settings
     histogram_properties = Histogram_properties()
@@ -355,7 +366,6 @@ if __name__ == '__main__':
     if (generator != 'PowhegPythia8'):
         histogram_files['TTJet'] = measurement_config.ttbar_generator_category_templates_trees[generator]
 
-    print(histogram_files['TTJet'])
     # Leftover from run1, when fit method was used
     # Leave implementation for now
     normalisations_electron = {
@@ -364,7 +374,7 @@ if __name__ == '__main__':
             }
 
     preliminary = True
-    useQCDControl = True
+    useQCDControl = False
     showErrorBandOnRatio = False
     b_tag_bin = '2orMoreBtags'
     norm_variable = 'MET'
@@ -392,7 +402,7 @@ if __name__ == '__main__':
                         # # # # # # # # 'Mjj',
                         # # # # # # # # 'M3',
                         # # # # # # # # 'angle_bl',
-                        'RelIso',
+                        # 'RelIso',
                         # 'sigmaietaieta'
                         ]
 
@@ -415,15 +425,16 @@ if __name__ == '__main__':
 
 
     for channel, label in {
-                            'electron' : 'EPlusJets', 
+                            # 'electron' : 'EPlusJets', 
                             'muon' : 'MuPlusJets',
                             # 'combined' : 'COMBINED'
                             }.iteritems() :
 
         for bSelection, b_tag_bin in {
-                            'Ref selection' : '2orMoreMediumBtags', 
-                            'Ref selection NoBSelection' : 'NoBtags',
-                            'Ref selection TightBSelection' : '2orMoreTightBtags',}.iteritems():
+                            'Ref selection' : '2orMoreBtags', 
+                            # 'Ref selection NoBSelection' : 'NoBtags',
+                            # 'Ref selection TightBSelection' : '2orMoreTightBtags'
+                            }.iteritems():
             
             # b_tag_bin = '2orMoreBtags'
 
@@ -958,10 +969,10 @@ if __name__ == '__main__':
         # QCD Control Region
         ###################################################
         for channel, label in {
-                                'electronQCDNonIso' : 'EPlusJets/QCD non iso e+jets',
-                                'electronQCDConversions' : 'EPlusJets/QCDConversions', 
-                                'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
-                                'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
+                                # 'electronQCDNonIso' : 'EPlusJets/QCD non iso e+jets',
+                                # 'electronQCDConversions' : 'EPlusJets/QCDConversions', 
+                                # 'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
+                                # 'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
                                 }.iteritems() :
             b_tag_bin = '0btag'
 

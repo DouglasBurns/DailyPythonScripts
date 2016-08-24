@@ -52,9 +52,9 @@ minimum_bin_width = {
 }
 
 control_plots_bins = {
-  'NJets' : [i + 0.5 for i in range ( 3, 12 + 1 )],
+  'NJets' : [i + 0.5 for i in range ( 3, 16 + 1 )],
   'JetPt' : [i * 5  for i in range ( 5, 40 )],  
-  'MuonPt' : [i * 10 for i in range ( 1, 20 )],
+  'MuonPt' : [i * 24 for i in range ( 1, 10 )],
   'ElectronPt' : [i * 10 for i in range ( 1, 20 )],
   'LeptonEta' : [i*0.5 for i in range( -25, 25 )],  
   'AbsLeptonEta' : [i*0.1 for i in range( 0, 25 )],  
