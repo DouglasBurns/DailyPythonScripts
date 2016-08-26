@@ -5,7 +5,7 @@ class XSectionConfig():
     current_analysis_path = '/hdfs/TopQuarkGroup/run2/atOutput/'
     known_centre_of_mass_energies = [13]
     # has to be separate as many variables depend on it
-    luminosities = {13:12892}
+    luminosities = {13:12835}
 
     parameters = [
         'SingleTop_category_templates', 'SingleTop_category_templates_trees', 'SingleTop_file',
@@ -538,7 +538,7 @@ class XSectionConfig():
 
         # self.new_luminosity = 11358.
         # self.new_luminosity = 15872
-        self.new_luminosity = 15930
+        self.new_luminosity = 12835
         self.ttbar_xsection = 831.76  # pb
 
         self.rate_changing_systematics = {#TODO check where this is used
