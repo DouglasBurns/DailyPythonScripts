@@ -374,7 +374,7 @@ if __name__ == '__main__':
             }
 
     preliminary = True
-    useQCDControl = False
+    useQCDControl = True
     showErrorBandOnRatio = False
     b_tag_bin = '2orMoreBtags'
     norm_variable = 'MET'
@@ -432,7 +432,7 @@ if __name__ == '__main__':
 
         for bSelection, b_tag_bin in {
                             'Ref selection' : '2orMoreBtags', 
-                            # 'Ref selection NoBSelection' : 'NoBtags',
+                            # 'Ref selection NoBSelection' : '0btag',
                             # 'Ref selection TightBSelection' : '2orMoreTightBtags'
                             }.iteritems():
             
@@ -572,7 +572,7 @@ if __name__ == '__main__':
                           rebin = 1,
                           legend_location = ( 0.9, 0.73 ),
                           cms_logo_location = 'right',
-                          use_qcd_data_region = False,
+                          use_qcd_data_region = useQCDControl,
                           )
 
             ###################################################
@@ -710,8 +710,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJets_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -745,8 +745,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJetsNoWeight_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -764,8 +764,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJetsUp_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -783,8 +783,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJetsDown_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -803,8 +803,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJets_LightUp_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -822,8 +822,8 @@ if __name__ == '__main__':
                 make_plot( channel,
                           x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                           y_axis_title = 'Events',
-                          signal_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
-                          control_region_tree = 'TTbar_plus_X_analysis/%s/%s/FitVariables' % (label, bSelection),
+                          signal_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
+                          control_region_tree = 'TTbar_plus_X_analysis/%s/Ref selection NoBSelection/FitVariables' % (label),
                           branchName = 'NBJets',
                           name_prefix = '%s_NBJets_LightDown_' % label,
                           x_limits = control_plots_bins['NBJets'],
@@ -971,8 +971,8 @@ if __name__ == '__main__':
         for channel, label in {
                                 # 'electronQCDNonIso' : 'EPlusJets/QCD non iso e+jets',
                                 # 'electronQCDConversions' : 'EPlusJets/QCDConversions', 
-                                # 'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
-                                # 'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
+                                'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
+                                'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
                                 }.iteritems() :
             b_tag_bin = '0btag'
 
