@@ -3,23 +3,23 @@ from optparse import OptionParser
 import os
 
 jobs = [
-        # # # 13 TeV
-        # '--centreOfMassEnergy 13 -f',
+        # # 13 TeV
+        '--centreOfMassEnergy 13 -f',
 
         '--centreOfMassEnergy 13 -s central',
-        # '--centreOfMassEnergy 13 -s central --topPtReweighting 1',
-        # '--centreOfMassEnergy 13 -s central --topPtReweighting -1',
+        '--centreOfMassEnergy 13 -s central --topPtReweighting 1',
+        '--centreOfMassEnergy 13 -s central --topPtReweighting -1',
 
-        # '--centreOfMassEnergy 13 -s amcatnlo',
-        # '--centreOfMassEnergy 13 -s madgraph',
-        # '--centreOfMassEnergy 13 -s powhegherwigpp',
-        # '--centreOfMassEnergy 13 -s amcatnloherwigpp',
+        '--centreOfMassEnergy 13 -s amcatnlo',
+        '--centreOfMassEnergy 13 -s madgraph',
+        '--centreOfMassEnergy 13 -s powhegherwigpp',
+        '--centreOfMassEnergy 13 -s amcatnloherwigpp',
 
-        # # # PS scale samples
-        # # '--centreOfMassEnergy 13 -s scaleup',
-        # # '--centreOfMassEnergy 13 -s scaledown',
+        # # PS scale samples
+        # '--centreOfMassEnergy 13 -s scaleup',
+        # '--centreOfMassEnergy 13 -s scaledown',
 
-        # # ME scale weights
+        # ME scale weights
         '--centreOfMassEnergy 13 --muFmuRWeight 1',
         '--centreOfMassEnergy 13 --muFmuRWeight 2',
         '--centreOfMassEnergy 13 --muFmuRWeight 3',
@@ -30,36 +30,37 @@ jobs = [
         '--centreOfMassEnergy 13 --alphaSWeight 0',
         '--centreOfMassEnergy 13 --alphaSWeight 1',
 
-        # # # Top mass
-        # '--centreOfMassEnergy 13 -s massup',
-        # '--centreOfMassEnergy 13 -s massdown',
+        # # Top mass
+        '--centreOfMassEnergy 13 -s massup',
+        '--centreOfMassEnergy 13 -s massdown',
 
-        # # # Experimental systematics
-        # '--centreOfMassEnergy 13 -s jesup',
-        # '--centreOfMassEnergy 13 -s jesdown',
+        # # Experimental systematics
+        '--centreOfMassEnergy 13 -s jesup',
+        '--centreOfMassEnergy 13 -s jesdown',
 
-        # '--centreOfMassEnergy 13 -s jerup',
-        # '--centreOfMassEnergy 13 -s jerdown',
+        '--centreOfMassEnergy 13 -s jerup',
+        '--centreOfMassEnergy 13 -s jerdown',
 
-        # '--centreOfMassEnergy 13 -s leptonup',
-        # '--centreOfMassEnergy 13 -s leptondown',
+        '--centreOfMassEnergy 13 -s leptonup',
+        '--centreOfMassEnergy 13 -s leptondown',
 
-        # '--centreOfMassEnergy 13 -s bjetup',
-        # '--centreOfMassEnergy 13 -s bjetdown',
+        '--centreOfMassEnergy 13 -s bjetup',
+        '--centreOfMassEnergy 13 -s bjetdown',
 
-        # '--centreOfMassEnergy 13 -s lightjetup',
-        # '--centreOfMassEnergy 13 -s lightjetdown',
+        '--centreOfMassEnergy 13 -s lightjetup',
+        '--centreOfMassEnergy 13 -s lightjetdown',
 
-        # '--centreOfMassEnergy 13 -s pileupSystematic',
+        '--centreOfMassEnergy 13 -s pileupUp',
+        '--centreOfMassEnergy 13 -s pileupDown',
 
-        # '--centreOfMassEnergy 13 -s ElectronEnUp',
-        # '--centreOfMassEnergy 13 -s ElectronEnDown' ,
-        # '--centreOfMassEnergy 13 -s MuonEnUp',
-        # '--centreOfMassEnergy 13 -s MuonEnDown',
-        # '--centreOfMassEnergy 13 -s TauEnUp',
-        # '--centreOfMassEnergy 13 -s TauEnDown',
-        # '--centreOfMassEnergy 13 -s UnclusteredEnUp',
-        # '--centreOfMassEnergy 13 -s UnclusteredEnDown',
+        '--centreOfMassEnergy 13 -s ElectronEnUp',
+        '--centreOfMassEnergy 13 -s ElectronEnDown' ,
+        '--centreOfMassEnergy 13 -s MuonEnUp',
+        '--centreOfMassEnergy 13 -s MuonEnDown',
+        '--centreOfMassEnergy 13 -s TauEnUp',
+        '--centreOfMassEnergy 13 -s TauEnDown',
+        '--centreOfMassEnergy 13 -s UnclusteredEnUp',
+        '--centreOfMassEnergy 13 -s UnclusteredEnDown',
         ]
 # #  Add pdf variations to list of jobs
 nPDFPerJob = 1
@@ -70,7 +71,7 @@ while variation <= maxPDF :
     nForThisJob = nPDFPerJob
     if variation + nPDFPerJob > maxPDF:
         nForThisJob = maxPDF - variation
-    jobs.append('--centreOfMassEnergy 13 --generatorWeight %i --nGeneratorWeights %i' % (variation, nForThisJob) )
+    jobs.append('--centreOfMassEnergy 13 --pdfWeight %i --nGeneratorWeights %i' % (variation, nForThisJob) )
     variation += nPDFPerJob
     pass
 
