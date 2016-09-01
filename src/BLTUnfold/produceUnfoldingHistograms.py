@@ -62,7 +62,9 @@ def getFileName( com, sample, measurementConfig ) :
                         'lightjetup' : measurementConfig.ttbar_category_templates_trees['central'],
                         'leptondown' : measurementConfig.ttbar_category_templates_trees['central'],
                         'leptonup' : measurementConfig.ttbar_category_templates_trees['central'],
-                        'pileupSystematic' : measurementConfig.ttbar_category_templates_trees['central'],
+                        'pileupUp' : measurementConfig.ttbar_category_templates_trees['central'],
+                        'pileupDown' : measurementConfig.ttbar_category_templates_trees['central'],
+
 
                         'ElectronEnUp' : measurementConfig.ttbar_category_templates_trees['central'],
                         'ElectronEnDown' : measurementConfig.ttbar_category_templates_trees['central'],
@@ -332,8 +334,11 @@ def main():
                 # Pileup weight
                 # Don't apply if calculating systematic
                 pileupWeight = event.PUWeight
-                if options.sample == "pileupSystematic":
-                    pileupWeight = 1
+                # print event.PUWeight,event.PUWeight_up,event.PUWeight_down
+                if options.sample == "pileupUp":
+                    pileupWeight = event.PUWeight_up
+                elif options.sample == "pileupDown":
+                    pileupWeight = event.PUWeight_down
 
                 # Generator level weight
                 genWeight = event.EventWeight * measurement_config.luminosity_scale
