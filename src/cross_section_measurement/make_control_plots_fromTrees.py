@@ -50,8 +50,8 @@ def getHistograms( histogram_files,
             normalisation = normalisations_electron[norm_variable]
         if use_qcd_data_region:
             qcd_data_region = qcd_data_region_electron
-        if not 'QCD' in channel and not 'NPU' in branchName:
-            weightBranchSignalRegion += ' * ElectronEfficiencyCorrection'
+        # if not 'QCD' in channel and not 'NPU' in branchName:
+        #     weightBranchSignalRegion += ' * ElectronEfficiencyCorrection'
     if 'muon' in channel:
         histogram_files['data'] = measurement_config.data_file_muon_trees
         histogram_files['QCD'] = measurement_config.muon_QCD_MC_category_templates_trees[category]
@@ -425,8 +425,8 @@ if __name__ == '__main__':
 
 
     for channel, label in {
-                            # 'electron' : 'EPlusJets', 
-                            'muon' : 'MuPlusJets',
+                            'electron' : 'EPlusJets', 
+                            # 'muon' : 'MuPlusJets',
                             # 'combined' : 'COMBINED'
                             }.iteritems() :
 
@@ -969,10 +969,10 @@ if __name__ == '__main__':
         # QCD Control Region
         ###################################################
         for channel, label in {
-                                # 'electronQCDNonIso' : 'EPlusJets/QCD non iso e+jets',
-                                # 'electronQCDConversions' : 'EPlusJets/QCDConversions', 
-                                'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
-                                'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
+                                'electronQCDNonIso' : 'EPlusJets/QCD non iso e+jets',
+                                'electronQCDConversions' : 'EPlusJets/QCDConversions', 
+                                # 'muonQCDNonIso' : 'MuPlusJets/QCD non iso mu+jets 3toInf',
+                                # 'muonQCDNonIso2' : 'MuPlusJets/QCD non iso mu+jets 1p5to3',
                                 }.iteritems() :
             b_tag_bin = '0btag'
 
