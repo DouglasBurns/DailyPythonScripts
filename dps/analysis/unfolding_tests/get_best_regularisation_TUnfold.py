@@ -19,28 +19,22 @@ usage:
 '''
 # imports
 from __future__ import division
-from math import log10, pow
 from optparse import OptionParser
 import sys
 # rootpy
 from rootpy.io import File
-from rootpy.plotting import Graph, Canvas
-from rootpy.matrix import Matrix
+from rootpy.plotting import Graph
 # DailyPythonScripts
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
-#from src.cross_section_measurement.lib import get_unfold_histogram_tuple
-from tools.ROOT_utils import set_root_defaults, get_histogram_from_file
-from config import XSectionConfig
-from config.variable_binning import reco_bin_edges_vis
-from tools.hist_utilities import value_error_tuplelist_to_hist
-import matplotlib.pyplot as plt
-from tools.plotting import Histogram_properties
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
+#from dps.analysis.xsection.lib import get_unfold_histogram_tuple
+from dps.utils.ROOT_utils import set_root_defaults, get_histogram_from_file
+from dps.config import XSectionConfig
+from dps.config.variable_binning import reco_bin_edges_vis
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
 from matplotlib import rc
-from config import CMS
-from config.latex_labels import variables_latex
+from dps.config import CMS
 from ROOT import TGraph, TSpline3, Double, TUnfoldDensity, TUnfold, TDecompSVD, TMatrixD, TCanvas, gROOT
-from numpy.linalg import svd
 from rootpy import asrootpy
 
 rc('font',**CMS.font)

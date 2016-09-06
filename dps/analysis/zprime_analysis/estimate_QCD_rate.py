@@ -9,8 +9,8 @@ as well get the calibration curve for the estimates (option --make-calibration-c
 In addition to above it should provide an easy way to present the binned estimates (MET, b-tag, other bins)
 
 '''
-from tools.QCD_rate_estimation import estimate_with_fit_to_relative_isolation
-import tools.QCD_rate_estimation as QCD_rate_estimation
+from dps.utils.QCD_rate_estimation import estimate_with_fit_to_relative_isolation
+import dps.utils.QCD_rate_estimation as QCD_rate_estimation
 from rootpy.io import File
 
 if __name__ == "__main__":

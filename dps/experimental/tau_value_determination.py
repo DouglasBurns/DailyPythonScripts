@@ -19,13 +19,14 @@ import matplotlib
 from copy import deepcopy
 from ROOT import Double, TH1F, TGraph
 
-from config.variable_binning import bin_edges
-from tools.file_utilities import read_data_from_JSON
-from tools.hist_utilities import value_error_tuplelist_to_hist
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from tools.ROOT_utils import set_root_defaults
+# @BROKEN
+from dps.config.variable_binning import bin_edges
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+from dps.utils.ROOT_utils import set_root_defaults
 # from examples.Bin_Centers import nbins
-from config import XSectionConfig
+from dps.config import XSectionConfig
 used_k = 2
 
 font = {'family' : 'normal',

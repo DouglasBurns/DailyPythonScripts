@@ -4,8 +4,7 @@ Created on 12 Nov 2012
 @author: kreczko
 '''
 
-from rootpy import asrootpy
-from tools.hist_utilities import rebin_asymmetric
+from .hist_utilities import rebin_asymmetric
 
 def get_bin_centers(bin_edges):
     centers = []

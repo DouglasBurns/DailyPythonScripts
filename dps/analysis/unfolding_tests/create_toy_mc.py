@@ -14,10 +14,10 @@ This script uses around 300 MB RAM per instance for n=10000
 '''
 from optparse import OptionParser
 from rootpy.io import File
-from config import XSectionConfig
-from tools.ROOT_utils import set_root_defaults
+from dps.config import XSectionConfig
+from dps.utils.ROOT_utils import set_root_defaults
 from rootpy.io.file import root_open
-from config.variable_binning import bin_edges_vis
+from dps.config.variable_binning import bin_edges_vis
 from rootpy import asrootpy
 
 
@@ -63,9 +63,9 @@ def main():
 
 
 def create_toy_mc(input_file, sample, output_folder, n_toy, centre_of_mass, ttbar_xsection):
-    from tools.file_utilities import make_folder_if_not_exists
-    from tools.toy_mc import generate_toy_MC_from_distribution, generate_toy_MC_from_2Ddistribution
-    from tools.Unfolding import get_unfold_histogram_tuple
+    from dps.utils.file_utilities import make_folder_if_not_exists
+    from dps.utils.toy_mc import generate_toy_MC_from_distribution, generate_toy_MC_from_2Ddistribution
+    from dps.utils.Unfolding import get_unfold_histogram_tuple
     make_folder_if_not_exists(output_folder)
     input_file_hists = File(input_file)
     output_file_name = get_output_file_name(output_folder, sample, n_toy, centre_of_mass)

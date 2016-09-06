@@ -14,8 +14,8 @@ Output consists of an estimated number of events and error
 '''
 from __future__ import division
 from math import sqrt
-import tools.ROOTFileReader as FileReader
-import tools.PlottingUtilities as plotting
+import dps.utils.ROOTFileReader as FileReader
+import dps.utils.PlottingUtilities as plotting
 import FILES
 try:
     from uncertainties import ufloat

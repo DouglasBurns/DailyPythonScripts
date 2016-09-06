@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 # import config.summations as summations
 from ROOT import TGraphAsymmErrors, TF1
 from array import array
-from config import CMS
-from tools.ROOT_utils import set_root_defaults
+from dps.config import CMS
+from dps.utils.ROOT_utils import set_root_defaults
 import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 

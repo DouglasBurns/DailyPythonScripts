@@ -42,12 +42,12 @@ N^{\text{rec\&gen}}_0
 from __future__ import print_function
 from rootpy import asrootpy
 from rootpy.io import File
-from tools.Calculation import calculate_purities, calculate_stabilities
-from tools.hist_utilities import rebin_2d
-from config import XSectionConfig
+from dps.utils.Calculation import calculate_purities, calculate_stabilities
+from dps.utils.hist_utilities import rebin_2d
+from dps.config import XSectionConfig
 from optparse import OptionParser
-from config.variable_binning import bin_edges_full, minimum_bin_width
-from tools.file_utilities import write_data_to_JSON
+from dps.config.variable_binning import bin_edges_full, minimum_bin_width
+from dps.utils.file_utilities import write_data_to_JSON
 from ROOT import TH1, TCanvas, TLine, gDirectory, TObjArray
 def main():
     '''

@@ -5,16 +5,15 @@ import sys
 # rootpy
 from rootpy.io import File
 # DailyPythonScripts
-from config.summations_common import b_tag_summations
-from config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges
-from config import XSectionConfig
+from dps.config.summations_common import b_tag_summations
+from dps.config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges
+from dps.config import XSectionConfig
 
-from tools.Calculation import decombine_result, combine_complex_results
-from tools.Fitting import Minuit, RooFitFit, FitData, FitDataCollection
-from tools.file_utilities import write_data_to_JSON
-from tools.ROOT_utils import set_root_defaults, get_histograms_from_trees
-from tools.hist_utilities import clean_control_region, adjust_overflow_to_limit, get_data_derived_qcd
-from lib import closure_tests
+from dps.utils.Calculation import combine_complex_results
+from dps.utils.Fitting import Minuit, RooFitFit, FitData, FitDataCollection
+from dps.utils.file_utilities import write_data_to_JSON
+from dps.utils.ROOT_utils import set_root_defaults, get_histograms_from_trees
+from .lib import closure_tests
 
 def get_histograms( channel, input_files, variable, met_systematic, met_type, variable_bin,
                    b_tag_bin, 

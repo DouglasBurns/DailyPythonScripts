@@ -5,16 +5,16 @@ Created on 20 Jul 2014
 '''
 import os
 from optparse import OptionParser
-
-from config import XSectionConfig, fit_var_inputs, latex_labels
-from src.cross_section_measurement.lib import closure_tests, read_fit_templates, \
+# @BROKEN
+from dps.config import XSectionConfig, fit_var_inputs, latex_labels
+from .lib import closure_tests, read_fit_templates, \
     read_initial_normalisation
-from tools.file_utilities import read_data_from_JSON, write_data_to_JSON
-from config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges, bin_edges_vis
-from tools.Fitting import FitData, FitDataCollection, Minuit
-from tools.hist_utilities import value_tuplelist_to_hist
-from tools.plotting import Histogram_properties, compare_measurements
-from config import CMS
+from dps.utils.file_utilities import read_data_from_JSON, write_data_to_JSON
+from dps.config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges, bin_edges_vis
+from dps.utils.Fitting import FitData, FitDataCollection, Minuit
+from dps.utils.hist_utilities import value_tuplelist_to_hist
+from dps.utils.plotting import Histogram_properties, compare_measurements
+from dps.config import CMS
 from matplotlib import rc
 rc( 'font', **CMS.font )
 rc( 'text', usetex = True )

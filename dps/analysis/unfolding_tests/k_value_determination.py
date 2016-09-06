@@ -27,13 +27,13 @@ from rootpy import asrootpy
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-from tools.file_utilities import make_folder_if_not_exists
-from tools.hist_utilities import value_error_tuplelist_to_hist, get_fit_results_histogram
-from tools.ROOT_utils import set_root_defaults
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from config.variable_binning import bin_edges_full
-from config import CMS, XSectionConfig
-from config.latex_labels import variables_latex
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.hist_utilities import get_fit_results_histogram
+from dps.utils.ROOT_utils import set_root_defaults
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+from dps.config.variable_binning import bin_edges_full
+from dps.config import CMS, XSectionConfig
+from dps.config.latex_labels import variables_latex
 
 
 matplotlib.rc('font',**CMS.font)

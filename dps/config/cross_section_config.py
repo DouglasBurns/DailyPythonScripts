@@ -1,5 +1,5 @@
 from __future__ import division
-import tools.measurement
+import dps.utils.measurement
 
 class XSectionConfig():
     current_analysis_path = '/hdfs/TopQuarkGroup/run2/atOutput/'
@@ -291,20 +291,20 @@ class XSectionConfig():
             if 'QCD' in systematic:
                 affected_samples = ['QCD']
 
-            sp = tools.measurement.Systematic( 
+            sp = dps.utils.measurement.Systematic( 
                         systematic + '+',
                         # systematic + '_up',
-                        stype = tools.measurement.Systematic.RATE,
+                        stype = dps.utils.measurement.Systematic.RATE,
                         affected_samples = affected_samples,
                         scale = 1 + self.rate_changing_systematics[systematic],
                         )
             scale = 1 - self.rate_changing_systematics[systematic]
             if scale <= 0: scale = 10e-5
 
-            sm = tools.measurement.Systematic( 
+            sm = dps.utils.measurement.Systematic( 
                         systematic + '-',
                         # systematic + '_down',
-                        stype = tools.measurement.Systematic.RATE,
+                        stype = dps.utils.measurement.Systematic.RATE,
                         affected_samples = affected_samples,
                         scale = scale,
                         )

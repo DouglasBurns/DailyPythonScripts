@@ -10,15 +10,15 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import rootpy.plotting.root2matplotlib as rplt
 
-from src.cross_section_measurement.lib import read_xsection_measurement_results
-from config import XSectionConfig
-from config.variable_binning import bin_edges_full
-from config.latex_labels import variables_latex
-from config import CMS
+from .lib import read_xsection_measurement_results
+from dps.config import XSectionConfig
+from dps.config.variable_binning import bin_edges_full
+from dps.config.latex_labels import variables_latex
+from dps.config import CMS
 from rootpy.plotting import Graph
 from ROOT import kRed, kMagenta, kBlue
 from matplotlib.ticker import MultipleLocator
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 
 output_formats = ['pdf', 'png']
 

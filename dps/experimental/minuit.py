@@ -1,5 +1,5 @@
 from iminuit import describe
-from tools.Fitting import IMinuit, FitData, FitDataCollection
+from dps.utils.Fitting import IMinuit, FitData, FitDataCollection
 from rootpy.plotting import Hist
 import numpy as np
 

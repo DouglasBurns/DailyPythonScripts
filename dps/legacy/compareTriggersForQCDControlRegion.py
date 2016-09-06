@@ -4,8 +4,8 @@
 #Step 4: Profit
 
 import FILES
-import tools.ROOTFileReader as FileReader
-import tools.PlottingUtilities as plotting
+import dps.utils.ROOTFileReader as FileReader
+import dps.utils.PlottingUtilities as plotting
 from ROOT import *
 gROOT.SetBatch(True)
 gROOT.ProcessLine('gErrorIgnoreLevel = 5001;')

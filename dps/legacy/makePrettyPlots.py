@@ -13,7 +13,7 @@ important features:
 
 '''
 
-import tools.PlottingUtilities as plotting
+import dps.utils.PlottingUtilities as plotting
 import FILES
 import ROOTFileReader as reader
 import QCDRateEstimation

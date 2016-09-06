@@ -7,7 +7,7 @@ Email: Lukasz.Kreczko@cern.ch
 '''
 #from ROOT import *
 from ROOT import RooRealVar, RooDataHist, RooArgList, RooHistPdf, RooArgSet, RooAddPdf, RooMCStudy, RooFit
-import tools.ROOTFileReader as FileReader
+import dps.utils.ROOTFileReader as FileReader
 import FILES
 from math import sqrt
 

@@ -1,9 +1,10 @@
 import ROOT
 from optparse import OptionParser
-from config.variable_binning_8TeV import variable_bins_ROOT, variable_bins_latex
-from config.met_systematics import metsystematics_sources, metsystematics_sources_latex
-from tools.Calculation import getRelativeError, symmetriseErrors, calculateTotalUncertainty
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+# @BROKEN
+from dps.config.variable_binning_8TeV import variable_bins_ROOT, variable_bins_latex
+from dps.config.met_systematics import metsystematics_sources, metsystematics_sources_latex
+from dps.utils.Calculation import getRelativeError, symmetriseErrors, calculateTotalUncertainty
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
 from math import sqrt
 
 categories = [ 'central', 'matchingup', 'matchingdown', 'scaleup', 'scaledown', 'BJet_down', 'BJet_up', 'JES_down', 'JES_up', 'LightJet_down', 'LightJet_up', 'PU_down', 'PU_up' ]

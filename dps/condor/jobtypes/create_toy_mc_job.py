@@ -1,7 +1,7 @@
 '''
     Condor jobs description for src/unfolding_tests/create_toy_mc
 '''
-from condor import Job
+from .. import Job
 
 
 class CreateToyMCJob(Job):
@@ -21,7 +21,7 @@ class CreateToyMCJob(Job):
         self.additional_input_files = [input_file]
 
     def run(self):
-        import src.unfolding_tests.create_toy_mc as toy
+        import dps.analysis.unfolding_tests.create_toy_mc as toy
         toy.create_toy_mc(input_file=self.input_file,
                           output_folder=self.output_folder,
                           variable=self.variable,
@@ -59,7 +59,7 @@ class CreateToyMCJob(Job):
             yield i + 1, len(l[i:i + new_n])
 
     def tar_output(self, job_id, subjob_id):
-        import src.unfolding_tests.create_toy_mc as toy
+        import dps.analysis.unfolding_tests.create_toy_mc as toy
         import shutil
         output_file = toy.get_output_file_name(self.output_folder,
                                                self.start_at,

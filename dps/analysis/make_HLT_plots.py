@@ -5,11 +5,11 @@ from rootpy import asrootpy
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 # from matplotlib.ticker import AutoMinorLocator
-# import config.summations as summations
+# import dps.config.summations as summations
 from ROOT import TEfficiency, TGraphAsymmErrors, TF1, TLegend, TLatex
 from array import array
-from config import CMS
-from tools.ROOT_utils import set_root_defaults
+from dps.config import CMS
+from dps.utils.ROOT_utils import set_root_defaults
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 

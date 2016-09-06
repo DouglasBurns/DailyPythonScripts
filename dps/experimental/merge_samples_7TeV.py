@@ -1,8 +1,8 @@
-from config.summations_7TeV import sample_summations
-from config import XSectionConfig
-from tools.file_utilities import make_folder_if_not_exists
+from dps.config.summations_7TeV import sample_summations
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import make_folder_if_not_exists
 
-from tools.file_utilities import merge_ROOT_files
+from dps.utils.file_utilities import merge_ROOT_files
 import os
 import subprocess
 import time

@@ -1,14 +1,14 @@
 # Library for all cross section measurement specific functions
 # that need to be shared between scripts
 from rootpy.io import File
-from config.variable_binning import bin_edges_vis
+from dps.config.variable_binning import bin_edges_vis
 
-from tools.hist_utilities import value_error_tuplelist_to_hist, value_errors_tuplelist_to_graph
-from tools.file_utilities import read_data_from_JSON
-from tools.Timer import Timer
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist, value_errors_tuplelist_to_graph
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.Timer import Timer
 
-from tools.logger import log
-mylog = log["src.cross_section_measurement.lib"]
+from dps.utils.logger import log
+mylog = log["dps.analysis.xsection.lib"]
 
 closure_tests = {
     'simple': {'V+Jets': 1.1, 'SingleTop': 1.2, 'TTJet': 1.3, 'QCD': 1.5},

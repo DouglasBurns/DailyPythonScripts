@@ -1,13 +1,13 @@
 
-from tools.file_utilities import read_data_from_JSON
-from tools.Unfolding import get_unfold_histogram_tuple, removeFakes
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.Unfolding import get_unfold_histogram_tuple, removeFakes
 from rootpy.io import File
 from rootpy import asrootpy
-from tools.hist_utilities import value_error_tuplelist_to_hist
-from config.cross_section_config import XSectionConfig
-from config.variable_binning import reco_bin_edges_vis
-from tools.plotting import compare_measurements, Histogram_properties
-from config import latex_labels
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
+from dps.config.cross_section_config import XSectionConfig
+from dps.config.variable_binning import reco_bin_edges_vis
+from dps.utils.plotting import compare_measurements, Histogram_properties
+from dps.config import latex_labels
 
 
 

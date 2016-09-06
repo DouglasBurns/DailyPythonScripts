@@ -5,7 +5,7 @@
 import FILES
 from ROOT import TFile
 from rootpy.io import File
-import tools.ROOTFileReader as fileReader
+import dps.utils.ROOTFileReader as fileReader
 from optparse import OptionParser
 
 btag_bins_available = ['0btag', '1btag', '2btags', '3btags', '4orMoreBtags'

@@ -4,33 +4,32 @@ from optparse import OptionParser
 import os, gc
 from copy import deepcopy
 
-from config.latex_labels import variables_latex, measurements_latex, \
-b_tag_bins_latex, fit_variables_latex
-from config.variable_binning import bin_edges_full, variable_bins_ROOT, variable_bins_visiblePS_ROOT, fit_variable_bin_edges,\
+from dps.config.latex_labels import variables_latex, measurements_latex, fit_variables_latex
+from dps.config.variable_binning import bin_edges_full, variable_bins_ROOT, variable_bins_visiblePS_ROOT, fit_variable_bin_edges,\
     bin_edges_vis
-from config import XSectionConfig
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.hist_utilities import value_error_tuplelist_to_hist, \
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist, \
 value_tuplelist_to_hist, value_errors_tuplelist_to_graph, graph_to_value_errors_tuplelist
 from math import sqrt
 # rootpy & matplotlib
 from ROOT import kRed, kGreen, kMagenta, kBlue, kBlack
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 import matplotlib as mpl
-from tools.plotting import get_best_max_y
+from dps.utils.plotting import get_best_max_y
 mpl.use( 'agg' )
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
-from config import CMS
-from tools.latex import setup_matplotlib
+from dps.config import CMS
+from dps.utils.latex import setup_matplotlib
 # latex, font, etc
 setup_matplotlib()
 
 import matplotlib.patches as mpatches
 
-from tools.logger import log
+from dps.utils.logger import log
 xsec_04_log = log["src/cross_section_measurement/04_make_plots_matplotlib"]
 
 @xsec_04_log.trace()
@@ -287,7 +286,7 @@ def make_template_plots( histograms, category, channel ):
 @xsec_04_log.trace()
 def plot_fit_results( histograms, category, channel ):
     global variable, b_tag_bin, output_folder, phase_space
-    from tools.plotting import Histogram_properties, make_data_mc_comparison_plot
+    from dps.utils.plotting import Histogram_properties, make_data_mc_comparison_plot
     fit_variables = histograms.keys()
 
     variableBins = None

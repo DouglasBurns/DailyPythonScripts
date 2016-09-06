@@ -5,9 +5,9 @@ Created on Aug 1, 2012
 
 Email: Lukasz.Kreczko@cern.ch
 '''
-from tools import Styles
+from dps.utils.import Styles
 import FILES
-import tools.ROOTFileReader as FileReader
+import dps.utils.ROOTFileReader as FileReader
 
 from ROOT import *
 #import HistGetter

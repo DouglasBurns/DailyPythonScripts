@@ -2,8 +2,8 @@ from rootpy.io import root_open
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
-from config import CMS
-from tools.hist_utilities import value_error_tuplelist_to_hist, hist_to_value_error_tuplelist
+from dps.config import CMS
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist, hist_to_value_error_tuplelist
 
 def normalise(histograms):
     for histogram in histograms:

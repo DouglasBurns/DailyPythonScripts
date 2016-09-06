@@ -1,8 +1,8 @@
 import unittest
 
-import tools.ROOT_utils as ru
+import ..ROOT_utils as ru
 from rootpy.io import File
-from tests.data import create_test_tree
+from dps.tests.data import create_test_tree
 
 
 

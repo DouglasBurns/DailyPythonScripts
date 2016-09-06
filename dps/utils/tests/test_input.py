@@ -5,8 +5,8 @@ Created on 21 Jul 2015
 '''
 import unittest
 from rootpy.io import File
-from tests.data import create_test_tree, create_test_hist
-import tools.input as ti
+from dps.tests.data import create_test_tree, create_test_hist
+import dps.utils.input as ti
 
 
 class Test(unittest.TestCase):

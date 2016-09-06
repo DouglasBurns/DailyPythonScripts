@@ -1,9 +1,9 @@
-from condor import Job
+from .. import Job
 
 
 class ProduceUnfoldingHistsJob(Job):
     '''
-        Condor job class for src.produce_unfold_hists.py
+        Condor job class for dps.analysis.produce_unfold_hists.py
     '''
 
     def __init__(self, params):

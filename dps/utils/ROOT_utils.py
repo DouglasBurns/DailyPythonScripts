@@ -8,8 +8,8 @@ from rootpy.io import File
 from ROOT import gROOT, TH1F
 from rootpy.plotting import Hist
 gcd = gROOT.cd
-import config.summations_common as sumations
-from tools.logger import log
+import dps.config.summations_common as sumations
+from .logger import log
 
 # define logger for this module
 root_utils_log = log["ROOT_Utils"]

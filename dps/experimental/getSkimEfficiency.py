@@ -5,7 +5,7 @@ import sys
 from ROOT import *
 import glob
 from legacy.fileInfo import getROOTFiles
-from tools.ROOT_utils import get_histogram_from_file
+from dps.utils.ROOT_utils import get_histogram_from_file
 
 pathToSkimHist = "topPairEPlusJetsSelectionAnalyser/consecutiveCuts_unweighted"
 

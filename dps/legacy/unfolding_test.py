@@ -6,10 +6,10 @@ import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 from rootpy import asrootpy
 from array import array
-from tools.Unfolding import Unfolding
-import config.RooUnfold as unfoldCfg
-from config import CMS, RooUnfold
-from tools.ROOT_utililities import set_root_defaults
+from dps.utils.Unfolding import Unfolding
+import dps.config.RooUnfold as unfoldCfg
+from dps.config import CMS, RooUnfold
+from dps.utils.ROOT_utils import set_root_defaults
 
 def saveClosureTest(unfolding, outputfile, **kwargs):
     

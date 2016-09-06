@@ -4,8 +4,6 @@ Created on 18 Dec 2012
 @author: kreczko
 '''
 from optparse import OptionParser
-#import grid utilities
-from tools.grid_utilities import fetch_grid_file, delete_grid_folder, remote_copy_folder
 
 def rm(filename, recursive = False):
     pass

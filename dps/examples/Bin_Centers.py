@@ -4,7 +4,7 @@ Created on 12 Nov 2012
 @author: kreczko
 '''
 
-from tools.datapoint_position import get_bin_centers, barycenters, calculate_correct_x_coordinates
+from dps.utils.datapoint_position import get_bin_centers, barycenters, calculate_correct_x_coordinates
 from rootpy.io import File
 from rootpy.plotting import Hist, Graph
 import rootpy.plotting.root2matplotlib as rplt

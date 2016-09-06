@@ -4,9 +4,9 @@ Created on 31 Oct 2012
 @author: kreczko
 '''
 from ROOT import gSystem, cout, TDecompSVD
-from tools.ROOT_utils import set_root_defaults
+from .ROOT_utils import set_root_defaults
 set_root_defaults(set_batch=True, msg_ignore_level=3001)
-from tools.hist_utilities import hist_to_value_error_tuplelist
+from .hist_utilities import hist_to_value_error_tuplelist
 from ROOT import TUnfoldDensity, TUnfold
 from ROOT import TH2D, TH1D, TGraph
 from rootpy import asrootpy

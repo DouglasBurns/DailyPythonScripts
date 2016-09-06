@@ -8,7 +8,7 @@ from rootpy.interactive import wait
 from rootpy.plotting import Hist
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
-from tools.plotting import make_plot, Histogram_properties
+from dps.utils.plotting import make_plot, Histogram_properties
 
 if __name__ == '__main__':
     # file available on soolin:

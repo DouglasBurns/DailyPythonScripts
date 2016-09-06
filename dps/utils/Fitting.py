@@ -11,7 +11,7 @@ RooCategory, RooSimultaneous, RooDataSet, RooRealSumPdf, RooHistFunc
 from array import array
 import math
 import logging
-from hist_utilities import adjust_overflow_to_limit
+from .hist_utilities import adjust_overflow_to_limit
 import rootpy.stl as stl
 from copy import deepcopy
 # RooFit is really verbose. Make it stop

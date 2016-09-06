@@ -17,19 +17,18 @@
 '''
 from __future__ import division
 from optparse import OptionParser
-# from tools.ROOT_utils import set_root_defaults, get_histogram_from_file
-import tools.ROOT_utils
-from tools.logger import log
-from config import XSectionConfig
-from src.cross_section_measurement.lib import closure_tests
-from tools.file_utilities import write_data_to_JSON
-from tools.hist_utilities import clean_control_region, \
+from dps.utils.logger import log
+from dps.config import XSectionConfig
+from .lib import closure_tests
+from dps.utils.file_utilities import write_data_to_JSON
+from dps.utils.hist_utilities import clean_control_region, \
     hist_to_value_error_tuplelist, fix_overflow
 
 import glob
-import tools.measurement
 from copy import deepcopy
-from tools.Calculation import combine_complex_results
+from dps.utils.Calculation import combine_complex_results
+from dps.utils.measurement import Measurement
+from dps.utils.ROOT_utils import set_root_defaults
 
 # define logger for this module
 mylog = log["01b_get_ttjet_normalisation"]
@@ -132,7 +131,7 @@ class TTJetNormalisation(object):
 
     @mylog.trace()
     def simultaneous_fit(self, histograms):
-        from tools.Fitting import FitData, FitDataCollection, Minuit
+        from dps.utils.Fitting import FitData, FitDataCollection, Minuit
         print('not in production yet')
         fitter = None
         fit_data_collection = FitDataCollection()
@@ -273,7 +272,7 @@ def main():
         measurement_files = glob.glob(input_template.format(**inputs))
         for f in sorted(measurement_files):
             print('Processing file ' + f)
-            measurement = tools.measurement.Measurement.fromJSON(f)
+            measurement = Measurement.fromJSON(f)
             # for each measurement
             norm = TTJetNormalisation(
                 config=measurement_config,
@@ -312,7 +311,7 @@ def get_category_from_file(json_file):
     return category
 
 if __name__ == '__main__':
-    tools.ROOT_utils.set_root_defaults()
+    set_root_defaults()
 
     options, args = parse_options()
 

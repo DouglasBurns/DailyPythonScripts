@@ -2,15 +2,16 @@
     Provides the classes Measurement and Systematic
 '''
 from __future__ import division
-from tools import log
-import tools.ROOT_utils
-import tools.file_utilities as fu
-import tools.hist_utilities as hu
-import tools.input as ti
+from . import log
 import copy
 from rootpy.io.file import Directory
+from dps.utils.ROOT_utils import get_histogram_from_file
+from dps.utils.file_utilities import make_folder_if_not_exists,\
+    write_data_to_JSON, read_data_from_JSON
+from dps.utils.input import Input
+from dps.utils.hist_utilities import clean_control_region
 # define logger for this module
-meas_log = log["tools.measurement"]
+meas_log = log["dps.utils.measurement"]
 
 
 class Measurement():
@@ -72,8 +73,8 @@ class Measurement():
         output = self.toDict()
         filename = JSON_file.split('/')[-1]
         directory = JSON_file.replace(filename, '')
-        fu.make_folder_if_not_exists(directory)
-        fu.write_data_to_JSON(output, JSON_file)
+        make_folder_if_not_exists(directory)
+        write_data_to_JSON(output, JSON_file)
 
     @meas_log.trace()
     def toDict(self):
@@ -98,7 +99,7 @@ class Measurement():
 
     @staticmethod
     def fromJSON(JSON_file):
-        src = fu.read_data_from_JSON(JSON_file)
+        src = read_data_from_JSON(JSON_file)
         m = Measurement.fromDict(src)
 
         return m
@@ -106,9 +107,9 @@ class Measurement():
     @staticmethod
     def fromDict(d):
         m = None
-        if d['class'] == 'tools.measurement.Measurement':
+        if d['class'] == 'dps.utils.measurement.Measurement':
             m = Measurement(d['name'])
-        if d['class'] == 'tools.measurement.Systematic':
+        if d['class'] == 'dps.utils.measurement.Systematic':
             m = Systematic(d['name'], d['type'],
                            affected_samples=d['affected_samples'], scale=d['scale'])
         m.setVariable(d['variable'])
@@ -117,7 +118,7 @@ class Measurement():
         m.setMETType(d['met_type'])
         for sample, i in d['samples'].items():
             if i.has_key('input'):
-                inp = ti.Input(**i['input'])
+                inp = Input(**i['input'])
                 m.addSample(sample, read=True, input=inp)
             else:
                 m.addSample(sample, i['file'], i['hist'], read=True)
@@ -162,7 +163,7 @@ class Measurement():
         subtract = copy.copy(self.histograms.keys())
         subtract.remove(sample)
         subtract.remove('data')
-        hist = hu.clean_control_region(self.histograms,
+        hist = clean_control_region(self.histograms,
                                        data_label='data',
                                        subtract=subtract,
                                        fix_to_zero=True)
@@ -187,13 +188,13 @@ class Measurement():
         if self.samples[sample].has_key('input'):
             i = self.samples[sample]['input']
             if isinstance(i, dict):
-                i = ti.Input(**self.samples[sample]['input'])
+                i = Input(**self.samples[sample]['input'])
             self.histograms[sample] = i.read()
             return
         input_file = self.samples[sample]['input_file']
         if self.samples[sample].has_key('hist'):
             hist = self.samples[sample]['hist']
-            self.histograms[sample] = tools.ROOT_utils.get_histogram_from_file(
+            self.histograms[sample] = get_histogram_from_file(
                 hist, input_file)
 
     @meas_log.trace()

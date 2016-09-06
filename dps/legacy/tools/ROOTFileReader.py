@@ -1,6 +1,6 @@
 from ROOT import TFile, gROOT
-import tools.Log as Log
-from config.sampleSummations import btag_bins_inclusive, btag_sums
+import dps.utils.Log as Log
+from dps.config.sampleSummations import btag_bins_inclusive, btag_sums
 
 openRootFile = TFile.Open
 gcd = gROOT.cd

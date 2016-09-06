@@ -7,9 +7,9 @@ from optparse import OptionParser
 import os
 from rootpy.io import File
 from array import array
-from tools.Unfolding import Unfolding
-from config import RooUnfold
-from tools.file_utilities import write_data_to_JSON
+from dps.utils.Unfolding import Unfolding
+from dps.config import RooUnfold
+from dps.utils.file_utilities import write_data_to_JSON
 import multiprocessing
 
 def check_multiple_data_multiple_unfolding(input_file, method, channel):

@@ -4,17 +4,16 @@
 '''
 from rootpy.io import File
 
-from config.variable_binning import bin_edges_vis, bin_widths_visiblePS
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from tools.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
-from tools.Calculation import calculate_normalised_xsection
-from config.cross_section_config import XSectionConfig
-from tools.plotting import compare_measurements, Histogram_properties
-from config import latex_labels
+from dps.config.variable_binning import bin_edges_vis, bin_widths_visiblePS
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+from dps.utils.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
+from dps.utils.Calculation import calculate_normalised_xsection
+from dps.config.cross_section_config import XSectionConfig
+from dps.utils.plotting import compare_measurements, Histogram_properties
+from dps.config import latex_labels
 from rootpy import asrootpy
 from collections import OrderedDict
-from tools.latex import setup_matplotlib
-from math import sqrt
+from dps.utils.latex import setup_matplotlib
 # latex, font, etc
 setup_matplotlib()
 def main():

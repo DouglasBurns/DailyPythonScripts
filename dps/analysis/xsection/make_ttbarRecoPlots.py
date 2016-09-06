@@ -1,14 +1,13 @@
 from optparse import OptionParser
-from config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex, \
-    variables_latex, fit_variables_latex, control_plots_latex
-from config.variable_binning import variable_bins_ROOT, bin_edges_vis, control_plots_bins
-from config import XSectionConfig
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties, \
-make_control_region_comparison
-from tools.hist_utilities import prepare_histograms, clean_control_region, get_normalisation_error, get_fitted_normalisation
-from tools.ROOT_utils import get_histograms_from_trees, set_root_defaults
-from tools.latex import setup_matplotlib
+from dps.config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex, \
+    variables_latex
+from dps.config.variable_binning import bin_edges_vis
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
+from dps.utils.hist_utilities import prepare_histograms, get_normalisation_error, get_fitted_normalisation
+from dps.utils.ROOT_utils import get_histograms_from_trees, set_root_defaults
+from dps.utils.latex import setup_matplotlib
 # latex, font, etc
 setup_matplotlib()
 

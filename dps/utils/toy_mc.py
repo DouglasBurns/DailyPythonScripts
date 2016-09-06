@@ -5,9 +5,8 @@ Created on 11 Dec 2012
 '''
 from __future__ import division
 from numpy.random import poisson
-import numpy as np
 from math import sqrt
-from hist_utilities import value_error_tuplelist_to_hist
+from .hist_utilities import value_error_tuplelist_to_hist
 from numpy.ma.extras import average
 
 def generate_toy_MC_from_distribution( distribution ):

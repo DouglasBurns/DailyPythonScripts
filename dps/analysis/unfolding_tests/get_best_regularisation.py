@@ -29,19 +29,18 @@ import sys
 # rootpy
 from rootpy.io import File
 # DailyPythonScripts
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-#from src.cross_section_measurement.lib import get_unfold_histogram_tuple
-from tools.ROOT_utils import set_root_defaults, get_histogram_from_file
-from config import XSectionConfig
-from config.variable_binning import bin_edges_full, bin_edges_vis
-from tools.hist_utilities import value_error_tuplelist_to_hist
-from tools.table import PrintTable
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+#from dps.analysis.xsection.lib import get_unfold_histogram_tuple
+from dps.utils.ROOT_utils import set_root_defaults, get_histogram_from_file
+from dps.config import XSectionConfig, CMS
+from dps.config.variable_binning import bin_edges_full, bin_edges_vis
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
+from dps.utils.table import PrintTable
 import matplotlib.pyplot as plt
-from tools.plotting import Histogram_properties
+from dps.utils.plotting import Histogram_properties
 from matplotlib import rc
-from config import CMS
-from config.latex_labels import variables_latex
+from dps.config.latex_labels import variables_latex
 rc('font',**CMS.font)
 rc( 'text', usetex = True )
 

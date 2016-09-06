@@ -16,8 +16,8 @@ with the content
 '''
 from __future__ import division
 from rootpy.io import File
-from tools.QCD_rate_estimation import estimate_with_fit_to_relative_isolation
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.QCD_rate_estimation import estimate_with_fit_to_relative_isolation
+from dps.utils.ROOT_utils import set_root_defaults
 # one template function per variable
 def get_electron_absolute_eta_templates(b_tag):
     global electron_data_file, met_bins

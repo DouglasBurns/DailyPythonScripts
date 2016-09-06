@@ -1,8 +1,8 @@
-from config import CMS
+from dps.config import CMS
 from optparse import OptionParser
-from config import XSectionConfig
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.plotting import Histogram_properties
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.plotting import Histogram_properties
 
 from matplotlib import pyplot as plt
 from matplotlib import rc
@@ -12,8 +12,8 @@ rc( 'text', usetex = True )
 import rootpy.plotting.root2matplotlib as rplt
 from rootpy.plotting import Hist2D
 import linecache
-from config.variable_binning import variable_bins_ROOT
-from config.latex_labels import samples_latex
+from dps.config.variable_binning import variable_bins_ROOT
+from dps.config.latex_labels import samples_latex
 
 def get_fit_results( variable, channel ):
     global path_to_JSON, category, met_type

@@ -1,6 +1,7 @@
-from src.cross_section_measurement.lib import read_normalisation, read_fit_templates, read_initial_normalisation, closure_tests
-from config.variable_binning import bin_edges
-from config.latex_labels import samples_latex
+from dps.analysis.xsection.lib import read_normalisation, read_fit_templates, read_initial_normalisation, closure_tests
+# @BROKEN
+from dps.config.variable_binning import bin_edges
+from dps.config.latex_labels import samples_latex
 
 
 # All possible options

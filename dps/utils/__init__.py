@@ -1,4 +1,4 @@
-from tools.logger import log
+from .logger import log
 # define logger for this module
 tools_log = log["tools"]
 

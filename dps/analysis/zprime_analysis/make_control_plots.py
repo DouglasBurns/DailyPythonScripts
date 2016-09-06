@@ -5,10 +5,10 @@ Created on 4 May 2013
 '''
 
 
-from config import CMS
-from tools.ROOT_utils import get_histograms_from_files
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties
-from tools.hist_utilities import prepare_histograms
+from dps.config import CMS
+from dps.utils.ROOT_utils import get_histograms_from_files
+from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
+from dps.utils.hist_utilities import prepare_histograms
                 
 if __name__ == '__main__':
     CMS.title['fontsize'] = 40
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     CMS.axis_label_minor['labelsize'] = 40
     CMS.legend_properties['size'] = 40
     
-    from config.latex_labels import b_tag_bins_latex, samples_latex
+    from dps.config.latex_labels import b_tag_bins_latex, samples_latex
     
     path_to_files = '/storage/TopQuarkGroup/results/histogramfiles/AN-11-265_V2/'
     lumi = 5028

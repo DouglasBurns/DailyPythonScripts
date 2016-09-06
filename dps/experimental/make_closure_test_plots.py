@@ -1,6 +1,6 @@
-from src.cross_section_measurement.lib import read_normalisation, read_fit_templates, read_initial_normalisation, closure_tests
+from dps.analysis.xsection.lib import read_normalisation, read_fit_templates, read_initial_normalisation, closure_tests
 from rootpy.plotting import Hist
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties
+from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
 
 
 fit_variable_properties = {

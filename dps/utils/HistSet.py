@@ -4,11 +4,11 @@ Created on 8 Jan 2015
 @author: kreczko
 '''
 import sys
-from tools.plotting import Histogram_properties, make_shape_comparison_plot,\
+from .plotting import Histogram_properties, make_shape_comparison_plot,\
     make_data_mc_comparison_plot
 from ROOT_utils import get_histogram_from_file
 import types
-from tools.hist_utilities import conditional_rebin
+from .hist_utilities import conditional_rebin
 
 class HistSet():
     '''

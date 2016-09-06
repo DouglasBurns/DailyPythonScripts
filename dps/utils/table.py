@@ -4,8 +4,8 @@ Created on 25 Mar 2015
 @author: kreczko
 '''
 from tabulate import tabulate
-from tools.logger import log
-mylog = log["tools.table"]
+from .logger import log
+mylog = log["dps.utils.table"]
 
 
 class PrintTable():

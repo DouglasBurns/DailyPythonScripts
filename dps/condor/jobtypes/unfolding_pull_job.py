@@ -1,12 +1,12 @@
 '''
-    Condor job for src.unfolding_tests.create_unfolding_pull_data
+    Condor job for dps.analysis.unfolding_tests.create_unfolding_pull_data
 '''
-from condor import Job
+from .. import Job
 
 class UnfoldingPullJob(Job):
 
     '''
-        Condor job for src.unfolding_tests.create_unfolding_pull_data
+        Condor job for dps.analysis.unfolding_tests.create_unfolding_pull_data
     '''
 
     def __init__(self, input_file_name, method, channel,
@@ -37,7 +37,7 @@ class UnfoldingPullJob(Job):
         '''
             Run the workload
         '''
-        import src.unfolding_tests.create_unfolding_pull_data as pull
+        import dps.analysis.unfolding_tests.create_unfolding_pull_data as pull
         pull.create_unfolding_pull_data(self.input_file_name, self.method,
                                         self.channel, self.centre_of_mass,
                                         self.variable, self.n_toy_mc,
@@ -71,7 +71,7 @@ class UnfoldingPullJob(Job):
             In order not to double-count, use_n_toy needs to be reduced per job.
 
         '''
-        import src.unfolding_tests.create_unfolding_pull_data as pull
+        import dps.analysis.unfolding_tests.create_unfolding_pull_data as pull
         if n == 1:
             return self
         run_matrix = pull.create_run_matrix(self.n_toy_mc,

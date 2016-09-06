@@ -1,8 +1,8 @@
 from optparse import OptionParser
-from read_BLT_ntuple import Particle, read_lepton_collections, match_four_momenta, get_parameters, set_parameter_limits, get_fitted_function_str
+from .read_BLT_ntuple import Particle, read_lepton_collections, match_four_momenta, get_parameters, set_parameter_limits, get_fitted_function_str
 from ROOT import TGraphAsymmErrors, TF1
-from tools.ROOT_utils import set_root_defaults
-from tools.file_utilities import make_folder_if_not_exists
+from dps.utils.ROOT_utils import set_root_defaults
+from dps.utils.file_utilities import make_folder_if_not_exists
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
@@ -16,7 +16,7 @@ import numpy
 from numpy import frompyfunc
 from pylab import plot
 
-from config import CMS
+from dps.config import CMS
 from matplotlib import rc
 rc( 'font', **CMS.font )
 rc( 'text', usetex = True )

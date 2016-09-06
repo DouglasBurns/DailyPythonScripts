@@ -14,15 +14,15 @@ from optparse import OptionParser
 from rootpy.io import File
 import matplotlib
 from copy import deepcopy
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 
-from tools.file_utilities import make_folder_if_not_exists
-from tools.hist_utilities import get_fit_results_histogram
-from tools.plotting import make_plot, Histogram_properties
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from config.variable_binning import bin_edges_vis
-from config import CMS, XSectionConfig
-from config.latex_labels import variables_latex
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.hist_utilities import get_fit_results_histogram
+from dps.utils.plotting import make_plot, Histogram_properties
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+from dps.config.variable_binning import bin_edges_vis
+from dps.config import CMS, XSectionConfig
+from dps.config.latex_labels import variables_latex
 
 matplotlib.use('agg')
 matplotlib.rc('font',**CMS.font)

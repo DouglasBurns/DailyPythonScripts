@@ -10,9 +10,9 @@ import numpy as np
 from rootpy.plotting import Hist2D
 
 # under test
-from tools.Calculation import calculate_purities
-from tools.Calculation import calculate_stabilities
-from tools.Calculation import decombine_result
+from ..Calculation import calculate_purities
+from ..Calculation import calculate_stabilities
+from ..Calculation import decombine_result
 
 class Test( unittest.TestCase ):
 

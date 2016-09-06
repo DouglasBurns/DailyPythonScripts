@@ -3,8 +3,8 @@ Created on 8 Nov 2012
 
 @author: kreczko
 '''
-
-from tools.Fitting import CurveFit
+# @BROKEN
+from dps.utils.Fitting import CurveFit
 import numpy as np
 from rootpy.plotting import Hist
 import rootpy.plotting.root2matplotlib as rplt

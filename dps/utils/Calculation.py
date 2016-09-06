@@ -5,9 +5,8 @@ Created on 20 Nov 2012
 '''
 from __future__ import division
 from uncertainties import ufloat
-import numpy
 from math import sqrt
-from config.met_systematics import metsystematics_sources
+from dps.config.met_systematics import metsystematics_sources
 from rootpy import asrootpy
 
 def calculate_xsection(inputs, luminosity, efficiency=1.):

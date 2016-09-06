@@ -14,8 +14,8 @@ outputFormat = CSV|plain|twiki|latex
 
 from __future__ import division
 from ROOT import *
-import tools.ROOTFileReader as FileReader
-import tools.PlottingUtilities as plotting
+import dps.utils.ROOTFileReader as FileReader
+import dps.utils.PlottingUtilities as plotting
 import FILES
 from math import sqrt
 import QCDRateEstimation

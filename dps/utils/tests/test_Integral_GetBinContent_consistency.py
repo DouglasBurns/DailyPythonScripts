@@ -1,11 +1,11 @@
 from __future__ import division
 import unittest
 from rootpy.plotting import Hist2D
-from tools.Calculation import calculate_purities, calculate_stabilities
+from ..Calculation import calculate_purities, calculate_stabilities
 import importlib
-from tools.hist_utilities import rebin_2d, fix_overflow
+from ..hist_utilities import rebin_2d, fix_overflow
 
-pick_bins = importlib.import_module( "src.cross_section_measurement.00_pick_bins" )
+pick_bins = importlib.import_module( "dps.analysis.xsection.00_pick_bins" )
 
 import numpy as np
 

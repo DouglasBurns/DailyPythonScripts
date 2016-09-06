@@ -1,16 +1,13 @@
 from optparse import OptionParser
-from config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex, \
-    variables_latex, fit_variables_latex, control_plots_latex
-from config.variable_binning import control_plots_bins
-from config.histogram_colours import histogram_colours as colours
-from config import XSectionConfig
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties, \
-make_control_region_comparison
-from rootpy.plotting import Hist
-from tools.hist_utilities import prepare_histograms, clean_control_region, get_normalisation_error, get_fitted_normalisation
-from tools.ROOT_utils import get_histograms_from_trees, set_root_defaults
-from tools.latex import setup_matplotlib
+from dps.config.latex_labels import samples_latex, variables_latex, control_plots_latex
+from dps.config.variable_binning import control_plots_bins
+from dps.config.histogram_colours import histogram_colours as colours
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.plotting import Histogram_properties, make_control_region_comparison
+from dps.utils.hist_utilities import prepare_histograms, clean_control_region
+from dps.utils.ROOT_utils import get_histograms_from_trees, set_root_defaults
+from dps.utils.latex import setup_matplotlib
 from uncertainties import ufloat
 
 # latex, font, etc

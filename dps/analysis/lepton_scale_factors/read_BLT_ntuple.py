@@ -7,7 +7,7 @@ Read the BLT ntuple and extract the trigger objects. Match them with reco object
 tag and probe studies to estimate single lepton trigger efficiency.
 
 '''
-from config import CMS
+from dps.config import CMS
 from rootpy.io import File
 from rootpy import asrootpy, ROOTError
 from optparse import OptionParser
@@ -23,10 +23,9 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from rootpy.plotting import Hist, Hist2D, Canvas, Efficiency
-from tools.ROOT_utils import set_root_defaults
-from tools.file_utilities import make_folder_if_not_exists
-from tools.hist_utilities import hist_to_value_error_tuplelist
-from tools.plotting import make_plot, Histogram_properties
+from dps.utils.ROOT_utils import set_root_defaults
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.plotting import make_plot, Histogram_properties
 from ROOT import TLorentzVector, TGraphAsymmErrors, TF1, gPad, gStyle
 from ROOT import RooFit, RooDataHist, RooArgList, RooAddPdf, RooRealVar, RooBreitWigner, RooExponential, RooFFTConvPdf, RooCBShape
 

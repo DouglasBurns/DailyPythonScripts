@@ -6,10 +6,10 @@ Created on 15 May 2014
 from __future__ import division
 import unittest
 from rootpy.io import File
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from tools.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
-from tools.ROOT_utils import set_root_defaults
-from config.variable_binning import bin_edges
+from ..Unfolding import Unfolding, get_unfold_histogram_tuple
+from ..hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
+from ..ROOT_utils import set_root_defaults
+from dps.config.variable_binning import bin_edges
 
 class Test( unittest.TestCase ):
 

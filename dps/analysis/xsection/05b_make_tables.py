@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
 '''
-src.cross_section_measurement.05b_make_tables -- creates tables for documentation
+dps.analysis.xsection.05b_make_tables -- creates tables for documentation
 
-src.cross_section_measurement.05b_make_tables is a script to create 
+dps.analysis.xsection.05b_make_tables is a script to create 
 
 
 @copyright:  2015 University of Bristol. All rights reserved.
@@ -18,14 +18,13 @@ import sys
 import os
 
 from optparse import OptionParser
-from config.cross_section_config import XSectionConfig
-from tools.table import PrintTable
-from src.cross_section_measurement.lib import read_initial_normalisation,\
+from dps.config.cross_section_config import XSectionConfig
+from dps.utils.table import PrintTable
+from .lib import read_initial_normalisation,\
     read_unfolded_normalisation
-from config.variable_binning import bin_edges_vis, bin_edges,\
-    variable_bins_latex, variable_bins_visiblePS_latex
+from dps.config.variable_binning import variable_bins_latex, variable_bins_visiblePS_latex
 
-from tools.logger import log
+from dps.utils.logger import log
 from math import ceil
 mylog = log["05_make_tables"]
 
@@ -224,7 +223,7 @@ if __name__ == "__main__":
     if PROFILE:
         import cProfile
         import pstats
-        profile_filename = 'src.cross_section_measurement.05b_make_tables_profile.txt'
+        profile_filename = 'dps.analysis.xsection.05b_make_tables_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
         p = pstats.Stats(profile_filename, stream=statsfile)

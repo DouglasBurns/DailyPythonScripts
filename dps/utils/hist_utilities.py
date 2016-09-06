@@ -13,8 +13,8 @@ from rootpy.plotting.hist import Hist2D
 import random
 import string
 from copy import deepcopy
-from tools.file_utilities import read_data_from_JSON
-from tools.logger import log
+from .file_utilities import read_data_from_JSON
+from .logger import log
 hu_log = log["tools/hist_utilities"]
 
 def hist_to_value_error_tuplelist( hist ):
@@ -349,8 +349,8 @@ def get_fitted_normalisation( variable, channel, path_to_JSON, category, met_typ
     This function now gets the error on the fit correctly,
     so that it can be applied if the --normalise_to_fit option is used
     '''
-    import config.variable_binning
-    variable_bins_ROOT = config.variable_binning.variable_bins_ROOT 
+    from dps.config import variable_binning as cfg_binning
+    variable_bins_ROOT = cfg_binning.variable_bins_ROOT 
     fit_results = read_data_from_JSON( path_to_JSON + variable + '/fit_results/' + category + '/fit_results_' + channel + '_' + met_type + '.txt' )
 
     N_fit_ttjet = [0, 0]

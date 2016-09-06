@@ -1,10 +1,11 @@
 from optparse import OptionParser
-import tools.plotting_utilities as plotting
+import dps.utils.plotting_utilities as plotting
 import os
-from config.variable_binning_8TeV import bin_edges, variable_bins_ROOT, eta_bin_edges
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.hist_utilities import value_error_tuplelist_to_hist, value_tuplelist_to_hist
-from tools.Calculation import calculateTotalUncertainty, symmetriseErrors
+# @BROKEN
+from dps.config.variable_binning_8TeV import bin_edges, variable_bins_ROOT, eta_bin_edges
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist, value_tuplelist_to_hist
+from dps.utils.Calculation import calculateTotalUncertainty, symmetriseErrors
 import ROOT
 from ROOT import TPaveText, kRed, TH1F, Double, TMinuit, Long, kGreen, gROOT, TCanvas, kMagenta, kBlue, TGraphAsymmErrors, TMath
 from ROOT import kAzure, kYellow, kViolet, THStack, gStyle

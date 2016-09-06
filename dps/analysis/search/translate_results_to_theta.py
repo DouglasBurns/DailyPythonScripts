@@ -26,9 +26,9 @@ from uncertainties import ufloat
 from math import sqrt
 from rootpy.io import root_open
 
-from tools.file_utilities import read_data_from_JSON
-from tools.hist_utilities import value_error_tuplelist_to_hist
-from config import XSectionConfig
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
+from dps.config import XSectionConfig
 
 def get_variable_from(variable='MET', path_to_JSON='data/8TeV', category='central', signal='Higgs', measurement_type='unfolded'):
     global met_type

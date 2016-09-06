@@ -4,7 +4,7 @@ Created on 26 Aug 2015
 @author: kreczko
 '''
 from rootpy.io.file import root_open, File
-from tools.ROOT_utils import root_mkdir
+from dps.utils.ROOT_utils import root_mkdir
 import shutil
 import subprocess
 

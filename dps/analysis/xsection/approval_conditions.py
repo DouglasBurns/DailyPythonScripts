@@ -2,16 +2,16 @@
 Approval conditions for TOP-15-013
 '''
 from __future__ import division
-from tools.plotting import Histogram_properties, compare_histograms, Plot, \
+from dps.utils.plotting import Histogram_properties, compare_histograms, Plot, \
     ErrorBand, compare_measurements
-from tools.file_utilities import read_data_from_JSON
-from tools.hist_utilities import value_error_tuplelist_to_hist,\
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist,\
     clean_control_region, absolute, value_tuplelist_to_hist, spread_x,\
     value_errors_tuplelist_to_graph
-from config.variable_binning import bin_edges_vis
-from config.latex_labels import variables_latex
-from tools.ROOT_utils import get_histogram_from_tree
-from config.cross_section_config import XSectionConfig
+from dps.config.variable_binning import bin_edges_vis
+from dps.config.latex_labels import variables_latex
+from dps.utils.ROOT_utils import get_histogram_from_tree
+from dps.config.cross_section_config import XSectionConfig
 from collections import namedtuple
 
 
@@ -432,7 +432,7 @@ def debug_last_bin():
 if __name__ == '__main__':
     import sys
     if '-d' in sys.argv:
-        from tools.logger import log
+        from dps.utils.logger import log
         log.setLevel(log.DEBUG)
 
     compare_combine_before_after_unfolding(measurement='unfolded_normalisation')

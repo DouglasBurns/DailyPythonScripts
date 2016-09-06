@@ -13,12 +13,11 @@ from ROOT import TGraphAsymmErrors, TGraph
 from rootpy import asrootpy
 import rootpy.plotting.root2matplotlib as rplt
 # DPS includes
-from src.unfolding_tests.make_unfolding_pull_plots import get_data, \
-    plot_pull
-from config import XSectionConfig, CMS
-from config.variable_binning import bin_edges_full
-from tools.ROOT_utils import set_root_defaults
-from tools.file_utilities import make_folder_if_not_exists
+from .make_unfolding_pull_plots import get_data, plot_pull
+from dps.config import CMS
+from dps.config.variable_binning import bin_edges_full
+from dps.utils.ROOT_utils import set_root_defaults
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 
 def main():

@@ -4,11 +4,10 @@
 '''
 from rootpy.io import File
 
-from config.variable_binning import bin_edges_vis
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple
-from config.cross_section_config import XSectionConfig
-from tools.plotting import compare_measurements, Histogram_properties
-from config import latex_labels
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
+from dps.config.cross_section_config import XSectionConfig
+from dps.utils.plotting import compare_measurements, Histogram_properties
+from dps.config import latex_labels
 
 
 def main():

@@ -12,7 +12,7 @@ Created on 15 Jan 2013
 from rootpy.logger import logging
 from ROOT import TFile, gROOT
 from argparse import ArgumentParser
-from tools.file_utilities import make_folder_if_not_exists, get_files_in_path, merge_ROOT_files, get_process_from_file
+from dps.utils.file_utilities import make_folder_if_not_exists, get_files_in_path, merge_ROOT_files, get_process_from_file
 
 File = TFile.Open
 gcd = gROOT.cd

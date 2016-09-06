@@ -7,15 +7,15 @@ from collections import OrderedDict
 from copy import copy, deepcopy
 
 from optparse import OptionParser
-from tools.ROOT_utils import get_histograms_from_files
-from tools.hist_utilities import prepare_histograms, clean_control_region, spread_x
-from tools.file_utilities import make_folder_if_not_exists
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties, make_shape_comparison_plot,\
+from dps.utils.ROOT_utils import get_histograms_from_files
+from dps.utils.hist_utilities import prepare_histograms, clean_control_region, spread_x
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties, make_shape_comparison_plot,\
     compare_measurements
-from config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex
-from config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges, bin_edges
-from config import XSectionConfig
-from tools.latex import setup_matplotlib
+from dps.config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex
+from dps.config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges, bin_edges_vis
+from dps.config import XSectionConfig
+from dps.utils.latex import setup_matplotlib
 # latex, font, etc
 setup_matplotlib()
 
@@ -37,7 +37,7 @@ b_tag_bin = '2orMoreBtags'
 b_tag_bin_ctl = '0orMoreBtag'
 category = 'central'
 
-variables = bin_edges.keys()
+variables = bin_edges_vis.keys()
 
 save_as = ['pdf']
     

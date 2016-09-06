@@ -11,11 +11,11 @@
 '''
 from __future__ import print_function
 from optparse import OptionParser
-import tools.measurement
-from config import XSectionConfig, variable_binning
-from tools.input import Input
-from tools.logger import log
+from dps.config import XSectionConfig, variable_binning
+from dps.utils.input import Input
+from dps.utils.logger import log
 from copy import deepcopy
+from dps.utils.measurement import Measurement, Systematic
 
 # define logger for this module
 create_measurement_log = log["01b_get_ttjet_normalisation"]
@@ -76,24 +76,24 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
     m = None
 
     if category == 'central':
-        m = tools.measurement.Measurement(category)
+        m = Measurement(category)
     else:
         vjet_systematics = [config.vjets_theory_systematic_prefix +
                             systematic for systematic in config.generator_systematics]
         if category in config.categories_and_prefixes.keys() or \
                 category in config.met_systematics_suffixes or \
                 category in vjet_systematics:
-            m = tools.measurement.Systematic(category,
-                                             stype=tools.measurement.Systematic.SHAPE,
-                                             affected_samples=config.samples)
+            m = Systematic(category,
+                           stype=Systematic.SHAPE,
+                           affected_samples=config.samples)
         elif category in config.rate_changing_systematics_names:
             m = config.rate_changing_systematics_values[category]
 
         elif category == 'QCD_shape':
-            m = tools.measurement.Systematic(category,
-                                             stype=tools.measurement.Systematic.SHAPE,
-                                             affected_samples=['QCD'],
-                                             )
+            m = Systematic(category,
+                           stype=Systematic.SHAPE,
+                           affected_samples=['QCD'],
+            )
 
     m.setVariable(variable)
     m.setCentreOfMassEnergy(com)
@@ -165,7 +165,7 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
         ),
     )
 
-    m_qcd = tools.measurement.Measurement(category)
+    m_qcd = Measurement(category)
     m_qcd.setVariable(variable)
     m_qcd.setCentreOfMassEnergy(com)
 
@@ -243,7 +243,7 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
     if category in [config.vjets_theory_systematic_prefix + systematic for systematic in config.generator_systematics]:
         v_template_category = category.replace(
             config.vjets_theory_systematic_prefix, '')
-        m_vjets = tools.measurement.Measurement(category)
+        m_vjets = Measurement(category)
         m_vjets.setVariable(variable)
         m_vjets.setCentreOfMassEnergy(com)
         if com == 7:  # special case for 7 TeV where we use 8 TeV shapes
@@ -281,7 +281,7 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
         path = base_path + '{category}.json'
         m.toJSON(path.format(**inputs))
     else:
-        if m.type == tools.measurement.Systematic.SHAPE:
+        if m.type == Systematic.SHAPE:
             inputs['type'] = 'shape_systematic'
         else:
             inputs['type'] = 'rate_systematic'
@@ -429,7 +429,7 @@ def create_input(config, sample, variable, category, channel, template,
     scale = 1.
 
     m = kwargs['measurement']
-    if m.type == tools.measurement.Systematic.RATE:
+    if m.type == Systematic.RATE:
         if 'luminosity' in m.name:
             lumi_scale = lumi_scale * m.scale
         else:

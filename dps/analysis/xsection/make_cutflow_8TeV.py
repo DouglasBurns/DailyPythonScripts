@@ -1,6 +1,6 @@
 from math import sqrt
-from tools.ROOT_utils import get_histograms_from_files
-from config import XSectionConfig
+from dps.utils.ROOT_utils import get_histograms_from_files
+from dps.config import XSectionConfig
 
 cuts = None
 cuts_electrons = [

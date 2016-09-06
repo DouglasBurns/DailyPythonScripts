@@ -9,12 +9,12 @@ from rootpy import asrootpy
 from rootpy.io import File
 from rootpy.plotting import Hist, Hist2D
 # DailyPythonScripts
-from config.variable_binning_8TeV import bin_widths, bin_edges
-from tools.Calculation import calculate_xsection, calculate_normalised_xsection
-from tools.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
-from tools.Unfolding import Unfolding
-from tools.file_utilities import read_data_from_JSON, write_data_to_JSON, make_folder_if_not_exists
-import config.RooUnfold as unfoldCfg
+from dps.config.variable_binning_8TeV import bin_widths, bin_edges
+from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsection
+from dps.utils.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
+from dps.utils.Unfolding import Unfolding
+from dps.utils.file_utilities import read_data_from_JSON, write_data_to_JSON, make_folder_if_not_exists
+import dps.config.RooUnfold as unfoldCfg
 
 luminosity = 5814
 ttbar_xsection = 225.19

@@ -1,8 +1,8 @@
 '''
     Condor jobs description for src/unfolding_tests/create_toy_mc_from_tree
 '''
-from condor import Job
-from config.cross_section_config import XSectionConfig
+from .. import Job
+from dps.config.cross_section_config import XSectionConfig
 
 
 class CreateToyMCFromTreeJob(Job):
@@ -20,7 +20,7 @@ class CreateToyMCFromTreeJob(Job):
         
 
     def run(self):
-        import src.unfolding_tests.create_toy_mc_from_tree as toy
+        import dps.analysis.unfolding_tests.create_toy_mc_from_tree as toy
         toy.generate_toy(
             n_toy=self.n_toy,
             n_input_mc=self.n_input_mc,
@@ -56,7 +56,7 @@ class CreateToyMCFromTreeJob(Job):
             yield i, len(l[i:i + new_n])
 
     def tar_output(self, job_id, subjob_id):
-        import src.unfolding_tests.create_toy_mc_from_tree as toy
+        import dps.analysis.unfolding_tests.create_toy_mc_from_tree as toy
         import shutil
         output_file = toy.get_output_file_name(self.output_folder,
                                                self.n_toy,

@@ -7,9 +7,9 @@ Email: Lukasz.Kreczko@cern.ch
 '''
 
 import FILES
-import tools.ROOTFileReader as FileReader
+import dps.utils.ROOTFileReader as FileReader
 from ROOT import gROOT
-import tools.FileUtilities as FileUtils
+import dps.utils.FileUtilities as FileUtils
 
 fileTemplate = 'data/correctionFactors/correctionFactors_%s_%s_JSON.txt'
 samples = [

@@ -1,13 +1,13 @@
 from __future__ import division  # the result of the division will be always a float
 from optparse import OptionParser
 from copy import deepcopy
-from config.latex_labels import variables_latex, variables_NonLatex, measurements_latex, samples_latex, typical_systematics_latex, met_systematics_latex
-from config.variable_binning import variable_bins_latex, variable_bins_ROOT, variable_bins_visiblePS_ROOT, variable_bins_visiblePS_latex, bin_edges_vis, bin_edges_full
-from config import XSectionConfig
-from tools.Calculation import getRelativeError
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists, read_xsection_measurement_results_with_errors
-from tools.hist_utilities import values_and_errors_to_hist
-from lib import read_normalisation, read_initial_normalisation
+from dps.config.latex_labels import variables_latex, variables_NonLatex, measurements_latex, samples_latex, typical_systematics_latex, met_systematics_latex
+from dps.config.variable_binning import variable_bins_latex, variable_bins_ROOT, variable_bins_visiblePS_ROOT, variable_bins_visiblePS_latex, bin_edges_vis, bin_edges_full
+from dps.config import XSectionConfig
+from dps.utils.Calculation import getRelativeError
+from dps.utils.file_utilities import make_folder_if_not_exists, read_xsection_measurement_results_with_errors
+from dps.utils.hist_utilities import values_and_errors_to_hist
+from .lib import read_normalisation, read_initial_normalisation
 import math
 import os.path
 from numpy import median
@@ -15,7 +15,7 @@ import matplotlib as mpl
 mpl.use( 'agg' )
 import matplotlib.pyplot as plt
 import rootpy.plotting.root2matplotlib as rplt
-from config import CMS
+from dps.config import CMS
 import matplotlib.cm as cm
 # use full stpectrum, yet use white for less than vmin=1 events
 my_cmap = cm.get_cmap( 'jet' )

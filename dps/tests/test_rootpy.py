@@ -4,7 +4,7 @@ Created on 21 Jul 2015
 @author: phxlk
 '''
 import unittest
-from tests.data import create_test_hist, create_test_tree
+from .data import create_test_hist, create_test_tree
 from rootpy.io.file import File
 
 class Test(unittest.TestCase):

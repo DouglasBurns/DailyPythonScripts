@@ -1,11 +1,11 @@
-from config import CMS
-from tools.ROOT_utils import get_histograms_from_files
+from dps.config import CMS
+from dps.utils.ROOT_utils import get_histograms_from_files
 
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 
-from make_control_region_plots import make_control_region_comparison
-from make_control_region_plots import make_control_region_data_mc_comparision
-from make_control_region_plots import prepare_histograms
+from .make_control_region_plots import make_control_region_comparison
+from .make_control_region_plots import make_control_region_data_mc_comparision
+from .make_control_region_plots import prepare_histograms
 
 if __name__ == '__main__':
     set_root_defaults()

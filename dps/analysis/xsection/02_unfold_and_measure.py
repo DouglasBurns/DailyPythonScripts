@@ -3,20 +3,20 @@ from __future__ import division
 from optparse import OptionParser
 # from array import array
 # rootpy
-from rootpy.io import File, root_open
+from rootpy.io import File
 from rootpy.plotting import Hist2D
 # DailyPythonScripts
-import config.RooUnfold as unfoldCfg
-from config.variable_binning import bin_widths, bin_widths_visiblePS, reco_bin_edges_full, reco_bin_edges_vis
-from config import XSectionConfig
-from tools.Calculation import calculate_xsection, calculate_normalised_xsection, \
+import dps.config.RooUnfold as unfoldCfg
+from dps.config.variable_binning import bin_widths, bin_widths_visiblePS, reco_bin_edges_full, reco_bin_edges_vis
+from dps.config import XSectionConfig
+from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsection, \
 combine_complex_results
-from tools.hist_utilities import hist_to_value_error_tuplelist, \
+from dps.utils.hist_utilities import hist_to_value_error_tuplelist, \
 value_error_tuplelist_to_hist
-from tools.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
-from tools.file_utilities import read_data_from_JSON, write_data_to_JSON
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
+from dps.utils.file_utilities import read_data_from_JSON, write_data_to_JSON
 from copy import deepcopy
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 # from ROOT import TGraph, TSpline3, TUnfoldDensity
 
 def unfold_results( results, category, channel, tau_value, h_truth, h_measured, h_response, h_fakes, method, visiblePS ):

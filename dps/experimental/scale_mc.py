@@ -8,9 +8,9 @@ Take the cross sections and processed events from config/dataset_info*
 Assume that the first part of the name is the process in question (and implement exceptions)
 '''
 from argparse import ArgumentParser
-from tools.file_utilities import get_process_from_file
-from config.dataset_info_7TeV import dataset_info as dataset_info_7TeV
-from config.dataset_info_8TeV import dataset_info as dataset_info_8TeV
+from dps.utils.file_utilities import get_process_from_file
+from dps.config.dataset_info_7TeV import dataset_info as dataset_info_7TeV
+from dps.config.dataset_info_8TeV import dataset_info as dataset_info_8TeV
 
 def scale_file(file_in_path):
     process_name = get_process_from_file(file_in_path)

@@ -7,7 +7,7 @@ import numpy as np
 from rootpy.plotting import Hist
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
-from config import CMS
+from dps.config import CMS
 CMS.axis_label_major['labelsize'] = 40
 CMS.title['fontsize'] = 40
 # create a normal distribution

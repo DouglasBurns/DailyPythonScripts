@@ -3,7 +3,7 @@ Created on 23 Jan 2015
 
 @author: phxlk
 '''
-from tools.file_utilities import read_data_from_JSON
+from dps.utils.file_utilities import read_data_from_JSON
 
 if __name__ == '__main__':
     JSON_input_file = 'data/absolute_eta_M3_angle_bl/7TeV/HT/fit_results/central/fit_results_muon_patType1CorrectedPFMet.txt'

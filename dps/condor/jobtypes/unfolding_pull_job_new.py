@@ -1,13 +1,13 @@
 '''
-    Condor job for src.unfolding_tests.create_unfolding_pull_data
+    Condor job for dps.analysis.unfolding_tests.create_unfolding_pull_data
 '''
-from condor import Job
-from config.cross_section_config import XSectionConfig
+from .. import Job
+from dps.config.cross_section_config import XSectionConfig
 
 class UnfoldingPullJob(Job):
 
     '''
-        Condor job for src.unfolding_tests.create_unfolding_pull_data
+        Condor job for dps.analysis.unfolding_tests.create_unfolding_pull_data
     '''
 
     def __init__(self, input_file_directory, method, channels,
@@ -47,8 +47,8 @@ class UnfoldingPullJob(Job):
         '''
             Run the workload
         '''
-        import src.unfolding_tests.create_unfolding_pull_data as pull
-        from tools.ROOT_utils import set_root_defaults
+        import dps.analysis.unfolding_tests.create_unfolding_pull_data as pull
+        from dps.utils.ROOT_utils import set_root_defaults
         set_root_defaults(msg_ignore_level=3001)
         pulls_file_name = pull.create_unfolding_pull_data(self.input_file_name,
                                         self.method,
@@ -62,7 +62,7 @@ class UnfoldingPullJob(Job):
                                         self.tau_value_to_run
                                         )
 
-        # import src.unfolding_tests.make_unfolding_pull_plots as plots
+        # import dps.analysis.unfolding_tests.make_unfolding_pull_plots as plots
         # plots.makeAllPlots(
         #     file_name = pulls_file_name,
         #     output_directory_base = 'plots/unfolding_pulls'
@@ -114,7 +114,6 @@ class UnfoldingPullJob(Job):
             Creates a tar file from the output of the job
         '''
         import tarfile
-        import os
         file_template = 'UnfoldingPullJob_{sample}'
         file_template += '_{com}TeV_{job_id}.{subjob_id}.tar.gz'
         output_file = file_template.format(

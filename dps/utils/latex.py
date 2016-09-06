@@ -5,7 +5,7 @@ Created on 5 May 2015
 '''
 
 from matplotlib import rc, rcParams
-from config import CMS
+from dps.config import CMS
 import subprocess
 import os
 from distutils.spawn import find_executable

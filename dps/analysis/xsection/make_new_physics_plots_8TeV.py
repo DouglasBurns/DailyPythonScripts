@@ -1,10 +1,10 @@
-from config import CMS, XSectionConfig
+from dps.config import CMS, XSectionConfig
 from optparse import OptionParser
-from tools.ROOT_utils import get_histograms_from_files
-from tools.file_utilities import read_data_from_JSON
-from tools.plotting import make_data_mc_comparison_plot, Histogram_properties
-from tools.hist_utilities import prepare_histograms
-from config.variable_binning import variable_bins_ROOT
+from dps.utils.ROOT_utils import get_histograms_from_files
+from dps.utils.file_utilities import read_data_from_JSON
+from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
+from dps.utils.hist_utilities import prepare_histograms
+from dps.config.variable_binning import variable_bins_ROOT
 
 def get_fitted_normalisation(variable, channel):
     global path_to_JSON, category, met_type
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     CMS.axis_label_minor['labelsize'] = 40
     CMS.legend_properties['size'] = 40
     
-    from config.latex_labels import b_tag_bins_latex, samples_latex
+    from dps.config.latex_labels import b_tag_bins_latex, samples_latex
     
     histogram_files = {
             'data' : measurement_config.data_file_electron,

@@ -4,7 +4,7 @@ Created on 14 May 2014
 @author: kreczko
 '''
 import unittest
-from config import XSectionConfig
+from .. import XSectionConfig
 from __builtin__ import getattr
 
 

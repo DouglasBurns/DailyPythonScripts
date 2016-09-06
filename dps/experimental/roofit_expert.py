@@ -6,11 +6,11 @@ import sys
 from rootpy.io import File
 from ROOT import RooFit, RooRealVar, RooDataHist, RooArgList, RooHistPdf, RooArgSet, RooAddPdf
 from ROOT import RooChi2Var, RooFormulaVar, RooMinuit, TCanvas, RooPlot, RooGaussian, RooProdPdf, RooLinkedList
-from config.variable_binning import variable_bins_ROOT
-from tools.Calculation import decombine_result
+from dps.config.variable_binning import variable_bins_ROOT
+from dps.utils.Calculation import decombine_result
 from uncertainties import ufloat
-from config import XSectionConfig
-from config.summations_common import b_tag_summations
+from dps.config import XSectionConfig
+from dps.config.summations_common import b_tag_summations
         
 # copied from 01_get_fit_results.py
 def get_histogram(input_file, histogram_path, b_tag_bin=''):
@@ -163,7 +163,7 @@ def get_fitted_normalisation_from_ROOT(channel, input_files, variable, met_type,
             
         
         leptonAbsEta = RooRealVar("leptonAbsEta", "leptonAbsEta", 0., 2.4)
-        # this has to move to tools/Fitting.py
+        # this has to move to dps.utils.Fitting.py
         vars = RooArgList()
         vars.add(leptonAbsEta)
         vars_set = RooArgSet()

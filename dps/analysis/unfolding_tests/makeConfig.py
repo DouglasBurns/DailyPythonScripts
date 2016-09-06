@@ -1,7 +1,6 @@
 import json
-from config import XSectionConfig
-from config.variable_binning import bin_edges_full, bin_edges_vis
-from tools.file_utilities import make_folder_if_not_exists
+from dps.config import XSectionConfig
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 com = 13
 fitVars = "M3_angle_bl"

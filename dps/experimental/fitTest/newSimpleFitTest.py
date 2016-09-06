@@ -4,7 +4,7 @@ Created on 20 July 2014
 @author: clement
 '''
 import unittest
-from tools.Fitting import Minuit, FitData, FitDataCollection
+from dps.utils.Fitting import Minuit, FitData, FitDataCollection
 from rootpy.plotting import Hist, Canvas, Legend
 from math import sqrt
 from ROOT import TH1, gStyle, TVirtualPad

@@ -7,7 +7,7 @@ Email: Lukasz.Kreczko@cern.ch
 '''
 from ROOT import TLegend, TCanvas, TPaveText, gROOT
 import Styles
-import file_utilities
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 defaultCanvasWidth = 1600
 defaultCanvasHeight = 1200
@@ -99,7 +99,7 @@ def saveAs(canvas, name, outputFormats=['png'], outputFolder=''):
         fullFileName = outputFolder + name + '.' + outputFormat
         if '/' in fullFileName:
             path = fullFileName[:fullFileName.rfind('/')]
-            file_utilities.make_folder_if_not_exists(path)
+            make_folder_if_not_exists(path)
         
         canvas.SaveAs(fullFileName)
         

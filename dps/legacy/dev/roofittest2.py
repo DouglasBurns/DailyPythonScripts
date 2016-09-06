@@ -7,7 +7,7 @@ Email: Lukasz.Kreczko@cern.ch
 '''
 from ROOT import *
 from ROOT import RooRealVar, RooDataHist, RooArgList, RooHistPdf, RooArgSet, RooAddPdf
-import tools.ROOTFileReader as FileReader
+import dps.utils.ROOTFileReader as FileReader
 import FILES
 from math import sqrt
 h_m3_data = FileReader.getHistogramFromFile("TTbarPlusMetAnalysis/EPlusJets/Ref selection/BinnedMETAnalysis/Electron_PFMET_bin_0-25/electron_AbsEta_2orMoreBtags", FILES.files['ElectronHad'])

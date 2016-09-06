@@ -16,18 +16,17 @@ different unfolding parameters k. Three kinds of tests are envisioned:
 from optparse import OptionParser
 from copy import deepcopy
 from ROOT import TH1F
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 import collections
 from rootpy.io import File
 
-from config import latex_labels, XSectionConfig
-from config.variable_binning import bin_widths, bin_edges_vis
-from tools.plotting import Histogram_properties, compare_measurements
-from tools.Unfolding import get_unfold_histogram_tuple, Unfolding
-from tools.Calculation import calculate_normalised_xsection
-from tools.hist_utilities import hist_to_value_error_tuplelist, get_fit_results_histogram
-from tools.hist_utilities import value_error_tuplelist_to_hist, spread_x
-from tools.file_utilities import make_folder_if_not_exists
+from dps.config import latex_labels, XSectionConfig
+from dps.config.variable_binning import bin_edges_vis
+from dps.utils.plotting import Histogram_properties, compare_measurements
+from dps.utils.Unfolding import get_unfold_histogram_tuple, Unfolding
+from dps.utils.hist_utilities import get_fit_results_histogram
+from dps.utils.hist_utilities import spread_x
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 def get_test_k_values( h_truth, h_measured, h_response, h_data = None ):
     """

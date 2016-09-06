@@ -6,7 +6,7 @@ Created on 31 Oct 2012
 from __future__ import division
 import unittest
 from rootpy.plotting import Hist, Hist2D
-from tools.hist_utilities import rebin_2d, adjust_overflow_to_limit, hist_to_value_error_tuplelist
+from ..hist_utilities import rebin_2d, adjust_overflow_to_limit
 
 import numpy as np
 N_bkg1 = 9000

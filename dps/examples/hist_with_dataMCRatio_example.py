@@ -5,7 +5,7 @@ import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 import ROOT
 import matplotlib.gridspec as gridspec
-from config import CMS
+from dps.config import CMS
 # Setting this to True (default in rootpy)
 # changes how the histograms look in ROOT...
 ROOT.TH1.SetDefaultSumw2(False)

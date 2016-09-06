@@ -4,12 +4,13 @@
 import os
 from rootpy.io import File
 
-from tools import log
-import tools.ROOT_utils
-import tools.file_utilities
+from . import log
+from dps.utils.file_utilities import read_data_from_JSON, write_data_to_JSON
+from dps.utils.ROOT_utils import get_histogram_from_file,\
+    get_histogram_from_tree
 
 # define logger for this module
-input_log = log["tools.input"]
+input_log = log["dps.utils.input"]
 
 
 class Input():
@@ -107,11 +108,11 @@ class Input():
             raise ValueError('Inputs are not valid')
 
         if self.hist_name:
-            self.hist = tools.ROOT_utils.get_histogram_from_file(
+            self.hist = get_histogram_from_file(
                 self.hist_name, self.file)
 
         if self.tree_name:
-            self.hist = tools.ROOT_utils.get_histogram_from_tree(
+            self.hist = get_histogram_from_tree(
                 tree=self.tree_name,
                 branch=self.branch,
                 weight_branches=self.weight_branches,
@@ -124,14 +125,14 @@ class Input():
 
     @staticmethod
     def fromJSON(json_file):
-        src = tools.file_utilities.read_data_from_JSON(json_file)
+        src = read_data_from_JSON(json_file)
         i = Input(**src)
         return i
 
     @input_log.trace()
     def toJSON(self, json_file):
         d = self.toDict()
-        tools.file_utilities.write_data_to_JSON(d, json_file)
+        write_data_to_JSON(d, json_file)
 
     @input_log.trace()
     def toDict(self):

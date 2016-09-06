@@ -16,13 +16,12 @@
         python src/unfolding_tests/make_unfolding_pull_plots.py data/pull_data/13TeV/HT/electron/*.txt -s 13 -c electron -o plots/pull_plots/ -v HT
 '''
 from __future__ import division, print_function
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 from optparse import OptionParser
-from glob import glob
 import sys
 
 import matplotlib as mpl
-from tools.plotting import Histogram_properties, compare_measurements
+from dps.utils.plotting import Histogram_properties, compare_measurements
 mpl.use('agg')
 
 import numpy
@@ -36,11 +35,11 @@ import matplotlib.pyplot as plt
 
 from math import sqrt
 
-from config.variable_binning import bin_edges_vis
-from config import CMS, latex_labels, XSectionConfig
-from tools.file_utilities import read_data_from_JSON, make_folder_if_not_exists
-from tools.hist_utilities import value_error_tuplelist_to_hist, make_line_hist
-from tools.latex import setup_matplotlib
+from dps.config.variable_binning import bin_edges_vis
+from dps.config import CMS, latex_labels, XSectionConfig
+from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist, make_line_hist
+from dps.utils.latex import setup_matplotlib
 
 setup_matplotlib()
 

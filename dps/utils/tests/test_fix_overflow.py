@@ -5,7 +5,7 @@ Created on 31 Oct 2012
 '''
 import unittest
 from rootpy.plotting import Hist, Hist2D
-from tools.hist_utilities import fix_overflow
+from ..hist_utilities import fix_overflow
 
 import numpy as np
 N_bkg1 = 9000

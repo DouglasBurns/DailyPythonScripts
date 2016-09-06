@@ -4,7 +4,7 @@ Created on 31 Oct 2012
 @author: kreczko
 '''
 import unittest
-from tools.Fitting import Minuit, FitData, FitDataCollection
+from ..Fitting import Minuit, FitData, FitDataCollection
 from rootpy.plotting import Hist
 from math import sqrt
 

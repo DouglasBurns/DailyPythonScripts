@@ -7,18 +7,18 @@ from __future__ import print_function, division
 
 import sys
 import os
-import math
 
 from optparse import OptionParser
-from config.cross_section_config import XSectionConfig
+from dps.config.cross_section_config import XSectionConfig
 from rootpy.io.file import root_open
-from config.variable_binning import bin_edges, bin_edges_vis
+# @BROKEN
+from dps.config.variable_binning import bin_edges, bin_edges_vis
 import numpy as np
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 from rootpy.plotting.hist import Hist, Hist2D
-from config.variableBranchNames import branchNames, genBranchNames_particle,\
+from dps.config.variableBranchNames import branchNames, genBranchNames_particle,\
     genBranchNames_parton
-from tools.file_utilities import make_folder_if_not_exists
+from dps.utils.file_utilities import make_folder_if_not_exists
 __all__ = []
 __version__ = 0.1
 __date__ = '2015-08-03'
@@ -354,7 +354,7 @@ if __name__ == "__main__":
         import cProfile
         import pstats
         from guppy import hpy
-        profile_filename = 'src.unfolding_tests.create_toy_mc_from_tree_profile.txt'
+        profile_filename = 'dps.analysis.unfolding_tests.create_toy_mc_from_tree_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
         p = pstats.Stats(profile_filename, stream=statsfile)

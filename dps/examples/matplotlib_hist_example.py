@@ -6,7 +6,7 @@ from rootpy.plotting import Hist, HistStack
 import rootpy.plotting.root2matplotlib as rplt
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
-from tools.plotting import Histogram_properties, make_data_mc_comparison_plot, make_control_region_comparison
+from dps.utils.plotting import Histogram_properties, make_data_mc_comparison_plot, make_control_region_comparison
 import ROOT
 
 # Setting this to True (default in rootpy)

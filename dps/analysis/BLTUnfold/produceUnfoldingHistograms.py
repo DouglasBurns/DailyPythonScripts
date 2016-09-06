@@ -1,12 +1,11 @@
-from rootpy.tree import Tree
-from rootpy.plotting import Hist, Hist2D, Canvas
-from rootpy.io import root_open, File
+from rootpy.plotting import Hist, Hist2D
+from rootpy.io import root_open
 #from rootpy.interactive import wait
 from optparse import OptionParser
-from config import XSectionConfig
-from config.variable_binning import bin_edges_vis, reco_bin_edges_vis
-from config.variableBranchNames import branchNames, genBranchNames_particle, genBranchNames_parton
-from tools.file_utilities import make_folder_if_not_exists
+from dps.config import XSectionConfig
+from dps.config.variable_binning import bin_edges_vis, reco_bin_edges_vis
+from dps.config.variableBranchNames import branchNames, genBranchNames_particle, genBranchNames_parton
+from dps.utils.file_utilities import make_folder_if_not_exists
 from math import trunc
 
 from scaleFactors import *

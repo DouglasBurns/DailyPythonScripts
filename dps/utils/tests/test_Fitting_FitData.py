@@ -4,11 +4,11 @@ Created on 31 Oct 2012
 @author: kreczko
 '''
 import unittest
-from tools.Fitting import FitData, FitDataCollection
+from ..Fitting import FitData, FitDataCollection
 from rootpy.plotting import Hist
 
 import numpy as np
-from tools.hist_utilities import adjust_overflow_to_limit
+from ..hist_utilities import adjust_overflow_to_limit
 N_bkg1 = 9000
 N_signal = 1000
 N_bkg1_obs = 10000

@@ -4,21 +4,21 @@ Created on 3 May 2013
 @author: kreczko
 '''
 import matplotlib as mpl
-from tools.file_utilities import make_folder_if_not_exists
-from tools.file_utilities import saveHistogramsToROOTFile
-from tools.hist_utilities import spread_x, graph_to_value_errors_tuplelist
-from tools.hist_utilities import get_histogram_ratios
+from .file_utilities import make_folder_if_not_exists
+from .file_utilities import saveHistogramsToROOTFile
+from .hist_utilities import spread_x, graph_to_value_errors_tuplelist
+from .hist_utilities import get_histogram_ratios
 mpl.use('agg')
 import matplotlib.pyplot as plt
 import rootpy.plotting.root2matplotlib as rplt
 from rootpy.plotting import HistStack, Hist, Graph
-from config import CMS
+from dps.config import CMS
 from matplotlib.patches import Rectangle
 from copy import deepcopy
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator, FixedLocator
 from itertools import cycle, combinations
-from tools.latex import setup_matplotlib
+from .latex import setup_matplotlib
 
 setup_matplotlib()
 

@@ -1,8 +1,9 @@
-from config import XSectionConfig
+from dps.config import XSectionConfig
 from copy import deepcopy
-from tools.file_utilities import read_xsection_measurement_results_with_errors
-from config.variable_binning import variable_bins_latex
-from tools.Calculation import calculate_lower_and_upper_PDFuncertainty, calculate_lower_and_upper_systematics
+from dps.utils.file_utilities import read_xsection_measurement_results_with_errors
+from dps.config.variable_binning import variable_bins_latex
+# @BROKEN
+from dps.utils.Calculation import calculate_lower_and_upper_PDFuncertainty, calculate_lower_and_upper_systematics
 from numpy import median
 
 measurement_config = XSectionConfig( 13 )

@@ -7,15 +7,14 @@ from __future__ import print_function
 from optparse import OptionParser
 from rootpy.io import File
 from rootpy import asrootpy
-from tools.Unfolding import Unfolding
-from tools.hist_utilities import hist_to_value_error_tuplelist
-from tools.file_utilities import write_data_to_JSON, make_folder_if_not_exists
-from tools.Timer import Timer
-from math import sqrt, log10
+from dps.utils.Unfolding import Unfolding
+from dps.utils.hist_utilities import hist_to_value_error_tuplelist
+from dps.utils.file_utilities import write_data_to_JSON, make_folder_if_not_exists
+from dps.utils.Timer import Timer
 from time import time
-from tools.ROOT_utils import set_root_defaults
+from dps.utils.ROOT_utils import set_root_defaults
 
-from config import XSectionConfig
+from dps.config import XSectionConfig
 
 
 def main():

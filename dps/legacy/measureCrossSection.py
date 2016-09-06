@@ -6,19 +6,19 @@ from math import sqrt
 from ROOT import RooRealVar, RooDataHist, RooArgList, RooHistPdf, RooArgSet, RooAddPdf, RooMCStudy, RooFit, RooMsgService
 import ROOT
 import FILES
-import tools.ROOTFileReader as FileReader
+import dps.utils.ROOTFileReader as FileReader
 from array import array
-import tools.PlottingUtilities as plotting
-import tools.FileUtilities as fileutils
+from dps.utils import plotting
+from dps.utils import file_utilities
 #import QCDRateEstimation
 from copy import deepcopy
 import numpy
-from tools.Timer import Timer
+from dps.utils.Timer import Timer
 import QCDRateEstimation
 from optparse import OptionParser
-from tools.ColorPrinter import colorstr
+from dps.utils.ColorPrinter import colorstr
 import json
-from config.sampleSummations import qcd_samples, muon_qcd_samples, singleTop_samples, wplusjets_samples, zplusjets_samples, allMC_samples, signal_samples, vplusjets_samples
+from dps.config.sampleSummations import qcd_samples, muon_qcd_samples, singleTop_samples, wplusjets_samples, zplusjets_samples, allMC_samples, signal_samples, vplusjets_samples
 from sets import Set
 import sys
 correctionFactors = None

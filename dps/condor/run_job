@@ -8,7 +8,7 @@ from optparse import OptionParser
 from jobtypes import *
 import shutil
 import os
-from tools.file_utilities import make_folder_if_not_exists
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 # from unfolding_pull_job import UnfoldingPullJob
 parser = OptionParser(__doc__)
