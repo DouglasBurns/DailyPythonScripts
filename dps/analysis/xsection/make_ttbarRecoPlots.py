@@ -2,7 +2,7 @@ from optparse import OptionParser
 from dps.config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex, \
     variables_latex
 from dps.config.variable_binning import bin_edges_vis
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import make_folder_if_not_exists
 from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
 from dps.utils.hist_utilities import prepare_histograms, get_normalisation_error, get_fitted_normalisation

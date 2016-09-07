@@ -7,7 +7,7 @@ from rootpy.io import File
 # DailyPythonScripts
 from dps.config.summations_common import b_tag_summations
 from dps.config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 
 from dps.utils.Calculation import combine_complex_results
 from dps.utils.Fitting import Minuit, RooFitFit, FitData, FitDataCollection

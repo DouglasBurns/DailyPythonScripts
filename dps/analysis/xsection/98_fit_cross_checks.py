@@ -1,6 +1,6 @@
 from dps.config import CMS
 from optparse import OptionParser
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
 from dps.utils.plotting import Histogram_properties
 

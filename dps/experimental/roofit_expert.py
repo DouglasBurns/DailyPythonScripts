@@ -9,7 +9,7 @@ from ROOT import RooChi2Var, RooFormulaVar, RooMinuit, TCanvas, RooPlot, RooGaus
 from dps.config.variable_binning import variable_bins_ROOT
 from dps.utils.Calculation import decombine_result
 from uncertainties import ufloat
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.summations_common import b_tag_summations
         
 # copied from 01_get_fit_results.py

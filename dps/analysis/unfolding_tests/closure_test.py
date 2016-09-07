@@ -8,7 +8,7 @@ from dps.config.variable_binning import bin_edges_vis, bin_widths_visiblePS
 from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
 from dps.utils.hist_utilities import hist_to_value_error_tuplelist, value_error_tuplelist_to_hist
 from dps.utils.Calculation import calculate_normalised_xsection
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.plotting import compare_measurements, Histogram_properties
 from dps.config import latex_labels
 from rootpy import asrootpy

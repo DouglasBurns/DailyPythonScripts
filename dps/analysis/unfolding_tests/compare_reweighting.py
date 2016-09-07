@@ -4,7 +4,7 @@ from dps.utils.Unfolding import get_unfold_histogram_tuple, removeFakes
 from rootpy.io import File
 from rootpy import asrootpy
 from dps.utils.hist_utilities import value_error_tuplelist_to_hist
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import reco_bin_edges_vis
 from dps.utils.plotting import compare_measurements, Histogram_properties
 from dps.config import latex_labels

@@ -1,5 +1,5 @@
 from dps.config.summations_7TeV import sample_summations
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import make_folder_if_not_exists
 
 from dps.utils.file_utilities import merge_ROOT_files

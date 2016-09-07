@@ -1,12 +1,7 @@
 
-from dps.config.histogram_colours import histogram_colours as colours
-from dps.config import XSectionConfig
-from rootpy.plotting import Hist
-from dps.utils.ROOT_utils import get_histograms_from_trees, set_root_defaults
+from dps.config.xsection import XSectionConfig
+from dps.utils.ROOT_utils import set_root_defaults
 from dps.utils.latex import setup_matplotlib
-from uncertainties import ufloat
-from math import sqrt
-from copy import deepcopy
 from rootpy.io import File
 from rootpy import asrootpy
 from ROOT import TCanvas, kRed

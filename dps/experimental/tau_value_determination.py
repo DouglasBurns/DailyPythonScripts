@@ -26,7 +26,7 @@ from dps.utils.hist_utilities import value_error_tuplelist_to_hist
 from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
 from dps.utils.ROOT_utils import set_root_defaults
 # from examples.Bin_Centers import nbins
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 used_k = 2
 
 font = {'family' : 'normal',

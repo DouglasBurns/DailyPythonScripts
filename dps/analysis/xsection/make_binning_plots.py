@@ -14,7 +14,7 @@ import matplotlib.cm as cm
 # from itertools import cycle
 from dps.config.latex_labels import b_tag_bins_latex, variables_latex
 from dps.config.variable_binning import bin_edges_full, bin_edges_vis
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.ROOT_utils import get_histogram_from_file
 from dps.utils.file_utilities import make_folder_if_not_exists
 from dps.utils.hist_utilities import value_tuplelist_to_hist

@@ -14,7 +14,7 @@ from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_propertie
     compare_measurements
 from dps.config.latex_labels import b_tag_bins_latex, samples_latex, channel_latex
 from dps.config.variable_binning import variable_bins_ROOT, fit_variable_bin_edges, bin_edges_vis
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.latex import setup_matplotlib
 # latex, font, etc
 setup_matplotlib()

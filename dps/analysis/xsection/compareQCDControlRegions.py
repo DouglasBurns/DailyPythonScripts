@@ -2,7 +2,7 @@ from optparse import OptionParser
 from dps.config.latex_labels import samples_latex, variables_latex, control_plots_latex
 from dps.config.variable_binning import control_plots_bins
 from dps.config.histogram_colours import histogram_colours as colours
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import make_folder_if_not_exists
 from dps.utils.plotting import Histogram_properties, make_control_region_comparison
 from dps.utils.hist_utilities import prepare_histograms, clean_control_region

@@ -5,7 +5,7 @@
 from rootpy.io import File
 
 from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.plotting import compare_measurements, Histogram_properties
 from dps.config import latex_labels
 

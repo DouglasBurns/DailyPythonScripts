@@ -29,7 +29,7 @@ from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exi
 from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
 #from dps.analysis.xsection.lib import get_unfold_histogram_tuple
 from dps.utils.ROOT_utils import set_root_defaults, get_histogram_from_file
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import reco_bin_edges_vis
 from dps.utils.hist_utilities import value_error_tuplelist_to_hist
 from matplotlib import rc

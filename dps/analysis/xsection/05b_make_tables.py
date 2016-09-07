@@ -18,7 +18,7 @@ import sys
 import os
 
 from optparse import OptionParser
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.table import PrintTable
 from .lib import read_initial_normalisation,\
     read_unfolded_normalisation

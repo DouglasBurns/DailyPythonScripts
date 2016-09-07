@@ -7,7 +7,7 @@ from copy import deepcopy
 from dps.config.latex_labels import variables_latex, measurements_latex, fit_variables_latex
 from dps.config.variable_binning import bin_edges_full, variable_bins_ROOT, variable_bins_visiblePS_ROOT, fit_variable_bin_edges,\
     bin_edges_vis
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
 from dps.utils.hist_utilities import value_error_tuplelist_to_hist, \
 value_tuplelist_to_hist, value_errors_tuplelist_to_graph, graph_to_value_errors_tuplelist

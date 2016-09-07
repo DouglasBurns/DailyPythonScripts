@@ -3,7 +3,7 @@ from optparse import OptionParser
 from copy import deepcopy
 from dps.config.latex_labels import variables_latex, variables_NonLatex, measurements_latex, samples_latex, typical_systematics_latex, met_systematics_latex
 from dps.config.variable_binning import variable_bins_latex, variable_bins_ROOT, variable_bins_visiblePS_ROOT, variable_bins_visiblePS_latex, bin_edges_vis, bin_edges_full
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.Calculation import getRelativeError
 from dps.utils.file_utilities import make_folder_if_not_exists, read_xsection_measurement_results_with_errors
 from dps.utils.hist_utilities import values_and_errors_to_hist

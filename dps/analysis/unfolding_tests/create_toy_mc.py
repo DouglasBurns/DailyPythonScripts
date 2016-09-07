@@ -14,7 +14,7 @@ This script uses around 300 MB RAM per instance for n=10000
 '''
 from optparse import OptionParser
 from rootpy.io import File
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.ROOT_utils import set_root_defaults
 from rootpy.io.file import root_open
 from dps.config.variable_binning import bin_edges_vis

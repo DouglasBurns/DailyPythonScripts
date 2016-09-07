@@ -6,12 +6,15 @@ from codecs import open
 import os
 import re
 import io
+import glob
 
 here = os.path.abspath(os.path.dirname(__file__))
+scripts = glob.glob('bin/*')
 
 # Get the long description from the README file
 with open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
 
 def read(*names, **kwargs):
     with io.open(
@@ -20,6 +23,7 @@ def read(*names, **kwargs):
     ) as fp:
         return fp.read()
 
+
 def find_version(*file_paths):
     version_file = read(*file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
@@ -27,6 +31,7 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name='dps',
@@ -50,11 +55,12 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Interpreters',
+        'Intended Audience :: Science/Research',
+        'Topic :: Utilities',
 
         'License :: OSI Approved :: Apache Software License',
 
@@ -66,6 +72,7 @@ setup(
     ],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     package_data={
-        'bin': ['*'],
+        'bin': ['bin/*'],
     },
+    scripts=scripts,
 )

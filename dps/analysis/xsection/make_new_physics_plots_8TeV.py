@@ -1,4 +1,5 @@
-from dps.config import CMS, XSectionConfig
+from dps.config import CMS
+from dps.config.xsection import XSectionConfig
 from optparse import OptionParser
 from dps.utils.ROOT_utils import get_histograms_from_files
 from dps.utils.file_utilities import read_data_from_JSON

@@ -20,7 +20,8 @@ from dps.utils.ROOT_utils import set_root_defaults
 import collections
 from rootpy.io import File
 
-from dps.config import latex_labels, XSectionConfig
+from dps.config import latex_labels
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import bin_edges_vis
 from dps.utils.plotting import Histogram_properties, compare_measurements
 from dps.utils.Unfolding import get_unfold_histogram_tuple, Unfolding

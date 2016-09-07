@@ -2,7 +2,7 @@ from rootpy.plotting import Hist, Hist2D
 from rootpy.io import root_open
 #from rootpy.interactive import wait
 from optparse import OptionParser
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import bin_edges_vis, reco_bin_edges_vis
 from dps.config.variableBranchNames import branchNames, genBranchNames_particle, genBranchNames_parton
 from dps.utils.file_utilities import make_folder_if_not_exists

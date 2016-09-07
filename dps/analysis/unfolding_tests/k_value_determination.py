@@ -32,7 +32,8 @@ from dps.utils.hist_utilities import get_fit_results_histogram
 from dps.utils.ROOT_utils import set_root_defaults
 from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple
 from dps.config.variable_binning import bin_edges_full
-from dps.config import CMS, XSectionConfig
+from dps.config import CMS
+from dps.config.xsection import XSectionConfig
 from dps.config.latex_labels import variables_latex
 
 

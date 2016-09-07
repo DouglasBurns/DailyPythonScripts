@@ -2,7 +2,7 @@
     Condor job for dps.analysis.unfolding_tests.create_unfolding_pull_data
 '''
 from .. import Job
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 
 class UnfoldingPullJob(Job):
 

@@ -1,6 +1,6 @@
 from optparse import OptionParser
 # @BROKEN
-from dps.config import XSectionConfig, fit_var_inputs
+from dps.config.xsection import XSectionConfig, fit_var_inputs
 from dps.config.variable_binning import bin_edges_vis
 from .lib import read_normalisation, closure_tests
 # from dps.utils.file_utilities import read_data_from_JSON

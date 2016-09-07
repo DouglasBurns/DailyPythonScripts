@@ -14,7 +14,7 @@
         data/absolute_eta_M3_angle_bl/{centre_of_mass_energy}TeV/{variable}/xsection_measurement_results/{channel}/central/
 '''
 from optparse import OptionParser
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import bin_edges_full
 from dps.utils.file_utilities import read_data_from_JSON
 from rootpy.io import File

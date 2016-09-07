@@ -1,6 +1,6 @@
 from __future__ import division, print_function
 from .file_utilities import read_data_from_JSON, write_data_to_JSON
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from copy import deepcopy
 from math import sqrt
 import numpy as np

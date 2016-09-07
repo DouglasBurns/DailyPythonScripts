@@ -9,7 +9,7 @@ import sys
 import os
 
 from optparse import OptionParser
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from rootpy.io.file import root_open
 # @BROKEN
 from dps.config.variable_binning import bin_edges, bin_edges_vis

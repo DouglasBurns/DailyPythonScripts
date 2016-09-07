@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from dps.config.summations_7TeV import sample_summations as sample_summations_7TeV
 from dps.config.summations_8TeV import sample_summations as sample_summations_8TeV
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import make_folder_if_not_exists
 from optparse import OptionParser
 
@@ -9,7 +9,6 @@ from dps.utils.file_utilities import merge_ROOT_files
 import os
 import sys
 import subprocess
-import time
 
 parser = OptionParser("Merge histogram files on DICE")
 parser.add_option("-n", dest="jobNumber", default=-1, type='int',

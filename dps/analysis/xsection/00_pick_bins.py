@@ -44,7 +44,7 @@ from rootpy import asrootpy
 from rootpy.io import File
 from dps.utils.Calculation import calculate_purities, calculate_stabilities
 from dps.utils.hist_utilities import rebin_2d
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from optparse import OptionParser
 from dps.config.variable_binning import bin_edges_full, minimum_bin_width
 from dps.utils.file_utilities import write_data_to_JSON

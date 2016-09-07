@@ -3,7 +3,7 @@ from dps.config.latex_labels import b_tag_bins_latex, samples_latex, channel_lat
     variables_latex, fit_variables_latex, control_plots_latex
 from dps.config.variable_binning import fit_variable_bin_edges, control_plots_bins
 from dps.config.histogram_colours import histogram_colours as colours
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import make_folder_if_not_exists
 from dps.utils.plotting import make_data_mc_comparison_plot, Histogram_properties
 from dps.utils.hist_utilities import prepare_histograms, clean_control_region

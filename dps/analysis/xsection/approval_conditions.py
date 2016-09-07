@@ -11,7 +11,7 @@ from dps.utils.hist_utilities import value_error_tuplelist_to_hist,\
 from dps.config.variable_binning import bin_edges_vis
 from dps.config.latex_labels import variables_latex
 from dps.utils.ROOT_utils import get_histogram_from_tree
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from collections import namedtuple
 
 

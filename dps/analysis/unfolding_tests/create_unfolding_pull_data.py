@@ -14,7 +14,7 @@ from dps.utils.Timer import Timer
 from time import time
 from dps.utils.ROOT_utils import set_root_defaults
 
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 
 
 def main():

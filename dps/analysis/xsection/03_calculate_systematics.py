@@ -16,7 +16,7 @@ This module produces several results for the three channels (electron, muon, com
 3) + 4) for more fine-grained analysis
 '''
 from optparse import OptionParser
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.config.variable_binning import bin_edges_vis
 from dps.utils.file_utilities import make_folder_if_not_exists
 from dps.utils.systematic import append_PDF_uncertainties, print_dictionary,\

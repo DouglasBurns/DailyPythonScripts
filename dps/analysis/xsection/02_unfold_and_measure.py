@@ -8,7 +8,7 @@ from rootpy.plotting import Hist2D
 # DailyPythonScripts
 import dps.config.RooUnfold as unfoldCfg
 from dps.config.variable_binning import bin_widths, bin_widths_visiblePS, reco_bin_edges_full, reco_bin_edges_vis
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsection, \
 combine_complex_results
 from dps.utils.hist_utilities import hist_to_value_error_tuplelist, \

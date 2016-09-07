@@ -1,4 +1,4 @@
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from copy import deepcopy
 from dps.utils.file_utilities import read_xsection_measurement_results_with_errors
 from dps.config.variable_binning import variable_bins_latex

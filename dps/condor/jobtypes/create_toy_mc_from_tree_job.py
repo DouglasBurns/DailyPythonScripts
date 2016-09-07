@@ -2,7 +2,7 @@
     Condor jobs description for src/unfolding_tests/create_toy_mc_from_tree
 '''
 from .. import Job
-from dps.config.cross_section_config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 
 
 class CreateToyMCFromTreeJob(Job):

@@ -2,7 +2,7 @@ from dps.config import CMS
 from optparse import OptionParser
 from dps.config.latex_labels import b_tag_bins_latex
 from dps.config.variable_binning import bin_edges_vis, variable_bins_ROOT
-from dps.config import XSectionConfig
+from dps.config.xsection import XSectionConfig
 from dps.utils.ROOT_utils import get_histograms_from_files
 from dps.utils.file_utilities import read_data_from_JSON
 from dps.utils.plotting import Histogram_properties, make_control_region_comparison

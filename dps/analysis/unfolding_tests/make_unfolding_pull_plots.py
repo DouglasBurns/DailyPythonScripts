@@ -36,7 +36,8 @@ import matplotlib.pyplot as plt
 from math import sqrt
 
 from dps.config.variable_binning import bin_edges_vis
-from dps.config import CMS, latex_labels, XSectionConfig
+from dps.config import CMS, latex_labels
+from dps.config.xsection import XSectionConfig
 from dps.utils.file_utilities import read_data_from_JSON, make_folder_if_not_exists
 from dps.utils.hist_utilities import value_error_tuplelist_to_hist, make_line_hist
 from dps.utils.latex import setup_matplotlib
