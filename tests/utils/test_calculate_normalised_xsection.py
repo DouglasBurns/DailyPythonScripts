@@ -5,7 +5,7 @@ Created on 12 Nov 2014
 '''
 from __future__ import division
 import unittest
-from ..Calculation import calculate_normalised_xsection
+from dps.utils.Calculation import calculate_normalised_xsection
 from uncertainties import ufloat
 
 class Test( unittest.TestCase ):

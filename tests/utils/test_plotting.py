@@ -3,9 +3,9 @@ Created on 5 May 2015
 
 @author: kreczko
 '''
-from ..plotting import get_best_max_y
-from ..hist_utilities import value_errors_tuplelist_to_graph
-from ..hist_utilities import value_error_tuplelist_to_hist
+from dps.utils.plotting import get_best_max_y
+from dps.utils.hist_utilities import value_errors_tuplelist_to_graph
+from dps.utils.hist_utilities import value_error_tuplelist_to_hist
 
 data_h =  [( 3, 1 ),
          ( 2, 1 ),

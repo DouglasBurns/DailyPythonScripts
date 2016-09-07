@@ -425,7 +425,7 @@ class RooFitFit():
             #WARNING: number of cores changes the results!!!
             self.saved_result = use_model.fitTo(
                         roofit_histograms[self.data_label],
-                        RooFit.Minimizer( "Minuit2", "Migrad" ),
+                        RooFit.Minimizer( "Minuit", "Migrad" ),
                         RooFit.NumCPU( 1 ),
                         RooFit.Extended(),
                         RooFit.Save(),

@@ -283,7 +283,7 @@ def get_bin_resolution( fine_binned_response , bin_middle ):
 def get_next_end( histograms, bin_start, bin_end, p_min, s_min, n_min, min_width ): 
     current_bin_start = bin_start
     current_bin_end = bin_end
-
+    p, s = 0, 0
     for gen_vs_reco_histogram in histograms:
         reco = asrootpy( gen_vs_reco_histogram.ProjectionX() )
         gen = asrootpy( gen_vs_reco_histogram.ProjectionY( 'py', 1 ) )

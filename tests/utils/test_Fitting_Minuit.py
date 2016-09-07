@@ -4,9 +4,12 @@ Created on 31 Oct 2012
 @author: kreczko
 '''
 import unittest
-from ..Fitting import Minuit, FitData, FitDataCollection
+from dps.utils.Fitting import Minuit, FitData, FitDataCollection
 from rootpy.plotting import Hist
 from math import sqrt
+import ROOT
+ROOT.gROOT.SetBatch(True)
+ROOT.gROOT.ProcessLine( 'gErrorIgnoreLevel = 4000;' )
 
 import numpy as np
 N_bkg1 = 9000

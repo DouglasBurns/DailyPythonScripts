@@ -71,24 +71,31 @@ class Input():
             self.scale = kwargs.pop('scale')
         # store remaining parameters
         self.kwargs = kwargs
+        self.error = ''
 
     @input_log.trace()
     def isValid(self):
         # file has to exists
         if not os.path.exists(self.file):
-            input_log.debug('File does not exist: ' + self.file)
+            msg = 'File does not exist: ' + self.file
+            self.error = msg
+            input_log.debug(msg)
             return False
         if self.hist_name:
             with File.open(self.file) as f:
                 if not f.__contains__(self.hist_name):
                     msg = 'File "{0}" does not contain histogram "{1}"'
-                    input_log.debug(msg.format(self.file, self.hist_name))
+                    msg = msg.format(self.file, self.hist_name)
+                    self.error = msg
+                    input_log.debug(msg)
                     return False
         if self.tree_name:
             with File.open(self.file) as f:
                 if not f.__contains__(self.tree_name):
                     msg = 'File "{0}" does not contain tree "{1}"'
-                    input_log.debug(msg.format(self.file, self.tree_name))
+                    msg = msg.format(self.file, self.tree_name)
+                    self.error = msg
+                    input_log.debug(msg)
                     return False
                 tree = f[self.tree_name]
                 branchToCheck = self.branch
@@ -98,14 +105,16 @@ class Input():
                     branchToCheck = branchToCheck.split('(')[-1].split(')')[0]
                 if not tree.has_branch(branchToCheck):
                     msg = 'Tree "{0}" does not contain branch "{1}"'
-                    input_log.debug(msg.format(self.tree_name, branchToCheck))
+                    msg = msg.format(self.tree_name, branchToCheck)
+                    self.error = msg
+                    input_log.debug(msg)
                     return False
         return True
 
     @input_log.trace()
     def read(self):
         if not self.isValid():
-            raise ValueError('Inputs are not valid')
+            raise ValueError('Inputs are not valid {0}'.format(self.error))
 
         if self.hist_name:
             self.hist = get_histogram_from_file(

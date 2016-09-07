@@ -1,19 +1,14 @@
 import unittest
 
 import dps.utils.ROOT_utils as ru
-from rootpy.io import File
-from dps.tests.data import create_test_tree
+from ..data import create_test_tree
 
 
 
 class Test(unittest.TestCase):
 
     def setUp(self):
-        f = File('test.root', 'recreate')
-        tree = create_test_tree()
-        tree.write()
-        f.write()
-        f.Close()
+        create_test_tree('test.root')
 
     def tearDown(self):
         pass
@@ -22,7 +17,7 @@ class Test(unittest.TestCase):
         hist = ru.get_histogram_from_tree(
                                        tree = 'test',
                                        branch = 'x',
-                                       weight_branch = 'z',
+                                       weight_branches = ['z'],
                                        selection_branches = ['i'],
                                        input_file = 'test.root',
                                        n_bins = 10,

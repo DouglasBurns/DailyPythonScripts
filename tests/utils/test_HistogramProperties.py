@@ -3,7 +3,7 @@ Created on 8 Jan 2015
 
 @author: kreczko
 '''
-from ..plotting import Histogram_properties
+from dps.utils.plotting import Histogram_properties
 
 def test_init_from_dictionary():
     test_values = {}

@@ -4,7 +4,7 @@ Created on 31 Oct 2012
 @author: kreczko
 '''
 import unittest
-from ..Fitting import RooFitFit, FitData, FitDataCollection
+from dps.utils.Fitting import RooFitFit, FitData, FitDataCollection
 from rootpy.plotting import Hist
 from math import sqrt
 
