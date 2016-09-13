@@ -1,4 +1,4 @@
-Executable = experimental/condor/01b/run_01.sh
+Executable = dps/experimental/condor/01b/run_01.sh
 Universe = vanilla
 Output = 01b.job.$(cluster).$(process).out
 Error = 01b.job.$(cluster).$(process).err
@@ -15,4 +15,4 @@ request_memory=500
 # use the ENV that is provided
 getenv = true
 
-queue 7
+queue 1

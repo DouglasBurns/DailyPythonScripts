@@ -7,6 +7,7 @@ echo "... getting ${git_branch} branch"
 time git clone https://github.com/BristolTopGroup/DailyPythonScripts.git
 cd DailyPythonScripts/
 git checkout ${git_branch}
+echo `pwd`
 echo "... extracting ${_CONDOR_JOB_IWD}/dps.tar on top"
 tar -xf ${_CONDOR_JOB_IWD}/dps.tar --overwrite
 echo "... enforcing conda python environment"
@@ -15,7 +16,7 @@ echo "DailyPythonScripts are set up"
 
 echo "Running payload"
 >&2 echo "Running payload"
-time python experimental/condor/run01_forAllOptions.py -n $1
+time python dps/experimental/condor/01b/run01_forAllOptions.py -n $1
 
 echo "Done"
 ls
