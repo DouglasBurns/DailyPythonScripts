@@ -15,21 +15,21 @@ export PYTHONPATH=$PYTHONPATH:`pwd`
 
 echo "DailyPythonScripts are set up"
 
-ls -l ${DPSROOT}/src/BLTUnfold/runJobsCrab.py
-chmod a+x ${DPSROOT}/src/BLTUnfold/runJobsCrab.py
-jobArguments=`${DPSROOT}/src/BLTUnfold/runJobsCrab.py --return_job_options -j $1`
+ls -l ${DPSROOT}/dps/analysis/BLTUnfold/runJobsCrab.py
+chmod a+x ${DPSROOT}/dps/analysis/BLTUnfold/runJobsCrab.py
+jobArguments=`${DPSROOT}/dps/analysis/BLTUnfold/runJobsCrab.py --return_job_options -j $1`
 echo "Job arguments "$jobArguments
 if [[ $jobArguments == *"generatorWeight"* ]]
 then
 	echo "Will copy input file locally"
-	hadoop fs -copyToLocal /TopQuarkGroup/run2/atOutput/13TeV/25ns/TTJets_PowhegPythia8_tree.root ${DPSROOT}/localInputFile.root
+	hadoop fs -copyToLocal /TopQuarkGroup/run2/atOutput/13TeV/2016/TTJets_PowhegPythia8_tree.root ${DPSROOT}/localInputFile.root
 fi
 
 echo "Running payload"
 >&2 echo "Running payload"
 mkdir -p unfolding/13TeV
 echo "Running script"
-time python ${DPSROOT}/src/BLTUnfold/runJobsCrab.py -j $1
+time python ${DPSROOT}/dps/analysis/BLTUnfold/runJobsCrab.py -j $1
 
 echo "Unfolding folder contents:"
 ls -l unfolding
