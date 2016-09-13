@@ -11,7 +11,8 @@
 '''
 from __future__ import print_function
 from optparse import OptionParser
-from dps.config.xsection import XSectionConfig, variable_binning
+from dps.config.xsection import XSectionConfig 
+from dps.config import variable_binning
 from dps.utils.input import Input
 from dps.utils.logger import log
 from copy import deepcopy
@@ -52,10 +53,6 @@ def main():
                     continue
                 create_measurement(
                     centre_of_mass_energy, category, variable, channel,
-                    phase_space='FullPS', norm_method='background_subtraction')
-                # and the visible phase space
-                create_measurement(
-                    centre_of_mass_energy, category, variable, channel,
                     phase_space='VisiblePS', norm_method='background_subtraction')
 
 
@@ -72,7 +69,6 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
     if should_not_run_systematic:
         # no MET uncertainty on HT (but JES and JER of course)
         return
-
     m = None
 
     if category == 'central':
@@ -121,6 +117,8 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
     if category in [config.vjets_theory_systematic_prefix + systematic for systematic in config.generator_systematics]:
         template_category = 'central'
 
+
+
     m.addSample(
         'TTJet',
         False,
@@ -164,6 +162,8 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
             variable_template_data, phase_space=phase_space, measurement=m,
         ),
     )
+
+
 
     m_qcd = Measurement(category)
     m_qcd.setVariable(variable)
@@ -240,38 +240,25 @@ def create_measurement(com, category, variable, channel, phase_space, norm_metho
 
     m.addNormForSample('QCD', norm_qcd, False)
 
+
+
     if category in [config.vjets_theory_systematic_prefix + systematic for systematic in config.generator_systematics]:
         v_template_category = category.replace(
             config.vjets_theory_systematic_prefix, '')
         m_vjets = Measurement(category)
         m_vjets.setVariable(variable)
         m_vjets.setCentreOfMassEnergy(com)
-        if com == 7:  # special case for 7 TeV where we use 8 TeV shapes
-            config8 = XSectionConfig(8)
-            m_vjets.addSample(
-                'V+Jets',
-                False,
-                input=create_input(
-                    config, 'V+Jets', variable, v_template_category,
-                    channel,
-                    variable_template,
-                    config8.generator_systematic_vjets_templates[
-                        v_template_category],
-                    phase_space=phase_space, measurement=m,
-                )
-            )
-        else:
-            m_vjets.addSample(
-                'V+Jets',
-                False,
-                input=create_input(
-                    config, 'V+Jets', variable, v_template_category,
-                    channel,
-                    variable_template,
-                    config.generator_systematic_vjets_templates[
-                        v_template_category]),
-                phase_space=phase_space, measurement=m,
-            )
+        m_vjets.addSample(
+            'V+Jets',
+            False,
+            input=create_input(
+                config, 'V+Jets', variable, v_template_category,
+                channel,
+                variable_template,
+                config.generator_systematic_vjets_templates[
+                    v_template_category]),
+            phase_space=phase_space, measurement=m,
+        )
         m.addShapeForSample('V+Jets', m_vjets, False)
 
     inputs['channel'] = channel

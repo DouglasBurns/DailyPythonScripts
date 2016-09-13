@@ -10,7 +10,7 @@ from dps.utils.hist_utilities import prepare_histograms, clean_control_region
 from dps.utils.ROOT_utils import get_histograms_from_trees, set_root_defaults
 from dps.utils.latex import setup_matplotlib
 from uncertainties import ufloat
-from .compareQCDControlRegions import getPUWeights
+from dps.analysis.xsection.compareQCDControlRegions import getPUWeights
 
 # latex, font, etc
 setup_matplotlib()
@@ -417,11 +417,10 @@ if __name__ == '__main__':
                             }.iteritems() :
 
         for bSelection, b_tag_bin in {
-                            'Ref selection' : '2orMoreMediumBtags', 
-                            'Ref selection NoBSelection' : 'NoBtags',
-                            'Ref selection TightBSelection' : '2orMoreTightBtags',}.iteritems():
-            
-            # b_tag_bin = '2orMoreBtags'
+                            'Ref selection' : '2orMoreBtags', 
+                            # 'Ref selection NoBSelection' : '0btag',
+                            # 'Ref selection TightBSelection' : '2orMoreTightBtags'
+                            }.iteritems():
 
 
 

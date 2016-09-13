@@ -19,7 +19,7 @@ from __future__ import division
 from optparse import OptionParser
 from dps.utils.logger import log
 from dps.config.xsection import XSectionConfig
-from .lib import closure_tests
+from dps.analysis.xsection.lib import closure_tests
 from dps.utils.file_utilities import write_data_to_JSON
 from dps.utils.hist_utilities import clean_control_region, \
     hist_to_value_error_tuplelist, fix_overflow
