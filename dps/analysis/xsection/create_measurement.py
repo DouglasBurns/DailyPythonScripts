@@ -51,8 +51,12 @@ def main():
                     continue
                 elif channel == 'muon' and (category == 'Electron_down' or category == 'Electron_up'):
                     continue
-                create_measurement(
-                    centre_of_mass_energy, category, variable, channel,
+                # create_measurement(
+                #     centre_of_mass_energy, category, variable, channel,
+                #     phase_space='FullPS', norm_method='background_subtraction')        
+                # and the visible phase space      
+                create_measurement(        
+                    centre_of_mass_energy, category, variable, channel,        
                     phase_space='VisiblePS', norm_method='background_subtraction')
 
 
