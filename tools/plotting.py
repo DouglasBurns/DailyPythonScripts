@@ -222,8 +222,8 @@ def make_data_mc_comparison_plot( histograms = [],
     if show_ratio:
         ratio = data.Clone( 'ratio' )
         sumHists = sum( stack.GetHists() )
-        for bin in range(1,sumHists.GetNbinsX()):
-            sumHists.SetBinError(bin,0)
+        for bin_i in range(1,sumHists.GetNbinsX()):
+            sumHists.SetBinError(bin_i,0)
         ratio.Divide( sum( stack.GetHists() ) )
         ratio.SetMarkerSize( 3 )
         gs = gridspec.GridSpec( 2, 1, height_ratios = [5, 1] ) 
