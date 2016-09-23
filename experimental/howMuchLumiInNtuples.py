@@ -1,12 +1,13 @@
+'''
+inputFiles as argument
+e.g. /hdfs/TopQuarkGroup/phxlk/ntuple/v0.0.8/Spring16/SingleMuon_Run2016E_PromptReco_v2/tmp/*/*.root
+'''
 import ROOT 
 from ROOT import gROOT, TFile, TH1F
-import json
-import glob
+import sys
 
-inputFiles = glob.glob('/hdfs/TopQuarkGroup/phxlk/ntuple/v0.0.8/Spring16/SingleMuon_Run2016E_PromptReco_v2/tmp/*/*.root')
-# inputFiles = glob.glob('/hdfs/TopQuarkGroup/phxlk/ntuple/v0.0.8/Spring16/SingleMuon_Run2016B_PromptReco_v2/tmp/*/*.root')
-# inputFiles = glob.glob('/hdfs/TopQuarkGroup/phxlk/ntuple/v0.0.8/Spring16/SingleMuon_Run2016C_PromptReco_v2/tmp/*/*.root')
-# inputFiles = glob.glob('/hdfs/TopQuarkGroup/phxlk/ntuple/v0.0.8/Spring16/SingleMuon_Run2016D_PromptReco_v2/tmp/*/*.root')
+inputFiles = sys.argv[1:]
+
 
 outputJson = {}
 
