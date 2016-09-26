@@ -92,13 +92,9 @@ if __name__ == '__main__':
     all_systematics = append_PDF_uncertainties(all_systematics)
 
     list_of_systematics = all_systematics
-    # If you want different listsof systematics can just do some manipulation here
+    # If you want different lists of systematics can just do some manipulation here
 
-    # Print the systematics if required
-    print_dictionary("List of the systematics in use", list_of_systematics)
-
-    # for channel in ['electron', 'muon', 'combined', 'combinedBeforeUnfolding']:
-    for channel in ['muon']:
+    for channel in ['electron', 'muon', 'combined', 'combinedBeforeUnfolding']:
         print("Channel in use is {0} : ".format(channel))
 
         # Output folder of covariance matrices
@@ -116,26 +112,27 @@ if __name__ == '__main__':
 
         # Retreive the normalised cross sections, for all groups in list_of_systematics.
         systematic_normalised_uncertainty, unfolded_systematic_normalised_uncertainty = get_normalised_cross_sections(opts, list_of_systematics)
-        print_dictionary("Normalised cross sections of the systematics in use", systematic_normalised_uncertainty)
+        # print_dictionary("Normalised cross sections of the systematics in use", systematic_normalised_uncertainty)
         # print_dictionary("Unfolded normalised cross sections of the systematics in use", unfolded_systematic_normalised_uncertainty)
 
-        # # Get and symmetrise the uncertainties
-        # x_sec_with_symmetrised_systematics = get_symmetrised_systematic_uncertainty(systematic_normalised_uncertainty, opts)
-        # unfolded_x_sec_with_symmetrised_systematics = get_symmetrised_systematic_uncertainty(unfolded_systematic_normalised_uncertainty, opts)
-        # # print_dictionary("Normalised cross sections of the systematics with symmetrised uncertainties", x_sec_with_symmetrised_systematics)
-        # # print_dictionary("Unfolded normalised cross sections of the systematics  with symmetrised uncertainties", unfolded_x_sec_with_symmetrised_systematics)
+        # Get and symmetrise the uncertainties
+        x_sec_with_symmetrised_systematics = get_symmetrised_systematic_uncertainty(systematic_normalised_uncertainty, opts)
+        unfolded_x_sec_with_symmetrised_systematics = get_symmetrised_systematic_uncertainty(unfolded_systematic_normalised_uncertainty, opts)
+        # print_dictionary("Normalised cross sections of the systematics with symmetrised uncertainties", x_sec_with_symmetrised_systematics)
+        # print_dictionary("Unfolded normalised cross sections of the systematics  with symmetrised uncertainties", unfolded_x_sec_with_symmetrised_systematics)
 
-        # # Create covariance matrices
-        # generate_covariance_matrices(opts, x_sec_with_symmetrised_systematics)
-        # generate_covariance_matrices(opts, unfolded_x_sec_with_symmetrised_systematics)
+        # Create covariance matrices
+        generate_covariance_matrices(opts, x_sec_with_symmetrised_systematics)
+        generate_covariance_matrices(opts, unfolded_x_sec_with_symmetrised_systematics)
 
-        # # Combine all systematic uncertainties for each of the groups of systematics
-        # full_measurement = get_measurement_with_total_systematic_uncertainty(opts, x_sec_with_symmetrised_systematics)
-        # full_unfolded_measurement = get_measurement_with_total_systematic_uncertainty(opts, unfolded_x_sec_with_symmetrised_systematics)
-        # # print_dictionary("Measurement with total systematic error for each systematic group", full_measurement)
-        # # print_dictionary("Unfolded measurement with total systematic error for each systematic group", full_unfolded_measurement)
+        # Combine all systematic uncertainties for each of the groups of systematics
+        # Currently returns (Value, SysUp, SysDown) - Need to include stat?
+        full_measurement = get_measurement_with_total_systematic_uncertainty(opts, x_sec_with_symmetrised_systematics)
+        full_unfolded_measurement = get_measurement_with_total_systematic_uncertainty(opts, unfolded_x_sec_with_symmetrised_systematics)
+        # print_dictionary("Measurement with total systematic error for each systematic group", full_measurement)
+        # print_dictionary("Unfolded measurement with total systematic error for each systematic group", full_unfolded_measurement)
 
-        # # Write central +- error to JSON. Group of systematics in question is included in outputfile name.
-        # for keys in list_of_systematics.keys():
-        #     write_normalised_xsection_measurement(opts, full_measurement[keys], full_unfolded_measurement[keys], summary = keys )
+        # Write central +- error to JSON. Group of systematics in question is included in outputfile name.
+        # Summary if you want to specify specific list. e.g. GeneratorOnly etc
+        write_normalised_xsection_measurement(opts, full_measurement, full_unfolded_measurement, summary = '' )
 

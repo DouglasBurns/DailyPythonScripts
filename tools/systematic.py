@@ -136,11 +136,10 @@ def get_normalised_cross_sections(options, list_of_systematics):
 
     central_measurement, central_measurement_unfolded = read_normalised_xsection_measurement(options, 'central')
     # central measurement
-    normalised_systematic_uncertainty_x_sections['central'] = [central_measurement]
-    unfolded_normalised_systematic_uncertainty_x_sections['central'] = [central_measurement]
+    normalised_systematic_uncertainty_x_sections['central'] = central_measurement
+    unfolded_normalised_systematic_uncertainty_x_sections['central'] = central_measurement
 
     for systematic, variation in list_of_systematics.iteritems():
-        print (systematic)
         if (systematic == 'PDF'):
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, is_multiple_sources=True)
 
@@ -158,9 +157,6 @@ def get_normalised_cross_sections(options, list_of_systematics):
 
             # Combine PDF with alphaS variations
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, list_of_systematics['TTJets_alphaS'])
-
-
-
             pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_lower, syst_unc_x_sec['lower'])]
             pdf_total_upper = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_upper, syst_unc_x_sec['upper'])]
             unf_pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(unf_pdf_total_lower, unf_syst_unc_x_sec['lower'])]
@@ -280,10 +276,10 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
         [signed uncertainty]        = [sign, sign...sign] For N Bins
     '''
     normalised_x_sections_with_symmetrised_systematics = deepcopy(norm_syst_unc_x_secs)
+    central_measurement = norm_syst_unc_x_secs['central']
     for systematic, variation in norm_syst_unc_x_secs.iteritems():
-        central_measurement = variation[0]
-        upper_measurement = variation[1]
-        lower_measurement = variation[2]
+        upper_measurement = variation[0]
+        lower_measurement = variation[1]
 
         isTopMassSystematic = True if systematic == 'TTJets_mass' else False
 
@@ -295,8 +291,11 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
             isTopMassSystematic 
         )
 
-        normalised_x_sections_with_symmetrised_systematics[systematic] = \
-            [central_measurement, symmetrised_uncertainties, signed_uncertainties] 
+        normalised_x_sections_with_symmetrised_systematics['central'] = norm_syst_unc_x_secs['central']
+        normalised_x_sections_with_symmetrised_systematics[systematic] = [
+            symmetrised_uncertainties, 
+            signed_uncertainties,
+        ]         
     return normalised_x_sections_with_symmetrised_systematics           
 
 def get_symmetrised_errors(central_measurement, upper_measurement, lower_measurement, options, isTopMassSystematic=False ):
@@ -361,17 +360,15 @@ def get_measurement_with_total_systematic_uncertainty(options, x_sec_with_symmet
         [symmetrised systematic uncertainty+]   = [central unc, central unc,... central unc] For N Bins
         [symmetrised systematic uncertainty-]   = [sys unc, sys unc,... sys unc] For N Bins
     '''
-    measurement_with_total_uncertainty = {}
     number_of_bins = options['number_of_bins']
-    for group_of_systematics, systematics_in_list in x_sec_with_symmetrised_systematics.iteritems():
-        sys_unc = 0
-        tmp_meas = []
-        for bin_i in range( 0, number_of_bins ):
-            for systematic, measurement in systematics_in_list.iteritems():
-                central = measurement[0][bin_i] # Still [Value, Error]
-                sys_unc += measurement[1][bin_i]**2
-            tmp_meas.append( [central[0], sqrt(sys_unc), sqrt(sys_unc)] )
-        measurement_with_total_uncertainty[group_of_systematics] = tmp_meas
+    sys_unc = 0
+    measurement_with_total_uncertainty = []
+    for bin_i in range( 0, number_of_bins ):
+        central = x_sec_with_symmetrised_systematics['central'][bin_i] # Still [Value, Error]
+        for systematic, measurement in x_sec_with_symmetrised_systematics.iteritems():
+            if (systematic == 'central'): continue
+            sys_unc += measurement[0][bin_i]**2
+        measurement_with_total_uncertainty.append( [central[0], sqrt(sys_unc), sqrt(sys_unc)] )
     return measurement_with_total_uncertainty
 
 def print_dictionary(title, dictionary_to_print):
@@ -394,14 +391,14 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
     '''
     number_of_bins=options['number_of_bins']
 
-    for group_of_systematics, systematics_in_list in x_sec_with_symmetrised_systematics.iteritems():
-        for systematic, measurement in systematics_in_list.iteritems():
-            covariance_matrix, correlation_matrix = generate_covariance_matrix(number_of_bins, group_of_systematics, systematic, measurement)
-            make_covariance_plot(options, systematic, covariance_matrix)
-            make_covariance_plot(options, systematic, correlation_matrix, label='Correlation')
+    for systematic, measurement in x_sec_with_symmetrised_systematics.iteritems():
+        if systematic == 'central': continue
+        covariance_matrix, correlation_matrix = generate_covariance_matrix(number_of_bins, systematic, measurement)
+        make_covariance_plot(options, systematic, covariance_matrix)
+        make_covariance_plot(options, systematic, correlation_matrix, label='Correlation')
     return
 
-def generate_covariance_matrix(number_of_bins, group_of_systematics, systematic, measurement):
+def generate_covariance_matrix(number_of_bins, systematic, measurement):
     '''
     Uses the symmetrised normalised cross sections uncertainties in the form:
     Group of Systematics : { List of Systematics in Group : [[central], [symmetrised uncertainty], [signed uncertainty]]}
@@ -414,10 +411,10 @@ def generate_covariance_matrix(number_of_bins, group_of_systematics, systematic,
     for bin_i in xrange(number_of_bins):
         for bin_j in xrange(number_of_bins):
             if (bin_j < bin_i): continue
-            uncertainty_i = measurement[1][bin_i]
-            uncertainty_j = measurement[1][bin_j]
-            sign_i = measurement[2][bin_i]
-            sign_j = measurement[2][bin_j]
+            uncertainty_i = measurement[0][bin_i]
+            uncertainty_j = measurement[0][bin_j]
+            sign_i = measurement[1][bin_i]
+            sign_j = measurement[1][bin_j]
             cov_ij = (sign_i*uncertainty_i)*(sign_j*uncertainty_j)
             cor_ij = ( sign_i * sign_j )
             # Bins when plotting Histogram start from 1 not 0
@@ -460,8 +457,8 @@ def make_covariance_plot( options, systematic, matrix, label='Covariance' ):
         cov_ij = entry[1]
         set_bin_value( bin_i, bin_j, cov_ij )
     # Easy access to .pngs 
-    canvas = TCanvas("canvas_name","canvas_title", 0, 0, 800, 600)
+    canvas = TCanvas("canvas_name","canvas_title", 0, 0, 1000, 800)
     hist.SetTitle(systematic+" "+label+" matrix for "+variable+" in channel "+channel+" ; Bin_i; Bin_j")
     hist.Draw("colz text")
     canvas.Update()
-    canvas.SaveAs(covariance_matrix_output_path+systematic+'_'+label+'_matrix.png')
+    canvas.SaveAs(covariance_matrix_output_path+systematic+'_'+label+'_matrix.pdf')
