@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 from tools.file_utilities import read_data_from_JSON, write_data_to_JSON
+from tools.Calculation import combine_errors_in_quadrature
 from config import XSectionConfig
 from copy import deepcopy
 from math import sqrt
@@ -68,6 +69,7 @@ def read_normalised_xsection_measurement(options, category):
             category = category,
             method = method
         )
+    print(filename)
 
     normalised_xsection = read_data_from_JSON( filename )
     measurement = normalised_xsection['TTJet_measured']#should this be measured without fakes???
@@ -84,14 +86,18 @@ def read_normalised_xsection_systematics(options, variation, is_multiple_sources
     systematics = {}
     systematics_unf = {}
 
+    print(variation)
+
     if is_multiple_sources:
         for source in variation:
             src, src_unf = read_normalised_xsection_measurement(options, source)
             systematics[source] = src
             systematics_unf[source] = src_unf  
     else:
+
         upper_variation = variation[0]
         lower_variation = variation[1]
+        print(upper_variation)
         systematic_up, systematic_up_unf = read_normalised_xsection_measurement(options, upper_variation)
         systematic_down, systematic_down_unf = read_normalised_xsection_measurement(options, lower_variation)
         systematics['lower'] = systematic_down
@@ -134,30 +140,48 @@ def get_normalised_cross_sections(options, list_of_systematics):
     unfolded_normalised_systematic_uncertainty_x_sections['central'] = [central_measurement]
 
     for systematic, variation in list_of_systematics.iteritems():
+        print (systematic)
         if (systematic == 'PDF'):
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, is_multiple_sources=True)
 
             # Replace all PDF weights with full PDF combination
-            pdf_total_lower, pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement, syst_unc_x_sec)
-            unf_pdf_total_lower, unf_pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement_unfolded, unf_syst_unc_x_sec)
+            pdf_total_lower, pdf_total_upper = calculate_total_PDFuncertainty(
+                options, 
+                central_measurement, 
+                syst_unc_x_sec
+            )
+            unf_pdf_total_lower, unf_pdf_total_upper = calculate_total_PDFuncertainty(
+                options, 
+                central_measurement_unfolded, 
+                unf_syst_unc_x_sec
+            )
 
-            # for PDF_Weight in variation:
-            #     normalised_systematic_uncertainty_x_sections[systematic].append(syst_unc_x_sec[PDF_Weight])
-            #     unfolded_normalised_systematic_uncertainty_x_sections[systematic].append(unf_syst_unc_x_sec[PDF_Weight])
+            # Combine PDF with alphaS variations
+            syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, list_of_systematics['TTJets_alphaS'])
 
-            normalised_systematic_uncertainty_x_sections['PDF_Combined'] = [
+
+
+            pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_lower, syst_unc_x_sec['lower'])]
+            pdf_total_upper = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_upper, syst_unc_x_sec['upper'])]
+            unf_pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(unf_pdf_total_lower, unf_syst_unc_x_sec['lower'])]
+            unf_pdf_total_upper = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(unf_pdf_total_lower, unf_syst_unc_x_sec['upper'])]
+
+            # Add the combined PDF to the tree
+            normalised_systematic_uncertainty_x_sections['PDF'] = [
                 pdf_total_upper, 
                 pdf_total_lower,
             ]
-            unfolded_normalised_systematic_uncertainty_x_sections['PDF_Combined'] = [
+            unfolded_normalised_systematic_uncertainty_x_sections['PDF'] = [
                 unf_pdf_total_upper, 
                 unf_pdf_total_lower,
             ]
-            del normalised_systematic_uncertainty_x_sections['PDF']
-            del unfolded_normalised_systematic_uncertainty_x_sections['PDF']
-            # Need to add in alphaS here
+
+            # Now alphaS is combined with pdfs dont need it in dictionary anymore.
+            # TODO Check whether this combination is ok. combining RMS with a value - should combine with difference to central...
+            del normalised_systematic_uncertainty_x_sections['TTJets_alphaS']
+            del unfolded_normalised_systematic_uncertainty_x_sections['TTJets_alphaS']
+
         elif (systematic == 'TTJets_envelope'):
-            # DO SeomthingHERE
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, is_multiple_sources=True)
             env_lower, env_upper = get_scale_envelope(options, syst_unc_x_sec)
             unf_env_lower, unf_env_upper = get_scale_envelope(options, unf_syst_unc_x_sec)
@@ -169,7 +193,8 @@ def get_normalised_cross_sections(options, list_of_systematics):
                 unf_env_lower,
                 unf_env_upper,
             ]
-        else:
+        elif (systematic == 'TTJets_alphaS'): continue
+        else :
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation)
             normalised_systematic_uncertainty_x_sections[systematic] = [
                 syst_unc_x_sec['upper'], 
@@ -217,7 +242,6 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
     @param pdf_uncertainty_values: dictionary of measurements with different PDF weights; 
                                     format {PDFWeights_%d: measurement}
     '''
-
     number_of_bins = options['number_of_bins']
     pdf_min = []
     pdf_max = []
