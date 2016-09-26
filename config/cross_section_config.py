@@ -226,6 +226,12 @@ class XSectionConfig():
             'TTJets_mass'               : ['TTJets_massup', 'TTJets_massdown'],
             'TTJets_hadronisation'      : ['TTJets_hadronisation', 'TTJets_hadronisation'],
             'TTJets_NLOgenerator'       : ['TTJets_NLOgenerator', 'TTJets_NLOgenerator'],
+
+            'TTJets_alphaS'             : ['TTJets_alphaSup', 'TTJets_alphaSdown'],
+            'TTJets_envelope'           : ['TTJets_factorisationup', 'TTJets_factorisationdown',
+                                            'TTJets_renormalisationup', 'TTJets_renormalisationdown',
+                                            'TTJets_combinedup', 'TTJets_combineddown'],
+
             # Event Reweighting
             'PileUp'                    : ['PileUpSystematic', 'PileUpSystematic'],
             'JES'                       : ['JES_up', 'JES_down'],
@@ -269,7 +275,11 @@ class XSectionConfig():
             'scaleup', 'scaledown',
             'massup', 'massdown',
             'hadronisation',
-            'NLOgenerator'
+            'NLOgenerator',
+            'factorisationup', 'factorisationdown', 
+            'renormalisationup', 'renormalisationdown', 
+            'combinedup', 'combineddown', 
+            'alphaSup', 'alphaSdown'
         ]
 
         self.generator_mcsamples = [
@@ -415,6 +425,14 @@ class XSectionConfig():
         self.unfolding_matching_down = self.unfolding_matching_down_raw.replace( '.root', '_asymmetric.root' )
         self.unfolding_matching_up = self.unfolding_matching_up_raw.replace( '.root', '_asymmetric.root' )
 
+        self.unfolding_renormalisation_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_05muR1muF.root' % self.centre_of_mass_energy
+        self.unfolding_renormalisation_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_2muR1muF.root' % self.centre_of_mass_energy
+        self.unfolding_factorisation_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_1muR05muF.root' % self.centre_of_mass_energy
+        self.unfolding_factorisation_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_1muR2muF.root' % self.centre_of_mass_energy
+        self.unfolding_combined_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_05muR05muF.root' % self.centre_of_mass_energy
+        self.unfolding_combined_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_2muR2muF.root' % self.centre_of_mass_energy
+        self.unfolding_alphaS_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_alphaSDown.root' % self.centre_of_mass_energy
+        self.unfolding_alphaS_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_alphaSUp.root' % self.centre_of_mass_energy
 
         self.unfolding_mass_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_massdown_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_mass_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_massup_asymmetric.root' % self.centre_of_mass_energy
