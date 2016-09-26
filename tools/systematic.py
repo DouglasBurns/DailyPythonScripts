@@ -127,32 +127,33 @@ def get_normalised_cross_sections(options, list_of_systematics):
     unfolded_normalised_systematic_uncertainty_x_sections = deepcopy(list_of_systematics)
 
     central_measurement, central_measurement_unfolded = read_normalised_xsection_measurement(options, 'central')
-    for group_of_systematics, systematics_in_list in list_of_systematics.iteritems():
-        for systematic, variation in systematics_in_list.iteritems():
-            normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic] = [central_measurement]
-            unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic] = [central_measurement]
-            if (systematic == 'PDF'):
-                syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, isPDF=True)
 
-                # Get full PDF combination
-                pdf_total_lower, pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement, syst_unc_x_sec)
-                unf_pdf_total_lower, unf_pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement_unfolded, unf_syst_unc_x_sec)
+    for systematic, variation in list_of_systematics.iteritems():
+        # central measurement
+        normalised_systematic_uncertainty_x_sections[systematic] = [central_measurement]
+        unfolded_normalised_systematic_uncertainty_x_sections[systematic] = [central_measurement]
+        if (systematic == 'PDF'):
+            syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, isPDF=True)
 
-                for PDF_Weight in variation:
-                    normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(syst_unc_x_sec[PDF_Weight])
-                    unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(unf_syst_unc_x_sec[PDF_Weight])
-                normalised_systematic_uncertainty_x_sections[group_of_systematics]['PDF_Combined'] = \
-                    [central_measurement, pdf_total_upper, pdf_total_lower]
-                unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics]['PDF_Combined'] = \
-                    [central_measurement_unfolded, unf_pdf_total_upper, unf_pdf_total_lower]
-                del normalised_systematic_uncertainty_x_sections[group_of_systematics]['PDF']
-                del unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics]['PDF']
-            else:
-                syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation)
-                normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(syst_unc_x_sec['upper'])
-                normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(syst_unc_x_sec['lower'])
-                unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(unf_syst_unc_x_sec['upper'])
-                unfolded_normalised_systematic_uncertainty_x_sections[group_of_systematics][systematic].append(unf_syst_unc_x_sec['lower'])
+            # Get full PDF combination
+            pdf_total_lower, pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement, syst_unc_x_sec)
+            unf_pdf_total_lower, unf_pdf_total_upper = calculate_total_PDFuncertainty(options, central_measurement_unfolded, unf_syst_unc_x_sec)
+
+            for PDF_Weight in variation:
+                normalised_systematic_uncertainty_x_sections[systematic].append(syst_unc_x_sec[PDF_Weight])
+                unfolded_normalised_systematic_uncertainty_x_sections[systematic].append(unf_syst_unc_x_sec[PDF_Weight])
+            normalised_systematic_uncertainty_x_sections['PDF_Combined'] = \
+                [central_measurement, pdf_total_upper, pdf_total_lower]
+            unfolded_normalised_systematic_uncertainty_x_sections['PDF_Combined'] = \
+                [central_measurement_unfolded, unf_pdf_total_upper, unf_pdf_total_lower]
+            del normalised_systematic_uncertainty_x_sections['PDF']
+            del unfolded_normalised_systematic_uncertainty_x_sections['PDF']
+        else:
+            syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation)
+            normalised_systematic_uncertainty_x_sections[systematic].append(syst_unc_x_sec['upper'])
+            normalised_systematic_uncertainty_x_sections[systematic].append(syst_unc_x_sec['lower'])
+            unfolded_normalised_systematic_uncertainty_x_sections[systematic].append(unf_syst_unc_x_sec['upper'])
+            unfolded_normalised_systematic_uncertainty_x_sections[systematic].append(unf_syst_unc_x_sec['lower'])
 
     return normalised_systematic_uncertainty_x_sections, unfolded_normalised_systematic_uncertainty_x_sections
 
@@ -196,17 +197,22 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
         [signed uncertainty]        = [sign, sign...sign] For N Bins
     '''
     normalised_x_sections_with_symmetrised_systematics = deepcopy(norm_syst_unc_x_secs)
-    for group_of_systematics, systematics_in_list in norm_syst_unc_x_secs.iteritems():
-        for systematic, variation in systematics_in_list.iteritems():
+        for systematic, variation in norm_syst_unc_x_secs.iteritems():
             central_measurement = variation[0]
             upper_measurement = variation[1]
             lower_measurement = variation[2]
 
             isTopMassSystematic = True if systematic == 'TTJets_mass' else False
 
-            symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(central_measurement, upper_measurement, lower_measurement, options, isTopMassSystematic )
+            symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(
+                central_measurement, 
+                upper_measurement, 
+                lower_measurement, 
+                options, 
+                isTopMassSystematic 
+            )
 
-            normalised_x_sections_with_symmetrised_systematics[group_of_systematics][systematic] = \
+            normalised_x_sections_with_symmetrised_systematics[systematic] = \
                 [central_measurement, symmetrised_uncertainties, signed_uncertainties] 
     return normalised_x_sections_with_symmetrised_systematics           
 

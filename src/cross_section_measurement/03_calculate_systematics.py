@@ -91,11 +91,8 @@ if __name__ == '__main__':
     # Add in the PDF weights
     all_systematics = append_PDF_uncertainties(all_systematics)
 
-    list_of_systematics = {}
-    # Do you want to use different groups of systematics?
-    list_of_systematics['all'] = all_systematics
-    # Get separated lists of systematics e.g. only hadronisation etc...
-    # TODO
+    list_of_systematics = all_systematics
+    # If you want different listsof systematics can just do some manipulation here
 
     # Print the systematics if required
     print_dictionary("List of the systematics in use", list_of_systematics)
