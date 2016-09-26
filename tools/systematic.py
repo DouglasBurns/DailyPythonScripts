@@ -217,6 +217,7 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
     @param pdf_uncertainty_values: dictionary of measurements with different PDF weights; 
                                     format {PDFWeights_%d: measurement}
     '''
+
     number_of_bins = options['number_of_bins']
     pdf_min = []
     pdf_max = []
@@ -235,9 +236,14 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
                 negative.append(pdf_uncertainty)
             else:
                 positive.append(pdf_uncertainty)
-                
-        pdf_max.append(sqrt(sum(max(x - central, y - central, 0) ** 2 for x, y in zip(negative, positive))))
-        pdf_min.append(sqrt(sum(max(central - x, central - y, 0) ** 2 for x, y in zip(negative, positive))))
+
+        # now to calculate the RMS (sigma)
+        rms_up, rms_down = 0, 0
+        for n,p in zip(negative, positive):
+            rms_up += (p-central)**2
+            rms_down += (n-central)**2   
+        pdf_max.append( sqrt( rms_up / (len(positive)-1) ))
+        pdf_min.append( sqrt( rms_down / (len(negative)-1) ))
 
     return pdf_min, pdf_max  
 
