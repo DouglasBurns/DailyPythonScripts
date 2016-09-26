@@ -97,7 +97,8 @@ if __name__ == '__main__':
     # Print the systematics if required
     print_dictionary("List of the systematics in use", list_of_systematics)
 
-    for channel in ['electron', 'muon', 'combined', 'combinedBeforeUnfolding']:
+    # for channel in ['electron', 'muon', 'combined', 'combinedBeforeUnfolding']:
+    for channel in ['muon']:
         print("Channel in use is {0} : ".format(channel))
 
         # Output folder of covariance matrices
@@ -115,7 +116,7 @@ if __name__ == '__main__':
 
         # Retreive the normalised cross sections, for all groups in list_of_systematics.
         systematic_normalised_uncertainty, unfolded_systematic_normalised_uncertainty = get_normalised_cross_sections(opts, list_of_systematics)
-        # print_dictionary("Normalised cross sections of the systematics in use", systematic_normalised_uncertainty)
+        print_dictionary("Normalised cross sections of the systematics in use", systematic_normalised_uncertainty)
         # print_dictionary("Unfolded normalised cross sections of the systematics in use", unfolded_systematic_normalised_uncertainty)
 
         # # Get and symmetrise the uncertainties
