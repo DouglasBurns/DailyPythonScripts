@@ -69,8 +69,6 @@ def read_normalised_xsection_measurement(options, category):
             category = category,
             method = method
         )
-    print(filename)
-
     normalised_xsection = read_data_from_JSON( filename )
     measurement = normalised_xsection['TTJet_measured']#should this be measured without fakes???
     measurement_unfolded = normalised_xsection['TTJet_unfolded']
@@ -86,8 +84,6 @@ def read_normalised_xsection_systematics(options, variation, is_multiple_sources
     systematics = {}
     systematics_unf = {}
 
-    print(variation)
-
     if is_multiple_sources:
         for source in variation:
             src, src_unf = read_normalised_xsection_measurement(options, source)
@@ -97,7 +93,6 @@ def read_normalised_xsection_systematics(options, variation, is_multiple_sources
 
         upper_variation = variation[0]
         lower_variation = variation[1]
-        print(upper_variation)
         systematic_up, systematic_up_unf = read_normalised_xsection_measurement(options, upper_variation)
         systematic_down, systematic_down_unf = read_normalised_xsection_measurement(options, lower_variation)
         systematics['lower'] = systematic_down
@@ -142,40 +137,12 @@ def get_normalised_cross_sections(options, list_of_systematics):
     for systematic, variation in list_of_systematics.iteritems():
         if (systematic == 'PDF'):
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, is_multiple_sources=True)
-
-            # Replace all PDF weights with full PDF combination
-            pdf_total_lower, pdf_total_upper = calculate_total_PDFuncertainty(
-                options, 
-                central_measurement, 
-                syst_unc_x_sec
-            )
-            unf_pdf_total_lower, unf_pdf_total_upper = calculate_total_PDFuncertainty(
-                options, 
-                central_measurement_unfolded, 
-                unf_syst_unc_x_sec
-            )
-
-            # Combine PDF with alphaS variations
-            syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, list_of_systematics['TTJets_alphaS'])
-            pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_lower, syst_unc_x_sec['lower'])]
-            pdf_total_upper = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(pdf_total_upper, syst_unc_x_sec['upper'])]
-            unf_pdf_total_lower = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(unf_pdf_total_lower, unf_syst_unc_x_sec['lower'])]
-            unf_pdf_total_upper = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(unf_pdf_total_lower, unf_syst_unc_x_sec['upper'])]
-
-            # Add the combined PDF to the tree
-            normalised_systematic_uncertainty_x_sections['PDF'] = [
-                pdf_total_upper, 
-                pdf_total_lower,
-            ]
-            unfolded_normalised_systematic_uncertainty_x_sections['PDF'] = [
-                unf_pdf_total_upper, 
-                unf_pdf_total_lower,
-            ]
-
-            # Now alphaS is combined with pdfs dont need it in dictionary anymore.
-            # TODO Check whether this combination is ok. combining RMS with a value - should combine with difference to central...
-            del normalised_systematic_uncertainty_x_sections['TTJets_alphaS']
-            del unfolded_normalised_systematic_uncertainty_x_sections['TTJets_alphaS']
+            normalised_systematic_uncertainty_x_sections[systematic] = []
+            unfolded_normalised_systematic_uncertainty_x_sections[systematic] = []
+            for weight, vals in syst_unc_x_sec.iteritems():
+                normalised_systematic_uncertainty_x_sections[systematic].append([weight, vals])
+            for weight, vals in unf_syst_unc_x_sec.iteritems():
+                unfolded_normalised_systematic_uncertainty_x_sections[systematic].append([weight, vals])
 
         elif (systematic == 'TTJets_envelope'):
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation, is_multiple_sources=True)
@@ -189,7 +156,7 @@ def get_normalised_cross_sections(options, list_of_systematics):
                 unf_env_lower,
                 unf_env_upper,
             ]
-        elif (systematic == 'TTJets_alphaS'): continue
+        # elif (systematic == 'TTJets_alphaS'): continue
         else :
             syst_unc_x_sec, unf_syst_unc_x_sec = read_normalised_xsection_systematics(options, variation)
             normalised_systematic_uncertainty_x_sections[systematic] = [
@@ -249,9 +216,10 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
         negative = []
         positive = []
         central = central_measurement[bin_i][0]
-        for index in range(0, 100):
-            pdf_weight = 'PDFWeights_{0}'.format(index)
-            pdf_uncertainty = pdf_uncertainty_values[pdf_weight][bin_i]
+        for pdf_variation in pdf_uncertainty_values:
+            # Get PDF weight index from its name
+            index = int(pdf_variation[0].rsplit('_', 1)[1])
+            pdf_uncertainty = pdf_variation[1][bin_i]
             if index % 2 == 0:  # even == negative
                 negative.append(pdf_uncertainty)
             else:
@@ -265,7 +233,10 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
         pdf_max.append( sqrt( rms_up / (len(positive)-1) ))
         pdf_min.append( sqrt( rms_down / (len(negative)-1) ))
 
-    return pdf_min, pdf_max  
+        pdf_sym = max(pdf_min, pdf_max)
+
+    # return pdf_min, pdf_max  
+    return pdf_sym  
 
 def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
     '''
@@ -278,24 +249,50 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
     normalised_x_sections_with_symmetrised_systematics = deepcopy(norm_syst_unc_x_secs)
     central_measurement = norm_syst_unc_x_secs['central']
     for systematic, variation in norm_syst_unc_x_secs.iteritems():
-        upper_measurement = variation[0]
-        lower_measurement = variation[1]
+        if (systematic == 'PDF'):
+            # Replace all PDF weights with full PDF combination
+            pdf_sym = calculate_total_PDFuncertainty(
+                options, 
+                central_measurement, 
+                variation,
+            )
+            # TODO Find signs etc... i.e. do proper covariance for PDF
+            normalised_x_sections_with_symmetrised_systematics[systematic] = [
+                pdf_sym, 
+                [0]*len(central_measurement),
+            ]  
 
-        isTopMassSystematic = True if systematic == 'TTJets_mass' else False
+        else:
+            upper_measurement = variation[0]
+            lower_measurement = variation[1]
 
-        symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(
-            central_measurement, 
-            upper_measurement, 
-            lower_measurement, 
-            options, 
-            isTopMassSystematic 
-        )
+            isTopMassSystematic = True if systematic == 'TTJets_mass' else False
 
-        normalised_x_sections_with_symmetrised_systematics['central'] = norm_syst_unc_x_secs['central']
-        normalised_x_sections_with_symmetrised_systematics[systematic] = [
-            symmetrised_uncertainties, 
-            signed_uncertainties,
-        ]         
+            symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(
+                central_measurement, 
+                upper_measurement, 
+                lower_measurement, 
+                options, 
+                isTopMassSystematic,
+            )
+
+            normalised_x_sections_with_symmetrised_systematics['central'] = norm_syst_unc_x_secs['central']
+            normalised_x_sections_with_symmetrised_systematics[systematic] = [
+                symmetrised_uncertainties, 
+                signed_uncertainties,
+            ]         
+
+
+
+    # Combine PDF with alphaS variations
+    alphaS = normalised_x_sections_with_symmetrised_systematics['TTJets_alphaS'][0]
+    pdf = normalised_x_sections_with_symmetrised_systematics['PDF'][0]
+    pdf_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(alphaS, pdf)]
+    normalised_x_sections_with_symmetrised_systematics['PDF'][0] = pdf_tot
+    # TODO combine the signs....
+
+    # Now alphaS is combined with pdfs dont need it in dictionary anymore.
+    del normalised_x_sections_with_symmetrised_systematics['TTJets_alphaS']
     return normalised_x_sections_with_symmetrised_systematics           
 
 def get_symmetrised_errors(central_measurement, upper_measurement, lower_measurement, options, isTopMassSystematic=False ):
@@ -309,6 +306,7 @@ def get_symmetrised_errors(central_measurement, upper_measurement, lower_measure
     number_of_bins = len(central_measurement)
     symm_uncerts = []
     sign_uncerts = []
+
 
     for c, u, l in zip(central_measurement, upper_measurement, lower_measurement):
         central = c[0] # Getting the measurement, not the error [xsec, unc]

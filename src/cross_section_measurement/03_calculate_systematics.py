@@ -95,6 +95,7 @@ if __name__ == '__main__':
     # If you want different lists of systematics can just do some manipulation here
 
     for channel in ['electron', 'muon', 'combined', 'combinedBeforeUnfolding']:
+    # for channel in ['muon']:
         print("Channel in use is {0} : ".format(channel))
 
         # Output folder of covariance matrices
