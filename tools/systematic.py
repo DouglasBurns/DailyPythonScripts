@@ -6,6 +6,7 @@ from copy import deepcopy
 from math import sqrt
 import numpy as np
 
+
 def write_normalised_xsection_measurement(options, measurement, measurement_unfolded, summary = '' ):
     '''
     Writes the list of normalised measurements and normalised unfolded measurements of the form: 
@@ -32,6 +33,7 @@ def write_normalised_xsection_measurement(options, measurement, measurement_unfo
 
     print("Data written to : ", output_file)
 
+
 def append_PDF_uncertainties(all_systematics):
     '''
     Replace 'PDF' entry in list of all systematics with actual PDF variations
@@ -41,6 +43,7 @@ def append_PDF_uncertainties(all_systematics):
         variation.append('PDFWeights_'+str(index))
     all_systematics['PDF'] = variation
     return all_systematics
+
 
 def read_normalised_xsection_measurement(options, category):
     '''
@@ -74,12 +77,14 @@ def read_normalised_xsection_measurement(options, category):
     measurement_unfolded = normalised_xsection['TTJet_unfolded']
     return measurement, measurement_unfolded  
 
+
 def read_normalised_xsection_systematics(options, variation, is_multiple_sources=False):
     '''
     Returns the list of normalised measurements and normalised unfolded measurements 
     for each systematic category
+
     variation: current systematic (BJet, PDF etc)
-    is_multiple_sources: is svariation composed of multiple sources? (PDF : PDFWeight1, ...)
+    is_multiple_sources: is variation composed of multiple sources? (PDF : PDFWeight1, ...)
     '''
     systematics = {}
     systematics_unf = {}
@@ -104,6 +109,7 @@ def read_normalised_xsection_systematics(options, variation, is_multiple_sources
     systematics_unf = get_systematic_measured_values_only(options, systematics_unf)   
     return systematics, systematics_unf
 
+
 def get_systematic_measured_values_only(options, syst_x_secs_and_errs):
     '''
     When retreiveing systematic uncertainties they come in form [Value, Error]. 
@@ -119,18 +125,27 @@ def get_systematic_measured_values_only(options, syst_x_secs_and_errs):
 
 def get_normalised_cross_sections(options, list_of_systematics):
     '''
-    Gets the normalised cross sections in the form:
-    List of Systematics in Group = {[[central], [upper], [lower]]}
-        [central] = [[x sec, unc], [x sec, unc]...[x sec, unc]] For N Bins
-        [upper]   = [[x sec], [x sec]...[x sec]] For N Bins
-        [lower]   = [[x sec], [x sec]...[x sec]] For N Bins
+    Returns the normalised cross section measurements for the given list of systematics
+
+    Of the form:
+        ['Central'] [Value, Error],
+        ['Systematic'] [[Lower Measurement], [Upper Measurement]],
+            ||
+            ||
+           \||/
+            \/
+
+    [central]               =   [[x sec, unc], [x sec, unc]...[x sec, unc]] For N Bins
+    [Upper Measurement]     =   [[x sec], [x sec]...[x sec]] For N Bins
+    [Lower Measurement]     =   [[x sec], [x sec]...[x sec]] For N Bins
+
+    For PDF there is an additional nest for each variation
     '''
     # Copy structure of the systmatic lists in order to replace systematic name with their normailsed x sections
     normalised_systematic_uncertainty_x_sections = deepcopy(list_of_systematics)
     unfolded_normalised_systematic_uncertainty_x_sections = deepcopy(list_of_systematics)
 
     central_measurement, central_measurement_unfolded = read_normalised_xsection_measurement(options, 'central')
-    # central measurement
     normalised_systematic_uncertainty_x_sections['central'] = central_measurement
     unfolded_normalised_systematic_uncertainty_x_sections['central'] = central_measurement
 
@@ -174,7 +189,8 @@ def get_normalised_cross_sections(options, list_of_systematics):
 def get_scale_envelope(options, d_syst):
     '''
     Calculate the scale envelope for the renormalisation/factorisation/combined systematic uncertainties
-    Do we need to store syst-central or just syst?
+    For all up variations in a bin keep the highest
+    For all down variations in a bin keep the lowest
     '''
     down_variations = []
     up_variations = []
@@ -196,20 +212,23 @@ def get_scale_envelope(options, d_syst):
     return envelope_down, envelope_up
 
 
-
-
 def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty_values):
     '''
-    Calculates the appropriate lower and upper PDF uncertainty
-    @param central_measurement: measurement from central PDF weight
-    @param pdf_uncertainty_values: dictionary of measurements with different PDF weights; 
-                                    format {PDFWeights_%d: measurement}
+    Returns the symmetrised PDF uncertainty. Finds the max of RMS 
+    of all the up variations and RMS of all the down variations in a bin.
+                
+                                                2
+                  SUM_Bins (Variation - Central)
+    RMS = SQRT ( -------------------------------- )
+                                N-1
+
+    Of the form:
+        [Uncertainty] for N bins
+
     '''
     number_of_bins = options['number_of_bins']
     pdf_min = []
     pdf_max = []
-    # print_dictionary("Central",central_measurement)
-    # print_dictionary("PDF",pdf_uncertainty_values)
 
     # split PDF uncertainties into downwards (negative) and upwards (positive) components
     for bin_i in xrange(number_of_bins):
@@ -238,13 +257,21 @@ def calculate_total_PDFuncertainty(options, central_measurement, pdf_uncertainty
     # return pdf_min, pdf_max  
     return pdf_sym  
 
+
 def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
     '''
-    Gets the symmetrised normalised cross sections uncertainties in the form:
-    Group of Systematics : { List of Systematics in Group : [[central], [symmetrised uncertainty], [signed uncertainty]]}
-        [central]                   = [[x sec, unc], [x sec, unc]...[x sec, unc]] For N Bins
-        [symmetrised uncertainty]   = [sym unc, sym unc...sym unc] For N Bins
-        [signed uncertainty]        = [sign, sign...sign] For N Bins
+    Returns the symmetrised uncertainties on the normalised cross sections.
+
+    Of the form:
+        ['Central'] [[Value][Stat_Uncert]],
+        ['Systematic'] [[Sym_Uncert],[Sign]],
+            ||
+            ||
+           \||/
+            \/
+
+    Separate uncertainty calculation for PDFs. Need to think how to calc correlation matrices. (i.e. no way to get sign yet)
+    Combine PDFs and alphaS systematics
     '''
     normalised_x_sections_with_symmetrised_systematics = deepcopy(norm_syst_unc_x_secs)
     central_measurement = norm_syst_unc_x_secs['central']
@@ -282,8 +309,6 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
                 signed_uncertainties,
             ]         
 
-
-
     # Combine PDF with alphaS variations
     alphaS = normalised_x_sections_with_symmetrised_systematics['TTJets_alphaS'][0]
     pdf = normalised_x_sections_with_symmetrised_systematics['PDF'][0]
@@ -295,18 +320,22 @@ def get_symmetrised_systematic_uncertainty(norm_syst_unc_x_secs, options):
     del normalised_x_sections_with_symmetrised_systematics['TTJets_alphaS']
     return normalised_x_sections_with_symmetrised_systematics           
 
+
 def get_symmetrised_errors(central_measurement, upper_measurement, lower_measurement, options, isTopMassSystematic=False ):
     '''
     Returns the symmetric error in each bin for a specific systematic and also the sign of the systematic.
-    Sign is used for calculating the covariance matrices. Returns of the form:
-    [Symmetric Uncertainties],[Signed Uncertainties]
-        [symmetrised uncertainty]   = [sym unc, sym unc...sym unc] For N Bins
-        [signed uncertainty]        = [sign, sign...sign] For N Bins
+    Sign is used for calculating the covariance matrices. 
+
+    Returns of the form:
+        [Symmetric Uncertainties]
+        [Signed Uncertainties]
+
+    [symmetrised uncertainty]   = [sym unc, sym unc...sym unc] For N Bins
+    [signed uncertainty]        = [sign, sign...sign] For N Bins
     '''
     number_of_bins = len(central_measurement)
     symm_uncerts = []
     sign_uncerts = []
-
 
     for c, u, l in zip(central_measurement, upper_measurement, lower_measurement):
         central = c[0] # Getting the measurement, not the error [xsec, unc]
@@ -331,6 +360,10 @@ def get_symmetrised_errors(central_measurement, upper_measurement, lower_measure
     return symm_uncerts, sign_uncerts
 
 def scaleTopMassSystematic( upper_uncertainty, lower_uncertainty, topMasses, topMassUncertainty ):
+    '''
+    For the top mass systematic, scale the uncertainties to the actual top mass uncertainty.
+    i.e. Samples with different top masses do not represent the top mass uncertainty
+    '''
     lowMassDifference = topMasses[1] - topMasses[0]
     upMassDifference = topMasses[2] - topMasses[1]
 
@@ -341,6 +374,7 @@ def scaleTopMassSystematic( upper_uncertainty, lower_uncertainty, topMasses, top
 
 def get_sign(central, upper, lower, upper_variation, lower_variation):
     '''
+    Currently Obsolete.
     Returns the sign of the uncertainty - i.e. was the upper variation bigger than the lower variation
     Returns 0 if the systematic is symmetrical
     '''
@@ -352,11 +386,17 @@ def get_sign(central, upper, lower, upper_variation, lower_variation):
 
 def get_measurement_with_total_systematic_uncertainty(options, x_sec_with_symmetrised_systematics):
     '''
-    Returns the measurement with the total symmetrised systematic uncertainties of the form:
-    Group of Systematics : [central value][central uncertainty][symmetrised systematic uncertainty+][symmetrised systematic uncertainty-]
-        [central value]                         = [[x sec, unc], [x sec, unc],... [x sec, unc]] For N Bins
-        [symmetrised systematic uncertainty+]   = [central unc, central unc,... central unc] For N Bins
-        [symmetrised systematic uncertainty-]   = [sys unc, sys unc,... sys unc] For N Bins
+    Returns the measurement with the total symmetrised systematic uncertainties 
+    Of the form:
+        [central] [syst_unc up] [syst_unc down]
+
+    [central]           = [x sec, x sec,... x sec]
+    [syst_unc up]       = [sys unc, sys unc,... sys unc]
+    [syst_unc down]     = [sys unc, sys unc,... sys unc] 
+    For N Bins
+
+    TODO Should we output something like [central] [stat_unc] [syst_unc] instead?
+
     '''
     number_of_bins = options['number_of_bins']
     sys_unc = 0
@@ -372,6 +412,7 @@ def get_measurement_with_total_systematic_uncertainty(options, x_sec_with_symmet
 def print_dictionary(title, dictionary_to_print):
     '''
     Prints dictionaries in a nicer form
+    TODO Maybe think how pandas can be incorporated into 03...
     '''
     import pprint
     pp = pprint.PrettyPrinter(indent=4)
@@ -398,8 +439,6 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
 
 def generate_covariance_matrix(number_of_bins, systematic, measurement):
     '''
-    Uses the symmetrised normalised cross sections uncertainties in the form:
-    Group of Systematics : { List of Systematics in Group : [[central], [symmetrised uncertainty], [signed uncertainty]]}
     Covariance_ij = (Sign_i*Unc_i) * (Sign_j*Unc_j)
     Variance_ii = (Unc_i) * (Unc_i)
     Returns the matrix in the form [[Bin_i, Bin_j], Cov_ij]
