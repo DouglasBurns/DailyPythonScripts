@@ -186,11 +186,14 @@ def get_normalised_cross_sections(options, list_of_systematics):
     return normalised_systematic_uncertainty_x_sections, unfolded_normalised_systematic_uncertainty_x_sections
 
 
-def get_scale_envelope(options, d_syst):
+def get_scale_envelope(options, d_scale_syst):
     '''
     Calculate the scale envelope for the renormalisation/factorisation/combined systematic uncertainties
     For all up variations in a bin keep the highest
     For all down variations in a bin keep the lowest
+
+    d_scale_syst is a dictionary containing all the Q2 scale variations
+    Retrieve the 3 up(down) variations from d_scale_syst and choose max(min) value as the envelope for each bin
     '''
     down_variations = []
     up_variations = []
@@ -198,11 +201,11 @@ def get_scale_envelope(options, d_syst):
     envelope_down = []
 
     # Separate into up/down scale variations
-    for scale_variation in d_syst:
+    for scale_variation in d_scale_syst:
         if 'down' in scale_variation:
-            down_variations.append(d_syst[scale_variation])
+            down_variations.append(d_scale_syst[scale_variation])
         elif 'up' in scale_variation:
-            up_variations.append(d_syst[scale_variation])
+            up_variations.append(d_scale_syst[scale_variation])
 
     # find min/max
     for v1, v2, v3 in zip (up_variations[0], up_variations[1], up_variations[2]):
@@ -382,6 +385,7 @@ def scaleTopMassSystematic( upper_uncertainty, lower_uncertainty, topMasses, top
 
 def get_sign(central, upper, lower, upper_variation, lower_variation):
     '''
+    @deprecated
     Currently Obsolete.
     Returns the sign of the uncertainty - i.e. was the upper variation bigger than the lower variation
     Returns 0 if the systematic is symmetrical

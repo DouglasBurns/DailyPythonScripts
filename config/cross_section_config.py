@@ -191,8 +191,8 @@ class XSectionConfig():
             'JER_down':'_JERDown',
             'JER_up':'_JERUp',
 
-
-            'PileUpSystematic' : '',
+            'PileUp_up' : '',
+            'PileUp_down' : '',
 
             # Other MET uncertainties not already included
             'ElectronEnUp' : '',
@@ -203,14 +203,6 @@ class XSectionConfig():
             'TauEnDown' : '',
             'UnclusteredEnUp' : '',
             'UnclusteredEnDown' : '',
-            # 'ElectronEn_up' : 'ElectronEnUp',
-            # 'ElectronEn_down' : 'ElectronEnDown',
-            # 'MuonEn_up' : 'MuonEnUp',
-            # 'MuonEn_down' : 'MuonEnDown',
-            # 'TauEn_up' : 'TauEnUp',
-            # 'TauEn_down' : 'TauEnDown',
-            # 'UnclusteredEn_up' : 'UnclusteredEnUp',
-            # 'UnclusteredEn_down' : 'UnclusteredEnDown',
         }
 
         self.list_of_systematics = {
@@ -233,7 +225,7 @@ class XSectionConfig():
                                             'TTJets_combinedup', 'TTJets_combineddown'],
 
             # Event Reweighting
-            'PileUp'                    : ['PileUpSystematic', 'PileUpSystematic'],
+            'PileUp'                    : ['PileUp_up', 'PileUp_down'],
             'JES'                       : ['JES_up', 'JES_down'],
             'JER'                       : ['JER_up', 'JER_down'],
             'BJet'                      : ['BJet_up', 'BJet_down'],
@@ -279,7 +271,7 @@ class XSectionConfig():
             'factorisationup', 'factorisationdown', 
             'renormalisationup', 'renormalisationdown', 
             'combinedup', 'combineddown', 
-            'alphaSup', 'alphaSdown'
+            'alphaSup', 'alphaSdown',
         ]
 
         self.generator_mcsamples = [
