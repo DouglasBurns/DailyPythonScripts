@@ -383,9 +383,9 @@ def scaleTopMassSystematic( upper_uncertainty, lower_uncertainty, topMasses, top
 
     return upper_uncertainty, lower_uncertainty
 
+@deprecated
 def get_sign(central, upper, lower, upper_variation, lower_variation):
     '''
-    @deprecated
     Currently Obsolete.
     Returns the sign of the uncertainty - i.e. was the upper variation bigger than the lower variation
     Returns 0 if the systematic is symmetrical
