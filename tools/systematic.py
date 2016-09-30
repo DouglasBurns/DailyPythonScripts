@@ -17,7 +17,7 @@ def write_normalised_xsection_measurement(options, measurement, measurement_unfo
     method=options['method']
     channel=options['channel']
 
-    output_file = '{path_to_JSON}/TEST/central/normalised_xsection_{channel}_{method}_with_errors.txt'
+    output_file = '{path_to_JSON}/central/normalised_xsection_{channel}_{method}_with_errors.txt'
     output_file = output_file.format(
                     path_to_JSON = path_to_JSON,
                     channel = channel,
