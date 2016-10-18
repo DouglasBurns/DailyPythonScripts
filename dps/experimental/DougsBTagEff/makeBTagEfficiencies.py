@@ -6,6 +6,7 @@ from array import array
 import math
 import os
 from optparse import OptionParser
+from dps.utils.file_utilities import make_folder_if_not_exists
 
 ROOT.gROOT.SetBatch(True)
 if __name__ == '__main__':
@@ -22,13 +23,13 @@ if __name__ == '__main__':
 	(options, args) = parser.parse_args()
 	if options.test : print "RUNNING OVER TEST SAMPLE"
 
-	basepath = "/hdfs/TopQuarkGroup/run2/atOutput/13TeV/25ns/20_05_16/"
+	basepath = "/hdfs/TopQuarkGroup/ec6821/0.0.10/atOutput/combined/"
 	input_files = {
 		0 : ["TTJets_PowhegPythia8_tree.root" , "PowhegPythia8"], 
 		1 : ["TTJets_powhegHerwigpp_tree.root" , "PowhegHerwigpp"],
 		2 : ["TTJets_amc_tree.root" , "aMCatNLOPythia8"],
-		3 : ["TTJets_amcatnloHerwigpp_tree.root" , "aMCatNLOHerwigpp"],
-		4 : ["TTJets_madgraph_tree.root" , "Madgraph"],
+		3 : ["TTJets_madgraph_tree.root" , "Madgraph"],
+		# 4 : ["TTJets_amcatnloHerwigpp_tree.root" , "aMCatNLOHerwigpp"],
 		}
 
 	partonHists = [
@@ -79,7 +80,6 @@ if __name__ == '__main__':
 			Mu_inputTree = "TTbar_plus_X_analysis/MuPlusJets/Ref selection NoBSelection/BTagEfficiencies/Jets"
 			Mu_Chain = TChain(Mu_inputTree)
 			Mu_Chain.Add(input_file)
-
 			Chain = {
 			0 : E_Chain,
 			1 : Mu_Chain,
@@ -95,6 +95,7 @@ if __name__ == '__main__':
 					n=n+1
 					if options.test :  
 						if n == 10000 : break
+						# if n == 10 : break
 					NJets = event.__getattr__("NJets")
 					pt = event.__getattr__("pt")
 					eta = event.__getattr__("eta")
@@ -108,15 +109,29 @@ if __name__ == '__main__':
 					puWeight = event.__getattr__("PUWeight")
 					if key == 0 : leptonWeight = event.__getattr__("ElectronEfficiencyCorrection")
 					else : leptonWeight = event.__getattr__("MuonEfficiencyCorrection")
-					
+
+
+
 					weight = eventWeight * puWeight * leptonWeight
+
 					
-					if (NJets == 0): continue;
+					if (NJets <= 0): continue;
 
 					for JetIndex in range (0,int(NJets)):
-
-						if (pt[JetIndex] < 25): continue;
-
+						if (pt[JetIndex] < 30): continue;
+						if (abs(eta[JetIndex]) > 2.4): continue;
+						# print "- "*10
+						# print 'leptonweight chosen ' , leptonWeight
+						# print 'electron wieght ' ,event.__getattr__("ElectronEfficiencyCorrection")
+						# print 'muon weight ' ,event.__getattr__("MuonEfficiencyCorrection")
+						# print "NJets ", NJets
+						# print "Weight ", weight
+						# print "eventWeight ", eventWeight
+						# print "puWeight ", puWeight
+						# print "lepWeight ", leptonWeight
+						# print "HadronFlavour ", hadronFlavour[JetIndex]
+						# print "is Med BTagged", isMedium[JetIndex]
+						# print "Pt jet", pt[JetIndex]
 						if (hadronFlavour[JetIndex] == 5):
 							bQuarkJets_Total_Hist[sample].Fill(pt[JetIndex], eta[JetIndex], weight)
 							if (isMedium[JetIndex] == 1):
@@ -168,7 +183,7 @@ if __name__ == '__main__':
 
 	if options.make_plots:
 		f = TFile("BTagEfficiency.root", "OPEN")
-		
+		make_folder_if_not_exists('plots/')
 		for key in range (0, len(input_files)):
 			generator = input_files[key][1]
 
