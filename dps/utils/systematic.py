@@ -4,7 +4,8 @@ from dps.utils.Calculation import combine_errors_in_quadrature
 from dps.utils.pandas_utilities import read_tuple_from_file, \
 dict_to_df, list_to_series, df_to_file, \
 divide_by_series, file_to_df, matrix_from_df, \
-create_covariance_matrixfrom copy import deepcopy
+create_covariance_matrix
+from copy import deepcopy
 from math import sqrt
 import numpy as np
 
@@ -499,7 +500,7 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
         create_covariance_matrix(correlation_matrix, table_outfile)
         make_covariance_plot(options, syst_name, correlation_matrix, label='Correlation')
 
-        generate_total_covariance(options, all_covariance_matrices)
+    generate_total_covariance(options, all_covariance_matrices)
 
     return
 
@@ -548,7 +549,7 @@ def generate_total_covariance(options, all_covariances):
     cov_stat = matrix_from_df(cov_stat)
     cov_tot = cov_stat
     for m in all_covariances:
-        cov_tot= m
+        cov_tot+=m
 
     table_outfile = 'tables/covariance_matrices/{ch}/{var}/Total_{label}_matrix.txt'.format(
         ch=options['channel'],
@@ -603,4 +604,3 @@ def make_covariance_plot( options, syst_name, matrix, label='Covariance' ):
         )
     make_folder_if_not_exists(covariance_matrix_output_path)
     plt.savefig(covariance_matrix_output_path+syst_name+'_'+label+'_matrix.pdf')
-    
