@@ -489,7 +489,7 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
         sign = measurement[1]
 
         # Create the matrices in numpy.matrix format
-        covariance_matrix, correlation_matrix = generate_covariance_matrix(number_of_bins, systematic, sign, statistic)
+        covariance_matrix, correlation_matrix = generate_covariance_matrix(number_of_bins, systematic, sign)
         all_covariance_matrices.append(covariance_matrix)
 
         # Convert the matrices to DF format, output and plot them
@@ -504,12 +504,14 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
 
     return
 
-def generate_covariance_matrix(number_of_bins, systematic, sign, statistic):
+def generate_covariance_matrix(number_of_bins, systematic, sign):
     '''
     Variance_ii = (Unc_i) * (Unc_i)
-    Correlation_ij = (Sign_i) * (Sign_j)
     Covariance_ij = (Sign_i*Unc_i) * (Sign_j*Unc_j)
-    Returns the matrix in the form of a numpy matrix    
+    Correlation_ij = (Sign_i*Unc_i) * (Sign_j*Unc_j)
+                    ---------------------------------
+                             (Unc_i * Unc_j)
+    Returns the matrices in the form of a numpy matrix    
     '''
     cov_matrix = []
     cor_matrix = []
@@ -520,11 +522,10 @@ def generate_covariance_matrix(number_of_bins, systematic, sign, statistic):
             uncertainty_i   = systematic[bin_i]
             uncertainty_j   = systematic[bin_j]
             sign_i          = sign[bin_i]
-            sign_j          = sign[bin_j]
-            stat_i          = statistic[bin_i][1]
-            stat_j          = statistic[bin_j][1]     
-            cor_ij          = sign_i*sign_j
+            sign_j          = sign[bin_j]   
             cov_ij          = (sign_i*uncertainty_i)*(sign_j*uncertainty_j)
+            cor_ij          = cov_ij/(uncertainty_i*uncertainty_j)
+
             cor_matrix_row.append(cor_ij)
             cov_matrix_row.append(cov_ij)
         cor_matrix.append(cor_matrix_row)
