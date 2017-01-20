@@ -491,6 +491,7 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
         # Create the matrices in numpy.matrix format
         covariance_matrix, correlation_matrix = generate_covariance_matrix(number_of_bins, systematic, sign)
         all_covariance_matrices.append(covariance_matrix)
+        all_correlation_matrices.append(correlation_matrix)
 
         # Convert the matrices to DF format, output and plot them
         table_outfile = table_outfile_tmp.format( ch=channel, sys=syst_name, var=variable, label='Covariance')
@@ -500,7 +501,7 @@ def generate_covariance_matrices(options, x_sec_with_symmetrised_systematics):
         create_covariance_matrix(correlation_matrix, table_outfile)
         make_covariance_plot(options, syst_name, correlation_matrix, label='Correlation')
 
-    generate_total_covariance(options, all_covariance_matrices)
+    generate_total_covariance(options, all_covariance_matrices, all_correlation_matrices)
 
     return
 
@@ -535,32 +536,49 @@ def generate_covariance_matrix(number_of_bins, systematic, sign):
     correlation_matrix = np.matrix(cor_matrix)
     return covariance_matrix, correlation_matrix
 
-def generate_total_covariance(options, all_covariances):
+def generate_total_covariance(options, all_covariances, all_correlations):
     '''
     Add covariances together for total covariance matrix
 
     Cov_tot = Cov_stat + Cov_PDF + Cov_BJet ...
+    Similarly for Correlation
     '''
-    # get statistical covariance matric here.
-    stat_filepath='tables/covariance_matrices/{ch}/{var}/Norm_Stat_Covariance_matrix.txt'.format(
-        ch=options['channel'],
-        var=options['variable'],
-    )
-    cov_stat = file_to_df(stat_filepath)
+    # Paths to statistical Covariance/Correlation matrices.
+    filepath_tmp='tables/covariance_matrices/{ch}/{var}/Stat_{label}_matrix.txt'.
+    cov_path=filepath_tmp.format(ch=options['channel'], var=options['variable'],
+        label='Covariance')
+    cor_path=filepath_tmp.format(ch=options['channel'], var=options['variable'],
+        label='Correlation')
+
+    # Convert to numpy matrix and create total
+    cov_stat = file_to_df(cov_path)
     cov_stat = matrix_from_df(cov_stat)
     cov_tot = cov_stat
     for m in all_covariances:
         cov_tot+=m
 
-    table_outfile = 'tables/covariance_matrices/{ch}/{var}/Total_{label}_matrix.txt'.format(
-        ch=options['channel'],
-        var=options['variable'], 
-        label='Covariance',
-    )
+    cor_stat = file_to_df(cor_path)
+    cor_stat = matrix_from_df(cor_stat)
+    cor_tot = cor_stat
+    for m in all_correlations:
+        cor_tot+=m
 
+    # Paths to output total Covariance/Correlation matrices.
+    table_outfile_tmp = 'tables/covariance_matrices/{ch}/{var}/Total_{label}_matrix.txt'
+    cov_outfile = table_outfile_tmp.format(ch=options['channel'], var=options['variable'], 
+        label='Covariance')
+    cor_outfile = table_outfile_tmp.format(ch=options['channel'], var=options['variable'], 
+        label='Covariance')
+
+    # Save the total matrices
     create_covariance_matrix( cov_tot, table_outfile )
+    create_covariance_matrix( cor_tot, table_outfile )
+
+    # Plot the total matrices
     make_covariance_plot( options, 'Stat', cov_stat, label='Covariance' )
     make_covariance_plot( options, 'Total', cov_tot, label='Covariance' )
+    make_covariance_plot( options, 'Stat', cor_stat, label='Correlation' )
+    make_covariance_plot( options, 'Total', cor_tot, label='Correlation' )
     return
 
 def make_covariance_plot( options, syst_name, matrix, label='Covariance' ):    

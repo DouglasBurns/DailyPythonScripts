@@ -120,16 +120,15 @@ def unfold_results( results, category, channel, tau_value, h_truth, h_measured, 
     # print "h_unfolded_data bin edges : ", h_unfolded_data
     h_data_no_fakes = h_data_no_fakes.rebinned(2)
     if category == 'central':
-        # Todo add the correlation matrices
-        # Return the covariance matrices
-        covariance_matrix, normalised_covariance_matrix = unfolding.get_covariance_matrix()
+        # Return the covariance matrices (They have been normailsed)
+        covariance_matrix, correlation_matrix = unfolding.get_covariance_matrix()
 
         # Write covariance matrices
         table_outfile_tmp = 'tables/covariance_matrices/{ch}/{var}/{cat}_{label}_matrix.txt'
         table_outfile=table_outfile_tmp.format( ch=channel, var=variable, label='Covariance', cat='Stat' )
         create_covariance_matrix( covariance_matrix, table_outfile)
-        table_outfile=table_outfile_tmp.format( ch=channel, var=variable, label='Covariance', cat='Norm_Stat' )
-        create_covariance_matrix( normalised_covariance_matrix, table_outfile )
+        table_outfile=table_outfile_tmp.format( ch=channel, var=variable, label='Correlation', cat='Stat' )
+        create_covariance_matrix( correlation_matrix, table_outfile )
     del unfolding
     return hist_to_value_error_tuplelist( h_data_rebinned ), hist_to_value_error_tuplelist( h_unfolded_data ), hist_to_value_error_tuplelist( h_data_no_fakes )
 
