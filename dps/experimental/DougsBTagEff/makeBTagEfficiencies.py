@@ -35,10 +35,20 @@ if __name__ == '__main__':
 	# ADD THE GENERATOR INPUT FILES
 	#################################################################################################################################
 	input_files = {
-		"TTJets_PowhegPythia8_tree.root" : "PowhegPythia8", 
-		"TTJets_PowhegHerwigpp_tree.root" : "PowhegHerwigpp",
-		"TTJets_amc_tree.root" : "aMCatNLOPythia8",
-		# "TTJets_madgraph_tree.root" : "Madgraph",
+		"TTJets_PowhegPythia8_tree.root" 			: "PowhegPythia8", 
+		"TTJets_PowhegHerwigpp_tree.root" 			: "PowhegHerwigpp",
+		"TTJets_amc_tree.root" 						: "aMCatNLOPythia8",
+		"TTJets_madgraph_tree.root" 				: "Madgraph",
+
+		"TTJets_PowhegPythia8_fsrup_tree.root" 		: "PowhegPythia8_fsrup", 
+		"TTJets_PowhegPythia8_fsrdown_tree.root" 	: "PowhegPythia8_fsrdown", 
+		"TTJets_PowhegPythia8_isrup_tree.root" 		: "PowhegPythia8_isrup", 
+		"TTJets_PowhegPythia8_isrdown_tree.root" 	: "PowhegPythia8_isrdown", 
+		"TTJets_PowhegPythia8_up_tree.root" 		: "PowhegPythia8_up", 
+		"TTJets_PowhegPythia8_down_tree.root" 		: "PowhegPythia8_down", 
+		"TTJets_PowhegPythia8_mtop1755_tree.root" 	: "PowhegPythia8_mtop1755", 
+		"TTJets_PowhegPythia8_mtop1695_tree.root" 	: "PowhegPythia8_mtop1695", 
+
 		# "TTJets_amcatnloHerwigpp_tree.root" : "aMCatNLOHerwigpp",
 	}
 
@@ -58,7 +68,7 @@ if __name__ == '__main__':
 	#################################################################################################################################
 	# INITIALISE THE INPUT AND OUTPUT PATHS
 	#################################################################################################################################
-	basepath = "/hdfs/TopQuarkGroup/ec6821/1.0.1/atOutput/combined/"
+	basepath = "/hdfs/TopQuarkGroup/ec6821/1.0.2/atOutput/combined/"
 	file_path = 'dps/experimental/DougsBTagEff/BTagEfficiency.root'
 	output_file = root_open(file_path, "recreate")
 
@@ -183,9 +193,7 @@ if __name__ == '__main__':
 	if options.make_plots:
 		f = TFile(file_path, "OPEN")
 		make_folder_if_not_exists('plots/BTagEfficiency/')
-		for key in range (0, len(input_files)):
-			generator = input_files[key][1]
-
+		for generator in input_files.values():
 			b_Hist = f.Get(generator+"/bQuarkJets_Ratio_Hist")
 			c_Hist = f.Get(generator+"/cQuarkJets_Ratio_Hist")
 			udsg_Hist = f.Get(generator+"/udsgQuarkJets_Ratio_Hist")
