@@ -77,7 +77,7 @@ def main():
 	#################################################################################################################################
 	# INITIALISE THE BINNING AND WEIGHTS
 	#################################################################################################################################
-	pt_binning = array ( 'f' , [30, 50, 70, 100, 140, 200, 300, 670] )
+	pt_binning = array ( 'f' , [20, 30, 50, 70, 100, 140, 200, 300, 600, 1000] )
 	eta_binning = array ( 'f', [-2.4, -2.1, -1.5, 0, 1.5, 2.1, 2.4] )
 	nPtBins = len( pt_binning )	- 1
 	nEtaBins = len( eta_binning ) - 1
@@ -99,6 +99,9 @@ def main():
 
 	if options.only_plots:
 	 	make_eff_plots(input_files, file_path)
+		# make_eff_plots(input_files, file_path, split='generator')
+		# make_eff_plots(input_files, file_path, split='Shape')
+		# make_eff_plots(input_files, file_path, split='Tune')
 	 	return
 
 	output_file = root_open(file_path, "recreate")
@@ -310,7 +313,7 @@ def main():
 	return
 
 
-def make_eff_plots(input_files, file_path):
+def make_eff_plots(input_files, file_path, split=''):
 	'''
 	1D and 2D efficiency plotter
 	'''
@@ -360,6 +363,36 @@ def make_eff_plots(input_files, file_path):
 	for generator in input_files.values():
 		# Only get generators if they exist in the file
 		if not f.GetListOfKeys().Contains(generator): continue
+
+		# Split into categories
+		if split == 'generator':
+			if generator not in [
+				'PowhegPythia8', 
+				'PowhegHerwigpp', 
+				'aMCatNLOPythia8', 
+				'Madgraph'
+				]: continue
+		if split == 'Shape':
+			if generator not in [
+				'PowhegPythia8', 
+				'PowhegPythia8_plusJES', 
+				'PowhegPythia8_minusJES', 
+				'PowhegPythia8_plusJER', 
+				'PowhegPythia8_minusJER',  
+				'PowhegPythia8_mtop1695', 
+				'PowhegPythia8_mtop1755'
+				]: continue
+		if split == 'Tune':
+			if generator not in [
+				'PowhegPythia8', 
+				'PowhegPythia8_fsrup', 
+				'PowhegPythia8_fsrdown', 
+				'PowhegPythia8_isrup', 
+				'PowhegPythia8_isrdown',
+				'PowhegPythia8_up', 
+				'PowhegPythia8_down'
+				]: continue
+
 		b_pt[generator] 	= asrootpy( f.Get(generator+"/bQuarkJets_Ratio_Pt_Hist") )
 		b_eta[generator] 	= asrootpy( f.Get(generator+"/bQuarkJets_Ratio_Eta_Hist") )
 		c_pt[generator] 	= asrootpy( f.Get(generator+"/cQuarkJets_Ratio_Pt_Hist") )
@@ -375,6 +408,8 @@ def make_eff_plots(input_files, file_path):
 		"udsg parton tagging effienciency (pt)" : udsg_pt,
 		"udsg parton tagging effienciency (eta)" : udsg_eta,
 	}
+
+	print b_pt
 
 	colours = [
 		'red', 'blue', 'green', 'chartreuse', 'indigo', 
@@ -407,17 +442,17 @@ def make_eff_plots(input_files, file_path):
 		ylimits=[]
 		if parton == 'b':
 			if var == 'pt':
-				y_limits = [0.58,0.75]
+				y_limits = [0.480,0.75]
 			if var == 'eta':
-				y_limits = [0.50,0.75]
+				y_limits = [0.510,0.75]
 		if parton == 'c':
 			if var == 'pt':
-				y_limits = [0.15,0.21]
+				y_limits = [0.150,0.200]
 			if var == 'eta':
-				y_limits = [0.12,0.21]
+				y_limits = [0.125,0.21]
 		if parton == 'udsg':
 			if var == 'pt':
-				y_limits = [0.015,0.038]
+				y_limits = [0.015,0.050]
 			if var == 'eta':
 				y_limits = [0.014,0.034]
 		# labels
@@ -470,14 +505,17 @@ def make_eff_plots(input_files, file_path):
 		# )
 
 		# filename and saving
-		name_template = '{parton}_{var}_efficiency.pdf'
+		name_template = '{parton}_{var}_{split}efficiency.pdf'
+		s=''
+		if split: s = split+'_' 
 		name = name_template.format(
 			parton=parton,
 			var=var,
-
+			split=s,
 		)
 		plt.tight_layout()
 		fig_eff.savefig('plots/BTagEfficiency/'+name)
+		fig_eff.close()
 
 	f.Close()
 	return
