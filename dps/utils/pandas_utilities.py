@@ -60,7 +60,7 @@ def file_to_df(f):
 			f.close()
 	else:
 		print "Could not find {} ".format(f)
-		return
+		return False
 	return df
 
 def append_to_df(df, df_new):
