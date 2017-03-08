@@ -11,9 +11,9 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 	'''
 	channel = ''
 	fullTable = ''
-	unit = ''
+	unit = ' '
 	if variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
-		unit+='\\textbf{{[GeV]}}'
+		unit+=' \\textbf{(GeV)}'
 	for ch in range(len(xsections)):
 	    #########################################################################################################
 	    ### Table Sub Header
@@ -27,12 +27,10 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 	    #########################################################################################################
 		latexHeader =  '\\begin{table}\n'
 		latexHeader += '\t\centering\n'
-		latexHeader += '\t\small\n'
-		# latexHeader += '\t\\textbf{{{ch}}} \\\\ \n'.format(ch=channel)
 		latexHeader += '\t\\begin{tabular}{|cccc|}\n'
 		# latexHeader +=  '\t\t\\textbf{{{ch}}} \t& \t& \t& \t \\\\ \n'.format(ch=channel)
 		latexHeader += '\t\t\hline\n'
-		latexHeader +=  '\t\t\\textbf{{{var}}}'.format(var=variables_latex[variable])+unit+' \t& \\textbf{{Central}} \t& \\textbf{{Statistical Uncertainty}} \t& \\textbf{{Systematic Uncertainty}}\t \\\\ \n'
+		latexHeader +=  '\t\t\\textbf{{{var}}}'.format(var=variables_latex[variable])+unit+' \t& \\textbf{Central} \t& \\textbf{Statistical Uncertainty} \t& \\textbf{Systematic Uncertainty}\t \\\\ \n'
 		latexHeader += '\t\t\hline\n'
 
 		fullTable += latexHeader
@@ -66,6 +64,7 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 		)	
 		tableFooter += '\\end{table}\n\n\n'
 		fullTable += tableFooter
+	fullTable += '\clearpage'
 
     #########################################################################################################
     ### Write Table
