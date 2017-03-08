@@ -9,23 +9,11 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 	'''
 	Generate and write the Latex table for the cross sections
 	'''
-    #########################################################################################################
-    ### Table Header
-    #########################################################################################################
-	latexHeader = '\\begin{table}\n'
-	latexHeader += '\t\centering\n'
-	latexHeader += '\t\small\n'
-	latexHeader += '\t\\begin{tabular}{|cccc|}\n'
-	latexHeader += '\t\t\hline\n'
-
-	labelHeader = '\t\t'
-	labelHeader += '\\textbf{{{var}}} \t& \\textbf{{Central}} \t& \\textbf{{Statistical Uncertainty}} \t& \\textbf{{Systematic Uncertainty}}\t \\\\ \n'.format(var=variables_latex[variable])
-	# labelHeader += '\t\t\hline\n'
-
-	fullTable = latexHeader
-	fullTable += labelHeader
-
 	channel = ''
+	fullTable = ''
+	unit = ''
+	if variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
+		unit+='\\textbf{{[GeV]}}'
 	for ch in range(len(xsections)):
 	    #########################################################################################################
 	    ### Table Sub Header
@@ -34,10 +22,20 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 		elif ch == 1: channel = 'muon'
 		elif ch == 2: channel = 'combined'
 
-		subHeader = '\t\t\\textbf{{{ch}}} \t& \t& \t& \t \\\\ \n'.format(ch=channel)
-		subHeader += '\t\t\hline\n'
-		fullTable += subHeader
+	    #########################################################################################################
+	    ### Table Header
+	    #########################################################################################################
+		latexHeader =  '\\begin{table}\n'
+		latexHeader += '\t\centering\n'
+		latexHeader += '\t\small\n'
+		# latexHeader += '\t\\textbf{{{ch}}} \\\\ \n'.format(ch=channel)
+		latexHeader += '\t\\begin{tabular}{|cccc|}\n'
+		# latexHeader +=  '\t\t\\textbf{{{ch}}} \t& \t& \t& \t \\\\ \n'.format(ch=channel)
+		latexHeader += '\t\t\hline\n'
+		latexHeader +=  '\t\t\\textbf{{{var}}}'.format(var=variables_latex[variable])+unit+' \t& \\textbf{{Central}} \t& \\textbf{{Statistical Uncertainty}} \t& \\textbf{{Systematic Uncertainty}}\t \\\\ \n'
+		latexHeader += '\t\t\hline\n'
 
+		fullTable += latexHeader
 	    #########################################################################################################
 	    ### Table Content
 	    #########################################################################################################
@@ -51,22 +49,23 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
 			)
 			fullTable += line_for_bin
 
-    #########################################################################################################
-    ### Table Footer
-    #########################################################################################################
-	tableFooter = '\t\t\hline\n'
-	tableFooter += '\t\end{tabular}\n'
-	tableFooter += '\t\caption{{Results of the {type} differential cross sections with respect to {var}.}}\n'.format(
-		type 	=crossSectionType,
-		var 	=variable,
-	)
-	tableFooter += '\t\label{{tb:xsection_{type}_{var}}}\n'.format(
-		type 	=crossSectionType,
-		var 	=variable,
-	)	
-	tableFooter += '\\end{table}\n'
-
-	fullTable += tableFooter
+	    #########################################################################################################
+	    ### Table Footer
+	    #########################################################################################################
+		tableFooter = '\t\t\hline\n'
+		tableFooter += '\t\end{tabular}\n'
+		tableFooter += '\t\caption{{Results of the {type} differential cross sections in the {ch} channel with respect to {var}.}}\n'.format(
+			type 	= crossSectionType,
+			ch 		= channel,
+			var 	= variables_latex[variable],
+		)
+		tableFooter += '\t\label{{tb:xsection_{type}_{var}_{ch}}}\n'.format(
+			type 	= crossSectionType,
+			ch 		= channel,
+			var 	= variable,
+		)	
+		tableFooter += '\\end{table}\n\n\n'
+		fullTable += tableFooter
 
     #########################################################################################################
     ### Write Table
