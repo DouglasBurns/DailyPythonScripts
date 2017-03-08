@@ -14,6 +14,7 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
     #########################################################################################################
 	latexHeader = '\\begin{table}\n'
 	latexHeader += '\t\centering\n'
+	latexHeader += '\t\small\n'
 	latexHeader += '\t\\begin{tabular}{|cccc|}\n'
 	latexHeader += '\t\t\hline\n'
 
@@ -53,7 +54,8 @@ def makeLatexTable( xsections, outputPath, variable, crossSectionType ):
     #########################################################################################################
     ### Table Footer
     #########################################################################################################
-	tableFooter = '\t\end{tabular}\n'
+	tableFooter = '\t\t\hline\n'
+	tableFooter += '\t\end{tabular}\n'
 	tableFooter += '\t\caption{{Results of the {type} differential cross sections with respect to {var}.}}\n'.format(
 		type 	=crossSectionType,
 		var 	=variable,
