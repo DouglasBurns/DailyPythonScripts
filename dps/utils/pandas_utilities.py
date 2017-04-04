@@ -224,4 +224,19 @@ def matrix_from_df( df ):
 	matrix = df.as_matrix()
 	return matrix
 
+def round_df(df, order):
+	'''
+	Round dataframe to order-1 significant figures
+								      -4
+	0.00056789 to order 2 => 5.68 x 10
+	'''
+	from decimal import Decimal
+	order = '%.'+str(order)+'e'
+
+	l=df.columns.tolist()
+	for sample in l:
+		df[sample] = [order%Decimal(v) for v in df[sample]]
+	return df
+
+
 
