@@ -40,17 +40,33 @@ N^{\text{rec\&gen}}_0
  X | X | X
 '''
 from __future__ import print_function
+
+from argparse import ArgumentParser
+
 from rootpy import asrootpy
 from rootpy.io import File
-from dps.utils.Calculation import calculate_purities, calculate_stabilities
-from dps.utils.hist_utilities import rebin_2d
-from dps.config.xsection import XSectionConfig
-from argparse import ArgumentParser
-from dps.config.variable_binning import bin_edges_full, minimum_bin_width, nice_bin_width
-from dps.utils.file_utilities import write_data_to_JSON
-from ROOT import TH1, TCanvas, TLine, gDirectory, TObjArray, TColor, TLegend
 
+import rootpy.plotting.root2matplotlib as rplt
+import numpy as np
+
+from dps.config.xsection import XSectionConfig
+from dps.config import CMS
+from dps.config.variable_binning import bin_edges_vis, minimum_bin_width, nice_bin_width
+from dps.config.latex_labels import b_tag_bins_latex, variables_latex
+from dps.utils.Calculation import calculate_purities, calculate_stabilities
+from dps.utils.ROOT_utils import get_histogram_from_file
+from dps.utils.file_utilities import make_folder_if_not_exists
+from dps.utils.hist_utilities import rebin_2d, value_tuplelist_to_hist
+from dps.utils.pandas_utilities import dict_to_df, df_to_file
 import dps.utils.resolution as rs
+import sys
+import gc
+
+from matplotlib import rc
+rc( 'font', **CMS.font )
+rc( 'text', usetex = True )
+
+channels_latex = { 'electron':'e+jets', 'muon':'$\mu$+jets', 'combined':'e+$\mu$+jets combined' }
 
 def main():
     '''
@@ -70,10 +86,36 @@ def main():
         action  = "store_true",
         help    = "Combine channels" 
     )
-    parser.add_argument( '-r', 
+    parser.add_argument( '-R', 
         dest    = "redo_resolution", 
         action  = "store_true",
         help    = "Recalculate the resolution plots" 
+    )
+    parser.add_argument( '-C', 
+        dest    = "com",
+        default = 13, 
+        type    = int,
+        help    = "Centre of mass" 
+    )
+    parser.add_argument( '-v', "--variable",
+        dest    = "variable",
+        default = '', 
+        help    = "Variable to run" 
+    )
+    parser.add_argument( "--plotRes",
+        dest    = "plot_resolution",
+        action  = "store_true",
+        help    = "Plot the resolution"
+    )
+    parser.add_argument( '-p', 
+        dest    = "plotBinning", 
+        action  = "store_true",
+        help    = "Create binning plots" 
+    )
+    parser.add_argument( '-b', 
+        dest    = "from_previous_binning", 
+        action  = "store_true",
+        help    = "Find parameters from current binning scheme" 
     )
     args = parser.parse_args()
 
@@ -101,6 +143,22 @@ def main():
         if 'Rap' in variable:
             variableToUse = 'abs_%s' % variable
         histogram_information = get_histograms( measurement_config, variableToUse, args )
+
+        # Calculate binning criteria from previous binning scheme 
+        if args.from_previous_binning and args.combined:
+            p, s = calculate_purity_stability(histogram_information, bin_edges_vis[variable])
+            r = calculate_resolutions(0,0, variable, 'combined' )
+
+            bin_criteria = {
+                'Purity' : p,
+                'Stability' : s,
+                'Resolution' : r,
+            }
+            f_out = 'unfolding/13TeV/binning_combined_{}.txt'.format(variable)
+            df_bin = dict_to_df(bin_criteria)
+            df_to_file( f_out, df_bin )
+            continue
+
 
         # Remake the resolution plots from the fine binned unfolding matrix
         if args.redo_resolution:
@@ -159,13 +217,12 @@ def main():
             outputInfo['s_i'] = info['s_i']
             outputInfo['N']   = info['N']
             outputInfo['res'] = info['res']
-            outputJsonFile = 'unfolding/13TeV/binningInfo_%s_%s_FullPS.txt' % ( variable, info['channel'] )
+            output_file = 'unfolding/13TeV/binningInfo_%s_%s_FullPS.txt' % ( variable, info['channel'] )
             if args.visiblePhaseSpace:
-                outputJsonFile = 'unfolding/13TeV/binningInfo_%s_%s_VisiblePS.txt' % ( variable, info['channel'] )
-            write_data_to_JSON( outputInfo, outputJsonFile )
-            print_latex_table(info, variable, best_binning)
-        for key in outputInfo:
-            print (key,outputInfo[key])
+                output_file = 'unfolding/13TeV/binningInfo_%s_%s_VisiblePS.txt' % ( variable, info['channel'] )
+            df_out = dict_to_df(outputInfo)
+            df_to_file( output_file, df_out )
+
         print('-' * 120)
 
     # Final print of all binnings to screen
@@ -247,19 +304,18 @@ def get_best_binning( histogram_information, p_min, s_min, n_min, min_width, nic
     
     current_bin_start = 0
     current_bin_end = 0
-        
+
     first_hist = histograms[0]
     n_bins     = first_hist.GetNbinsX()
-
     # Start at minimum x instead of 0
     if x_min:
         current_bin_start = first_hist.ProjectionX().FindBin(x_min) - 1
         current_bin_end = current_bin_start
-    
+
     # Calculate the bin edges until no more bins can be iterated over
     while current_bin_end < n_bins:
         # Return the next bin end + (p, s, N_reco, res)
-        current_bin_end, _, _, _, r = get_next_end( histograms, current_bin_start, current_bin_end, p_min, s_min, n_min, min_width, nice_width, is_NJet=is_NJet )
+        current_bin_end, _, _, _, r = get_next_end( histograms, current_bin_start, current_bin_end, p_min, s_min, n_min, min_width, nice_width, is_NJet=is_NJet)
         resolutions.append(r)
 
         # Attach first bin low edge
@@ -362,6 +418,7 @@ def get_next_end( histograms, bin_start, bin_end, p_min, s_min, n_min, min_width
                 # Choose the middle fine bin of the total bin width as the resolution
                 res = rs.get_merged_bin_resolution('plots/resolutionStudies/resolution.root', var, x_low, x_high)
                 res = round( res, 3 )
+
                 if ( x_high - x_mid > res and x_mid - x_low > res ):
                     current_bin_end = bin_i
                     break
@@ -402,6 +459,113 @@ def print_latex_table( info, variable, best_binning ):
                 bin_range = '{start} - {end}'.format(start=best_binning[i],end=best_binning[i + 1] )
         print('%s & %.3f & %.3f & %.3f & %d\\\\' % (bin_range, info['p_i'][i], info['s_i'][i], info['res'][i], info['N'][i]))
     print('\hline')
-    
+   
+
+def calculate_purity_stability(hist_infos, bin_edges):
+    '''
+    Rebin finebinned histograms to current binning standards
+    '''
+    hists = []
+    for hist_info in hist_infos:
+        hist = hist_info['hist']
+        binned_hist = rebin_2d( hist, bin_edges, bin_edges ).Clone()
+        p = calculate_purities(binned_hist)
+        s = calculate_stabilities(binned_hist)
+        hists.append(binned_hist)
+    return p, s
+
+# def calculate_resolutions(histograms = [], n_fine_bin_edges, variable, channel):
+def calculate_resolutions(histogram, n_fine_bin_edges, variable, channel):
+    '''
+    Calculate the resolutions in the bins using the residual method
+    '''
+
+
+    bin_edges = bin_edges_vis[variable]
+    # f = File( histogram['file'] )
+    f = File( 'unfolding/13TeV/unfolding_TTJets_13TeV.root' )
+    tmp_path = '{}_{}/responseVis_without_fakes'.format( variable, channel )
+    path = '{}_{}/residuals/Residuals_Bin_'.format( variable, channel )
+    tmp2d = f.Get( tmp_path ).Clone()
+    tmp1d = asrootpy( tmp2d.ProjectionX() )
+
+    n_fine_bin_edges = list(tmp1d.xedges())
+
+    # Absolute lepton eta can have multiple fine bins at the same precision as wide bins. Only taking first.
+    if variable == 'abs_lepton_eta': n_fine_bin_edges = [round(entry, 2) for entry in n_fine_bin_edges]
+
+    # LIST OF FINE BINS IN EACH WIDEBIN
+    segmented_bins = {}
+    list_of_fine_bins = []
+    i=0
+    for j, fine_bin_edge in enumerate(n_fine_bin_edges):
+        if fine_bin_edge == bin_edges[i]: 
+            if not i == 0: segmented_bins[i]=list_of_fine_bins
+            
+            list_of_fine_bins = []
+            i+=1
+
+            if fine_bin_edge == bin_edges[-1]: break
+        list_of_fine_bins.append(j+1)
+
+    # COMBINE FINE BIN RESIDUALS INTO WIDE BIN RESIDUALS
+    cumulated_residuals = {}
+    for wide_bin, fine_bins in segmented_bins.iteritems():
+        # Initialise and add up histgrams in each wide bin. Store in combined residual dictionary.
+        hist = f.Get( path+str(fine_bins[0]) ).Clone()
+        for fine_bin in fine_bins:
+            if fine_bin == fine_bins[0]:continue
+            tmp_hist = f.Get( path+str(fine_bin) ).Clone()
+            hist.Add(hist, tmp_hist, 1.0, 1.0)
+        cumulated_residuals[wide_bin] = hist
+
+    # PLOT THE RESIDUALS ()ADD BIN RANGES TO PLOT
+    title = "channel = {}, variable = ${}$".format(channel, variable)
+
+    list_of_resolutions = []
+    for i, h in cumulated_residuals.iteritems():
+        # double quantile[1] = { quantileToCalculate };
+        # GetQuantiles( nProbSum, q, probSum)
+        # nProbSum = max size of q (how many quantiles)
+        # q = array filled with nq quantiles (0<q<1)
+        # probSum = null = quantile from lowest edge going to highest.
+
+        # Get the quantile at 68% = 1 sigma = Resolution
+        interval = np.array([0.])
+        quantile = np.array([0.68])
+        h.GetQuantiles( 1, interval, quantile)
+        list_of_resolutions.append(round(interval[0], 2))
+
+        fig = plt.figure()
+        axes = plt.axes()
+        rplt.hist(h, axes = axes, label = 'residuals')
+        plt.axvline(x=interval[0], linewidth=1, color='r', label = 'Resolution')
+
+        axes.set_ylim(ymin = 0)
+        # axes.set_yscale("log", nonposy='clip')
+        axes.set_xlabel('Residual')
+        axes.set_ylabel('N')
+        fig.suptitle('Residual Distribution', fontsize=14, fontweight='bold')
+        plt.title(title, loc='right')
+
+        leg = plt.legend(loc='best')
+        leg.draw_frame(False)   
+
+        plot_filepath = 'plots/binning/residuals/'
+        plot_filename = channel+'_'+variable+'_'+str(i)+'_Residual.pdf'
+        make_folder_if_not_exists(plot_filepath)
+        fig.savefig(plot_filepath+plot_filename, bbox_inches='tight')
+        fig.clf()
+        plt.close()
+        gc.collect()
+
+    return list_of_resolutions
+
+
+
+
+
+
+
 if __name__ == '__main__':
     main()
