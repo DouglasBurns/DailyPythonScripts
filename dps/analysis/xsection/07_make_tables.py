@@ -6,7 +6,7 @@ from dps.config.variable_binning import bin_edges_vis
 from dps.utils.file_utilities import make_folder_if_not_exists
 import numpy as np
 
-def makeLatexTable( xsections_abs, xsections_rel, outputPath, variable, crossSectionType ):
+def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, crossSectionType ):
 	'''
 	Generate and write the Latex table for the cross sections
 	'''
@@ -108,8 +108,9 @@ def makeLatexTable( xsections_abs, xsections_rel, outputPath, variable, crossSec
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	return
 
-def makeCondensedLatexTable(variables, inputPath, input_file_template, outputPath):
+def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template, outputPath):
 	'''
 	Make a condensed table of all the (median) systematics
 	'''
@@ -195,9 +196,10 @@ def makeCondensedLatexTable(variables, inputPath, input_file_template, outputPat
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	return
 
 
-def makeExpandedLatexTable( xsections_rel, outputPath, variable ):
+def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 	'''
 	Generate and write the Latex table for the cross sections
 	'''
@@ -250,7 +252,7 @@ def makeExpandedLatexTable( xsections_rel, outputPath, variable ):
 		line_for_bin = '\t\t'+col.replace('_', '\_')
 		for bin in range (len(bin_edges_vis[variable])-1): 
 			xsec = xsections_rel[col][bin]*100
-			line_for_bin += '\t & \t \ensuremath{{ {:.3g} }}'.format(xsec)
+			line_for_bin += '\t & \t \ensuremath{{ {:.2g} }}'.format(xsec)
 		line_for_bin += ' \\\\ \n'
 
 	# 	# REPLACE e^ WITH x10^. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
@@ -267,12 +269,8 @@ def makeExpandedLatexTable( xsections_rel, outputPath, variable ):
     #########################################################################################################
 	tableFooter = '\t\t\hline\n'
 	tableFooter += '\t\end{tabular}\n'
-	tableFooter += '\t\caption{{ Breakdown of the relative uncertainties in the combined channel with respect to {var}.}}\n'.format(
-		var 	= variables_latex[variable],
-	)
-	tableFooter += '\t\label{{tb:syst_{var}_combined}}\n'.format(
-		var 	= variable,
-	)	
+	tableFooter += '\t\caption{{ Breakdown of the relative uncertainties in the combined channel with respect to {var}.}}\n'.format( var = variables_latex[variable] )
+	tableFooter += '\t\label{{tb:syst_{var}_combined}}\n'.format( var = variable )	
 	tableFooter += '\\end{table}\n'
 	tableFooter += '\\end{landscape}\n'
 	fullTable += tableFooter
@@ -286,19 +284,85 @@ def makeExpandedLatexTable( xsections_rel, outputPath, variable ):
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	return
 
 
+def makeBinningLatexTable():
+	'''
+	Generate Binning Latex Tables
+	'''
+	fullTable = ''
 
+	#########################################################################################################
+	### Table Header
+	#########################################################################################################
+	tableHeader =  ''
+	tableHeader += '\\begin{table}\n'
+	tableHeader += '\t\caption{ A table showing the bin size and resolution in the calculation of the bin sizes for all variables in the combined channel }\n'
+	tableHeader += '\t\label{tb:binning_combined}\n'	
+	tableHeader += '\t\\tiny\n'
+	tableHeader += '\t\centering\n'
 
+	colHeader =  ''
+	colHeader += '\t\\begin{tabular}{ccc}\n'
+	colHeader += '\t\t\hline\n'
+	colHeader += '\t\t\hline\n'
+	colHeader += '\t\t  & \t Bin Width \t & \t Resolution \\\\ \n'
 
+	#########################################################################################################
+	### Table Content
+	#########################################################################################################
+	tableContent1 = ''
+	tableContent2 = ''
+	for variable in measurement_config.variables:
+		tableContent = ''
+		path_to_file = 'unfolding/13TeV/binning_combined_{}.txt'.format(variable)
+		binning_params = file_to_df(path_to_file)
 
+		tableContent += '\t\t\\textbf{{{var}}} \t &   &  \\\\ \n'.format(var=variables_latex[variable])
+		tableContent += '\t\t\hline\n'
 
+		for bin in range (len(bin_edges_vis[variable])-1):
+			tableContent += '\t\t {edge_down}-{edge_up} \t & {bin_width} & {r} \\\\ \n'.format(
+				edge_down = bin_edges_vis[variable][bin], 
+				edge_up = bin_edges_vis[variable][bin+1],
+				bin_width = bin_edges_vis[variable][bin+1]-bin_edges_vis[variable][bin],
+				r = binning_params['Resolution'][bin],
+			)
 
+		# For splitting into two tables
+		if variable in ['HT', 'ST', 'MET', 'WPT']: tableContent1 += tableContent
+		else:  tableContent2 += tableContent
 
+	#########################################################################################################
+	### Table Footer
+	#########################################################################################################
+	colFooter 	= ''
+	colFooter 	+= '\t\t\hline\n'
+	colFooter 	+= '\t\end{tabular}\n'
+	tableFooter = ''
+	tableFooter += '\\end{table}\n'
+	tableFooter += '\clearpage\n'
 
+	fullTable += tableHeader
+	fullTable += colHeader
+	fullTable += tableContent1
+	fullTable += colFooter
+	fullTable += colHeader
+	fullTable += tableContent2
+	fullTable += colFooter
+	fullTable += tableFooter
 
-
-
+	#########################################################################################################
+	### Write Table
+	#########################################################################################################
+	outputPath = 'tables/binning/'
+	make_folder_if_not_exists(outputPath)
+	file_template = outputPath + '/Table_BinningParams.tex'
+	output_file = open(file_template, 'w')
+	output_file.write(fullTable)
+	output_file.close()
+	return
 
 
 
@@ -344,31 +408,42 @@ if __name__ == '__main__':
 	input_file_template 	= "xsection_{type}_combined_TUnfold_summary_absolute.txt"
 	path_to_input_template  = '{path}/{com}TeV/{variable}/{phase_space}/central/'
 	path_to_output_template = '{path}/{crossSectionType}/'
-	# for utype in unc_type:
-		# for variable in measurement_config.variables:
-		# 	print "Writing the {type} {var} cross sections to Latex Tables".format(type = utype, var=variable)
-		# 	path_to_output = path_to_output_template.format(
-		# 		path=outputTablePath, 
-		# 		crossSectionType=utype,
-		# 	)
-		# 	path_to_input = path_to_input_template.format(
-		# 	    path = args.path, 
-		# 	    com = 13,
-		# 	    variable = variable,
-		# 	    phase_space = phase_space,
-		# 	)
+	for utype in unc_type:
+		for variable in measurement_config.variables:
+			print "Writing the {type} {var} cross sections to Latex Tables".format(type = utype, var=variable)
+			path_to_output = path_to_output_template.format(
+				path=outputTablePath, 
+				crossSectionType=utype,
+			)
+			path_to_input = path_to_input_template.format(
+			    path = args.path, 
+			    com = 13,
+			    variable = variable,
+			    phase_space = phase_space,
+			)
 
-		# 	# Read cross sections and write tables
-		# 	xsections_abs = file_to_df(path_to_input+input_file_template.format(type = utype))
-		# 	xsections_rel = file_to_df(path_to_input+input_file_template.replace('absolute', 'relative').format(type = utype))
-		# 	# makeLatexTable( xsections_abs=xsections_abs, xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable, crossSectionType=utype )
-		# 	makeExpandedLatexTable( xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable )
+			# Read cross sections and write tables
+			xsections_abs = file_to_df(path_to_input+input_file_template.format(type = utype))
+			xsections_rel = file_to_df(path_to_input+input_file_template.replace('absolute', 'relative').format(type = utype))
+			# makeResultLatexTable( xsections_abs=xsections_abs, xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable, crossSectionType=utype )
+			makeExpandedSystematicLatexTable( xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable )
+
+	# ########################################################################################################################
+	# ### CONDENSED SYSTEMATIC UNCERTAINTIES (MEDIAN VALUES)
+	# ########################################################################################################################
+	# condensed_path_to_input = path_to_input_template.format(
+	#     path = args.path, 
+	#     com = 13,
+	#     variable = 'VAR_TMP',
+	#     phase_space = phase_space,
+	# )
+	# makeCondensedSystematicLatexTable( measurement_config.variables, condensed_path_to_input, input_file_template, 'tables/systematics/' )
 
 
-	condensed_path_to_input = path_to_input_template.format(
-	    path = args.path, 
-	    com = 13,
-	    variable = 'VAR_TMP',
-	    phase_space = phase_space,
-	)
-	makeCondensedLatexTable( measurement_config.variables, condensed_path_to_input, input_file_template, 'tables/systematics/' )
+	########################################################################################################################
+	### PURITY/STABILITY/RESOLUTION 
+	########################################################################################################################
+	makeBinningLatexTable()
+
+
+
