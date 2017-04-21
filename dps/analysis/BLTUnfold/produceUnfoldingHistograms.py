@@ -391,10 +391,11 @@ def main():
                             maxVar = 2.4
                             minVar = -2.4
                             nBins = 1000
+                        # nBins = 960 so that small bin width is usable in 00. [0.0025]
                         elif 'abs' in variable and 'eta' in variable:
                             maxVar = 2.4
                             minVar = 0.
-                            nBins = 1000
+                            nBins = 960
                         elif 'Rap' in variable:
                             maxVar = 2.4
                             minVar = -2.4
