@@ -318,10 +318,10 @@ def makeBinningLatexTable():
 	tableHeader += '\t\centering\n'
 
 	colHeader =  ''
-	colHeader += '\t\\begin{tabular}{ccc}\n'
+	colHeader += '\t\\begin{tabular}{cccc}\n'
 	colHeader += '\t\t\hline\n'
 	colHeader += '\t\t\hline\n'
-	colHeader += '\t\t  & \t Bin Width \t & \t Resolution \\\\ \n'
+	colHeader += '\t\t  & \t Bin Width \t & \t Resolution \t & $\\frac{\\text{Resolution}}{\\text{Bin Width}}$\\\\ \n'
 
 	#########################################################################################################
 	### Table Content
@@ -329,19 +329,61 @@ def makeBinningLatexTable():
 	tableContent1 = ''
 	tableContent2 = ''
 	for variable in measurement_config.variables:
+
 		tableContent = ''
 		path_to_file = 'unfolding/13TeV/binning_combined_{}.txt'.format(variable)
 		binning_params = file_to_df(path_to_file)
 
-		tableContent += '\t\t\\textbf{{{var}}} \t &   &  \\\\ \n'.format(var=variables_latex[variable])
+		tableContent += '\t\t\\textbf{{{var}}} \t &   &	  & \\\\ \n'.format(var=variables_latex[variable])
 		tableContent += '\t\t\hline\n'
 
 		for bin in range (len(bin_edges_vis[variable])-1):
-			tableContent += '\t\t {edge_down}-{edge_up} \t & {bin_width} & {r} \\\\ \n'.format(
-				edge_down = bin_edges_vis[variable][bin], 
-				edge_up = bin_edges_vis[variable][bin+1],
-				bin_width = bin_edges_vis[variable][bin+1]-bin_edges_vis[variable][bin],
-				r = binning_params['Resolution'][bin],
+			bin_low = bin_edges_vis[variable][bin]
+			bin_high = bin_edges_vis[variable][bin+1]
+			bin_width = bin_high - bin_low
+			bin_res = binning_params['Resolution'][bin]
+			bin_row = bin_res / bin_width
+
+			# Resolution of NJets is always 1
+			if 'NJets' in variable:
+				bin_res = 1
+				bin_row = bin_res / bin_width
+
+			# Insert different rounding here for each variable
+			bin_dp = ''
+			res_dp = ':.1f'
+			row_dp = ':.1f'
+			if 'abs_lepton_eta' in variable:
+				bin_dp = ':.2f'
+
+			# Tuning table to different d.p for each variable and replacing 0.0 with <0.1.
+			tableContent_tmp = ''
+			if bin_row < 0.1: 
+				bin_row = '$<$ 0.1'
+				tableContent_tmp = '\t\t {{{bin_dp}}} - {{{bin_dp}}} \t & \t {{{bin_dp}}} \t & \t {{{res_dp}}} \t & \t {{}} \\\\ \n'.format(
+					bin_dp = bin_dp,
+					res_dp = res_dp,
+				)
+				if bin_res < 0.1:
+					bin_res = '$<$ 0.1'
+					tableContent_tmp = '\t\t {{{bin_dp}}} - {{{bin_dp}}} \t & \t {{{bin_dp}}} \t & \t {{}} \t & \t {{}} \\\\ \n'.format(
+						bin_dp = bin_dp,
+						res_dp = res_dp,
+					)
+			else:
+				tableContent_tmp = '\t\t {{{bin_dp}}} - {{{bin_dp}}} \t & \t {{{bin_dp}}} \t & \t {{{res_dp}}} \t & \t {{{row_dp}}} \\\\ \n'.format(
+					bin_dp = bin_dp,
+					res_dp = res_dp,
+					row_dp = row_dp,
+				)
+			
+			# Edge Down - Edge Up | Bin Width | Resolution | Resolution / Bin Width
+			tableContent += tableContent_tmp.format(
+				bin_low, 
+				bin_high,
+				bin_width,
+				bin_res,
+				bin_row,
 			)
 
 		# For splitting into two tables
@@ -457,7 +499,7 @@ if __name__ == '__main__':
 	########################################################################################################################
 	### PURITY/STABILITY/RESOLUTION 
 	########################################################################################################################
-	# makeBinningLatexTable()
+	makeBinningLatexTable()
 
 
 
