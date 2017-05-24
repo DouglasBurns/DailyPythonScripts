@@ -52,6 +52,7 @@ control_plots_latex = {
     'NJets': '\ensuremath{N_{\mathrm{Jets}}}',
     'NBJets': '\ensuremath{N_{\mathrm{B Jets}}}',
     'pt': '\ensuremath{p_{\mathrm{T}}^{l}}',
+    'jpt': '\ensuremath{p_{\mathrm{T}}^{\\text{jet}}}',
     'eta': '\ensuremath{\eta^{l}}',
     'relIso_03_deltaBeta': "RelIso",
     'relIso_04_deltaBeta': "RelIso",
