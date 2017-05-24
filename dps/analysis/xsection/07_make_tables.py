@@ -108,22 +108,21 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	print 'Written Results +- Stat +- Systematic'.format(variable)
+
 	return
 
-def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template, outputPath):
+def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template, outputPath, utype):
 	'''
 	Make a condensed table of all the (median) systematics
 	'''
 	d_summarised_syst = {}
 
 	for v in variables:
-		xsections_rel = file_to_df(inputPath.replace('VAR_TMP', v)+input_file_template.replace('absolute', 'relative').format(type = 'normalised'))
+		systematics = file_to_df(inputPath.replace('VAR_TMP', v)+input_file_template.replace('absolute', 'relative').format(type = utype))
 		d_median_variable = {}
-		for col in xsections_rel.columns:
-			# print xsections_rel[col]
-			# print np.median(xsections_rel[col])
-			median = np.median(xsections_rel[col])*100
-			# print median
+		for col in systematics.columns:
+			median = np.median(systematics[col])*100
 			d_median_variable[col] = median
 		d_summarised_syst[v] = d_median_variable
 	# print d_summarised_syst
@@ -135,8 +134,11 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexFooter 	= ''
 
 	latexHeader += '\\begin{table}\n'
+	latexHeader += '\t\label{{tb:syst_condensed_combined_{}}}\n'.format(utype)
+	latexHeader += '\t\caption{{ The median relative uncertainty, in \%, originating from each source of systematic uncertainty in the {t} differential cross section, over all bins of the measurement for each variable.  The median of the total relative uncertainty over all bins is also shown for each variable.}}\n'.format(t=utype)
 	# latexHeader += '\t\\tiny\n'
 	latexHeader += '\t\centering\n'
+	latexHeader += '\t\\footnotesize\n'
 	latexHeader += '\t\\begin{tabular}{lccccccc}\n'
 	latexHeader += '\t\t\hline\n'
 	latexHeader += '\t\t\hline\n'
@@ -152,34 +154,87 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	)
 	latexTitle += '\t\t\hline\n'
 
-	for col in xsections_rel.columns:
+	for col in systematics.columns:
 		if 'central' in col or 'systematic' in col or 'statistical' in col: continue
 
+		HT 				= d_summarised_syst['HT'][col] 
+		ST 				= d_summarised_syst['ST'][col] 
+		MET 			= d_summarised_syst['MET'][col] 
+		WPT 			= d_summarised_syst['WPT'][col] 
+		lepton_pt	 	= d_summarised_syst['lepton_pt'][col] 
+		abs_lepton_eta 	= d_summarised_syst['abs_lepton_eta'][col] 
+		NJets 			= d_summarised_syst['NJets'][col]
+
+		# If less than 0.1 replace with '<0.1'
+		HT_dp = ':.1f'
+		if HT < 0.1:
+			HT_dp = ''
+			HT = '$<$ 0.1'
+		ST_dp = ':.1f'
+		if ST < 0.1:
+			ST_dp = ''
+			ST = '$<$ 0.1'
+		MET_dp = ':.1f'
+		if MET < 0.1:
+			MET_dp = ''
+			MET = '$<$ 0.1'
+		WPT_dp = ':.1f'
+		if WPT < 0.1:
+			WPT_dp = ''
+			WPT = '$<$ 0.1'
+		lepton_pt_dp = ':.1f'
+		if lepton_pt < 0.1:
+			lepton_pt_dp = ''
+			lepton_pt = '$<$ 0.1'
+		abs_lepton_eta_dp = ':.1f'
+		if abs_lepton_eta < 0.1:
+			abs_lepton_eta_dp = ''
+			abs_lepton_eta = '$<$ 0.1'
+		NJets_dp = ':.1f'
+		if NJets < 0.1:
+			NJets_dp = ''
+			NJets = '$<$ 0.1'
+
+		latexContent_met = '\t\t{{}}\t&\t{{}}\t&\t{{{ST_dp}}}\t&\t{{{MET_dp}}}\t&\t{{{WPT_dp}}}\t&\t{{}}\t&\t{{}}\t&\t{{}}\\\\ \n'.format(
+			ST_dp = ST_dp,
+			MET_dp = MET_dp,
+			WPT_dp = WPT_dp,
+		)
+		latexContent_all = '\t\t{{}}\t&\t{{{HT_dp}}}\t&\t{{{ST_dp}}}\t&\t{{{MET_dp}}}\t&\t{{{WPT_dp}}}\t&\t{{{lepton_pt_dp}}}\t&\t{{{abs_lepton_eta_dp}}}\t&\t{{{NJets_dp}}}\\\\ \n'.format(
+			HT_dp = HT_dp,
+			ST_dp = ST_dp,
+			MET_dp = MET_dp,
+			WPT_dp = WPT_dp,
+			lepton_pt_dp = lepton_pt_dp,
+			abs_lepton_eta_dp = abs_lepton_eta_dp,
+			NJets_dp = NJets_dp,
+		)
+
 		if col in measurement_config.systematic_group_met:
-			latexContent += '\t\t{}\t&\t{}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
-			systematics_latex[col],
-			'--',
-			d_summarised_syst['ST'][col],
-			d_summarised_syst['MET'][col],
-			d_summarised_syst['WPT'][col],
-			'--',
-			'--',
-			'--',
+			latexContent += latexContent_met.format(
+				systematics_latex[col],
+				'--',
+				ST,
+				MET,
+				WPT,
+				'--',
+				'--',
+				'--',
 			)
 		else:
-			latexContent += '\t\t{}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\\\\ \n'.format(
-			systematics_latex[col],
-			d_summarised_syst['HT'][col], 
-			d_summarised_syst['ST'][col], 
-			d_summarised_syst['MET'][col], 
-			d_summarised_syst['WPT'][col], 
-			d_summarised_syst['lepton_pt'][col], 
-			d_summarised_syst['abs_lepton_eta'][col], 
-			d_summarised_syst['NJets'][col],
+			latexContent += latexContent_all.format(
+				systematics_latex[col],
+				HT, 
+				ST, 
+				MET, 
+				WPT, 
+				lepton_pt, 
+				abs_lepton_eta, 
+				NJets,
 			)
 
 	latexContent += '\t\t\hline\n'
-	latexContent += '\t\t{}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\t&\t{:.2f}\\\\ \n'.format(
+	latexContent += '\t\t{}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\\\\ \n'.format(
 		'Total',
 		d_summarised_syst['HT']['systematic'], 
 		d_summarised_syst['ST']['systematic'], 
@@ -192,8 +247,6 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexContent += '\t\t\hline\n'
 
 	latexFooter += '\t\end{tabular}\n'
-	latexFooter += '\t\caption{ Summary}\n'
-	latexFooter += '\t\label{tb:syst_condensed_combined}\n'
 	latexFooter += '\\end{table}\n'
 	latexFooter += '\clearpage'
 
@@ -206,10 +259,14 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
     ### Write Table
     #########################################################################################################
 	make_folder_if_not_exists(outputPath)
-	file_template = outputPath + '/CondensedSystematics.tex'
+	if 'normalised' in utype:
+		file_template = outputPath + '/CondensedNormalisedSystematics.tex'
+	else: 
+		file_template = outputPath + '/CondensedAbsoluteSystematics.tex'
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	print 'Written Median Systematics for all variables'
 	return
 
 
@@ -298,6 +355,8 @@ def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	print 'Written Full Systematics for {}'.format(variable)
+
 	return
 
 
@@ -341,7 +400,7 @@ def makeBinningLatexTable():
 			bin_low = bin_edges_vis[variable][bin]
 			bin_high = bin_edges_vis[variable][bin+1]
 			bin_width = bin_high - bin_low
-			bin_res = binning_params['Resolution'][bin]
+			bin_res = binning_params['res'][bin]
 			bin_row = bin_res / bin_width
 
 			# Resolution of NJets is always 1
@@ -418,10 +477,8 @@ def makeBinningLatexTable():
 	output_file = open(file_template, 'w')
 	output_file.write(fullTable)
 	output_file.close()
+	print "Written Binning Table"
 	return
-
-
-
 
 
 
@@ -481,20 +538,27 @@ if __name__ == '__main__':
 			# Read cross sections and write tables
 			xsections_abs = file_to_df(path_to_input+input_file_template.format(type = utype))
 			xsections_rel = file_to_df(path_to_input+input_file_template.replace('absolute', 'relative').format(type = utype))
+			
+			########################################################################################################################
+			### RESULT +- STAT +- SYST
+			########################################################################################################################
 			makeResultLatexTable( xsections_abs=xsections_abs, xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable, crossSectionType=utype )
+			
+			########################################################################################################################
+			### EXPANDED SYSTEMATIC UNCERTAINTIES (MEDIAN VALUES)
+			########################################################################################################################
 			makeExpandedSystematicLatexTable( xsections_rel=xsections_rel, outputPath=path_to_output, variable=variable )
 
-	# ########################################################################################################################
-	# ### CONDENSED SYSTEMATIC UNCERTAINTIES (MEDIAN VALUES)
-	# ########################################################################################################################
-	condensed_path_to_input = path_to_input_template.format(
-	    path = args.path, 
-	    com = 13,
-	    variable = 'VAR_TMP',
-	    phase_space = phase_space,
-	)
-	makeCondensedSystematicLatexTable( measurement_config.variables, condensed_path_to_input, input_file_template, 'tables/systematics/' )
-
+		########################################################################################################################
+		### CONDENSED SYSTEMATIC UNCERTAINTIES (MEDIAN VALUES)
+		########################################################################################################################
+		condensed_path_to_input = path_to_input_template.format(
+		    path = args.path, 
+		    com = 13,
+		    variable = 'VAR_TMP',
+		    phase_space = phase_space,
+		)
+		makeCondensedSystematicLatexTable( measurement_config.variables, condensed_path_to_input, input_file_template, 'tables/systematics/', utype )
 
 	########################################################################################################################
 	### PURITY/STABILITY/RESOLUTION 
