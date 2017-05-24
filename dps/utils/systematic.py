@@ -633,15 +633,14 @@ def make_covariance_plot( options, syst_name, matrix, label='Covariance' ):
     plt.tight_layout()
 
     # Output folder of covariance matrices
-    covariance_matrix_output_path = 'plots/covariance_matrices/{phase_space}/{channel}/{variable}/{norm}/'
+    covariance_matrix_output_path = 'plots/covariance_matrices/{phase_space}/{channel}/{norm}/'
     covariance_matrix_output_path = covariance_matrix_output_path.format(
-        variable = variable,
         channel = channel,
         phase_space = phase_space,
         norm = norm,
         )
     make_folder_if_not_exists(covariance_matrix_output_path)
-    plt.savefig(covariance_matrix_output_path+syst_name+'_'+label+'_matrix.pdf')
+    plt.savefig(covariance_matrix_output_path+syst_name+'_'+variable+'_'+label+'_matrix.pdf')
     fig.clf()
     plt.close()
     gc.collect()
