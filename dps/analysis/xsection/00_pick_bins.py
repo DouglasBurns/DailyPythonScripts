@@ -381,12 +381,12 @@ def get_next_end( histogram_information, bin_start, bin_end, p_min, s_min, n_min
             x_low  = reco.GetXaxis().GetBinUpEdge(current_bin_start)
             binWidth = x_high - x_low
 
-            if binWidth < min_width:
+            if binWidth < min_width and bin_i < len( reco_i ):
                 current_bin_end = bin_i
                 continue
 
             # Does Not work for abs_lepton_eta with current unfolding matrices. fix in produce_unfolding_histograms should fix this.
-            if reco.GetXaxis().GetBinLowEdge(bin_i+1) % nice_width > 1e-8:
+            if reco.GetXaxis().GetBinLowEdge(bin_i+1) % nice_width > 1e-8 and bin_i < len( reco_i ):
                 current_bin_end = bin_i
                 continue
 
@@ -424,6 +424,7 @@ def get_next_end( histogram_information, bin_start, bin_end, p_min, s_min, n_min
 
             # if it gets to the end, this is the best we can do
             current_bin_end = bin_i
+
             # And now for the next channel starting with current_bin_end.
         return current_bin_end, p, s, n_reco, res
 
@@ -481,7 +482,7 @@ def calculate_resolutions(variable, bin_edges = [], channel = 'combined', res_to
         resolutions.append(round(interval[0], 2))
 
         if res_to_plot:
-            plotting_resolution( variable, channel, fineBin_histRes, round(interval[0], 2), bin_edges[i], bin_edges[i+1] )
+            plotting_resolution( variable, channel, fineBin_histRes, round(interval[0], 2), i, bin_edges[i], bin_edges[i+1] )
 
     return resolutions
 
@@ -518,7 +519,8 @@ def plotting_purity_stability(variable, channel, binning_criteria, bin_edges ):
     plt.tick_params( **CMS.axis_label_major )
     plt.tick_params( **CMS.axis_label_minor )
 
-    x_title = '$' + variables_latex[variable] + '$ [GeV]'
+    x_title = '$' + variables_latex[variable] + '$'
+    if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: x_title += '[GeV]'
     plt.xlabel( x_title, CMS.x_axis_title )
 
     leg = plt.legend(loc=4,prop={'size':40})
@@ -531,12 +533,16 @@ def plotting_purity_stability(variable, channel, binning_criteria, bin_edges ):
     fig.savefig(plot_filepath+plot_filename, bbox_inches='tight')
 
 
-def plotting_resolution(variable, channel, residual, resolution, bin_low, bin_high ):
+def plotting_resolution(variable, channel, residual, resolution, bin_number, bin_low, bin_high ):
     '''
     Resolution plots.
     '''
     bin_width = bin_high - bin_low
-    title = "channel = {}, variable = ${}$, {}-{}".format(channel, variable, bin_low, bin_high)
+    
+    unit = ''
+    if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: unit += '[GeV]'
+
+    title = "channel = {}, variable = ${}${}, {}-{}".format(channel, variables_latex[variable], unit, bin_low, bin_high)
 
     fig = plt.figure()
     axes = plt.axes()
@@ -558,7 +564,7 @@ def plotting_resolution(variable, channel, residual, resolution, bin_low, bin_hi
 
     plot_filepath = 'plots/binning/residuals/'
     make_folder_if_not_exists(plot_filepath)
-    plot_filename = '{}_{}_{}-{}_Residual.pdf'.format(channel, variable, str(bin_low), str(bin_high))
+    plot_filename = '{}_{}_{}_Residual.pdf'.format(channel, variable, str(bin_number))
     fig.savefig(plot_filepath+plot_filename, bbox_inches='tight')
     fig.clf()
     plt.close()
