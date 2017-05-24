@@ -2,7 +2,7 @@ from __future__ import division
 import dps.utils.measurement
 
 class XSectionConfig():
-    current_analysis_path = '/hdfs/TopQuarkGroup/ec6821/1.0.7/atOutput/combined/'
+    current_analysis_path = '/hdfs/TopQuarkGroup/db0268/1.0.8/atOutput/combined/'
     known_centre_of_mass_energies = [13]
     # has to be separate as many variables depend on it
     luminosities = {13:35900}
@@ -80,6 +80,7 @@ class XSectionConfig():
         path_to_files = self.path_to_files
 
         self.path_to_unfolding_histograms = '/hdfs/TopQuarkGroup/run2/unfolding/13TeV/Moriond2017/'
+        # self.path_to_unfolding_histograms = '/hdfs/TopQuarkGroup/run2/unfolding/13TeV/EPS2017/'
         # self.path_to_unfolding_histograms = 'unfolding/13TeV/'
         path_to_unfolding_histograms = self.path_to_unfolding_histograms
 
@@ -433,7 +434,8 @@ class XSectionConfig():
         self.unfolding_amcatnlo_herwig_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_amcatnloherwigpp.root' % self.centre_of_mass_energy
 
         # Choose central MC Sample
-        self.unfolding_central_raw = self.unfolding_powheg_pythia8_raw
+        # self.unfolding_central_raw = self.unfolding_powheg_pythia8_raw
+        self.unfolding_central_raw = 'unfolding/13TeV/unfolding_TTJets_13TeV.root'
 
         # Raw --> asymmetric
         self.unfolding_powheg_pythia8 = self.unfolding_powheg_pythia8_raw.replace( '.root', '_asymmetric.root' )
@@ -619,23 +621,23 @@ class XSectionConfig():
          }
 
         self.tau_values_electron = {
-            "WPT" : 0.000881615905726,
-            "NJets" : 8.05993374815e-05,
-            "lepton_pt" : 0.000316334070444,
-            "HT" : 0.00113067423024,
-            "ST" : 0.00148108135844,
-            "MET" : 0.00185491517971,
+            "WPT" : 0.0008844791043,
+            "NJets" : 8.10189009766e-05,
+            "lepton_pt" : 0.000314736393369,
+            "HT" : 0.00113322118389,
+            "ST" : 0.0014859830286,
+            "MET" : 0.00186599526208,
             "abs_lepton_eta" : 1.1970850305e-08,
-           }
+        }
 
         self.tau_values_muon = {
-            "WPT" : 0.00114209523503,
-            "NJets" : 0.000102116130769,
-            "lepton_pt" : 0.000428653575116,
-            "HT" : 0.00145677708429,
-            "ST" : 0.00190877707059,
-            "MET" : 0.00238693282151,
-            "abs_lepton_eta" : 2.3162104792e-06,
+            "WPT" : 0.0011493622426,
+            "NJets" : 0.000102772350787,
+            "lepton_pt" : 0.000431806985455,
+            "HT" : 0.00146446910083,
+            "ST" : 0.00192109241721,
+            "MET" : 0.00240030731786,
+            "abs_lepton_eta" : 2.29348568572e-06,
         }
 
         self.tau_values_combined = {
