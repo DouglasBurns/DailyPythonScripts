@@ -40,21 +40,10 @@ def getHistograms( histogram_files,
     qcd_data_region_electron    = 'QCD non iso e+jets'
     qcd_data_region_muon        = 'QCD non iso mu+jets 1p5to3'
 
-    # QCD replaced here therefore need to make sure mode is correct.
-    m = ''
-    if 'JESUp' in signal_region_tree.split('_')[-1]:
-        m = '_plusJES'
-    if 'JESDown' in signal_region_tree.split('_')[-1]:
-        m = '_minusJES'
-    if 'JERUp' in signal_region_tree.split('_')[-1]:
-        m = '_plusJER'
-    if 'JERDown' in signal_region_tree.split('_')[-1]:
-        m = '_minusJER'
-
     # Channel specific files and weights
     if 'electron' in channel:
         histogram_files['data'] = measurement_config.data_file_electron
-        histogram_files['QCD']  = measurement_config.electron_QCD_MC_trees[category].replace('_tree', m+'_tree')
+        histogram_files['QCD']  = measurement_config.electron_QCD_MC_trees[category]
         if use_qcd_data_region:
             qcd_data_region     = qcd_data_region_electron
         # No Lepton Eff in QCD CR and PU distributions
@@ -63,7 +52,7 @@ def getHistograms( histogram_files,
 
     if 'muon' in channel:
         histogram_files['data'] = measurement_config.data_file_muon
-        histogram_files['QCD']  = measurement_config.muon_QCD_MC_trees[category].replace('_tree', m+'_tree')
+        histogram_files['QCD']  = measurement_config.muon_QCD_MC_trees[category]
         if use_qcd_data_region:
             qcd_data_region     = qcd_data_region_muon
         if not 'QCD' in channel:
@@ -83,11 +72,11 @@ def getHistograms( histogram_files,
     if channel == 'combined':
         histogram_files_electron            = dict(histogram_files)
         histogram_files_electron['data']    = measurement_config.data_file_electron
-        histogram_files_electron['QCD']     = measurement_config.electron_QCD_MC_trees[category].replace('_tree', m+'_tree')
+        histogram_files_electron['QCD']     = measurement_config.electron_QCD_MC_trees[category]
 
         histogram_files_muon                = dict(histogram_files)
         histogram_files_muon['data']        = measurement_config.data_file_muon
-        histogram_files_muon['QCD']         = measurement_config.muon_QCD_MC_trees[category].replace('_tree', m+'_tree')
+        histogram_files_muon['QCD']         = measurement_config.muon_QCD_MC_trees[category]
 
         histograms_electron = get_histograms_from_trees( 
             trees = [signal_region_tree.replace('COMBINED','EPlusJets')], 
@@ -388,7 +377,7 @@ def make_plot( channel, x_axis_title, y_axis_title,
     return
 
 def print_output(signal_region_hists, qcd_from_data, output_folder_to_use, branchName, channel):
-    '''Printout on normalisation of different samples'''
+    '''Printout on normalisation of different samples to screen and table'''
     print 'Normalisation after selection'
     print 'Data       :', signal_region_hists['data'].integral(overflow=True)
     print 'TTJet      :', signal_region_hists['TTJet'].integral(overflow=True)
@@ -412,7 +401,8 @@ def print_output(signal_region_hists, qcd_from_data, output_folder_to_use, branc
     summary['QCD']          = [qcd_from_data.integral(overflow=True)]
     summary['TotalData']    = [signal_region_hists['data'].integral(overflow=True)]
     summary['TotalMC']      = [mcSum]
-    order=['Data', 'TTJet', 'SingleTop', 'V+Jets', 'QCD', 'TotalData', 'TotalMC']
+    summary['DataToMC']     = [signal_region_hists['data'].integral(overflow=True) / mcSum]
+    order=['Data', 'TTJet', 'SingleTop', 'V+Jets', 'QCD', 'TotalData', 'TotalMC', 'DataToMC']
 
     d = dict_to_df(summary)
     d = d[order]
@@ -495,7 +485,6 @@ if __name__ == '__main__':
         elif 'JER_up' in mode: modeToReplace = '_plusJER'
         elif 'JER_down' in mode: modeToReplace = '_minusJER'
         else: print('Unrecognised mode, Please try again (JES_up|JES_down|JER_up|JER_down)')
-        histogram_files['TTJet'] = histogram_files['TTJet'].replace('_tree', modeToReplace+'_tree')
         histogram_files['V+Jets'] = histogram_files['V+Jets'].replace('_tree', modeToReplace+'_tree')
         histogram_files['QCD'] = histogram_files['QCD'].replace('_tree', modeToReplace+'_tree')
         histogram_files['SingleTop'] = histogram_files['SingleTop'].replace('_tree', modeToReplace+'_tree')
@@ -564,11 +553,6 @@ if __name__ == '__main__':
     modeToReplace = ''
     if 'central' not in mode: 
         special = mode
-        if 'JES_up' in mode: modeToReplace = '_JESUp'
-        elif 'JES_down' in mode: modeToReplace = '_JESDown'
-        elif 'JER_up' in mode: modeToReplace = '_JERUp'
-        elif 'JER_down' in mode: modeToReplace = '_JERDown'
-        else: mode = ''
 
     output_folder_tmp = '{base}/{special}/Variables/{sel}/'.format(
         base = args.output_folder,
@@ -598,8 +582,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['HT'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['HT']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'HT',
                 name_prefix = '%s_HT_' % label,
                 x_limits = control_plots_bins['HT'],
@@ -620,8 +604,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['MET'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['MET']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'MET',
                 name_prefix = '%s_MET_' % label,
                 x_limits = control_plots_bins['MET'],
@@ -642,8 +626,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['ST'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['ST']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'ST',
                 name_prefix = '%s_ST_' % label,
                 x_limits = control_plots_bins['ST'],
@@ -664,8 +648,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['WPT'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['WPT']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'WPT',
                 name_prefix = '%s_WPT_' % label,
                 x_limits = control_plots_bins['WPT'],
@@ -689,8 +673,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['pt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins[binsLabel]),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'lepton_pt',
                 name_prefix = '%s_LeptonPt_' % label,
                 x_limits = control_plots_bins[binsLabel],
@@ -713,8 +697,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['eta'],
                 y_axis_title = 'Events/(%.1f)' % binWidth(control_plots_bins['LeptonEta']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'lepton_eta',
                 name_prefix = '%s_LeptonEta_' % label,
                 x_limits = control_plots_bins['LeptonEta'],
@@ -735,8 +719,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['eta'],
                 y_axis_title = 'Events/(%.1f)' % binWidth(control_plots_bins['AbsLeptonEta']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'abs(lepton_eta)',
                 name_prefix = '%s_AbsLeptonEta_' % label,
                 x_limits = control_plots_bins['AbsLeptonEta'],
@@ -757,8 +741,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NJets'],
                 y_axis_title = 'Events / 1',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NJets',
                 name_prefix = '%s_NJets_' % label,
                 x_limits = control_plots_bins['NJets'],
@@ -774,8 +758,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NJets'],
                 y_axis_title = 'Events / 1',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NJets',
                 name_prefix = '%s_NJets_logY_' % label,
                 x_limits = control_plots_bins['NJets'],
@@ -815,8 +799,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % fit_variables_latex['M3'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['M3']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'M3',
                 name_prefix = '%s_M3_' % label,
                 x_limits = fit_variable_bin_edges['M3'],
@@ -836,8 +820,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % fit_variables_latex['angle_bl'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'angle_bl',
                 name_prefix = '%s_angle_bl_' % label,
                 x_limits = fit_variable_bin_edges['angle_bl'],
@@ -860,8 +844,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJets_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -878,8 +862,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJetsNoWeight_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -895,8 +879,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJetsUp_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -912,8 +896,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJetsDown_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -929,8 +913,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJets_LightUp_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -946,8 +930,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NBJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/FitVariables{mode}'.format(ch=label, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/Ref selection NoBSelection/AnalysisVariables'.format(ch=label),
                 branchName = 'NBJets',
                 name_prefix = '%s_NBJets_LightDown_' % label,
                 x_limits = control_plots_bins['NBJets'],
@@ -967,8 +951,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NVertex'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NVertices',
                 name_prefix = '%s_NPU_' % label,
                 x_limits = control_plots_bins['NVertex'],
@@ -984,8 +968,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NVertex'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NVertices',
                 name_prefix = '%s_NPUNoWeight_' % label,
                 x_limits = control_plots_bins['NVertex'],
@@ -1001,8 +985,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NVertex'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NVertices',
                 name_prefix = '%s_NPUUp_' % label,
                 x_limits = control_plots_bins['NVertex'],
@@ -1018,8 +1002,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NVertex'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'NVertices',
                 name_prefix = '%s_NPUDown_' % label,
                 x_limits = control_plots_bins['NVertex'],
@@ -1039,8 +1023,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt',
                 name_prefix = '%s_JetPt_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1055,8 +1039,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt[0]',
                 name_prefix = '%s_JetPt0_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1071,8 +1055,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt[1]',
                 name_prefix = '%s_JetPt1_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1087,8 +1071,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt[2]',
                 name_prefix = '%s_JetPt2_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1103,8 +1087,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt[3]',
                 name_prefix = '%s_JetPt3_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1119,8 +1103,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['jpt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['JetPt']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'jet_pt',
                 name_prefix = '%s_JetPtAdd_' % label,
                 x_limits = control_plots_bins['JetPt'],
@@ -1140,8 +1124,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['relIso'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = '%s' % 'lepton_isolation',
                 name_prefix = '%s_relIso_' % channel,
                 x_limits = control_plots_bins['relIso'],
@@ -1158,8 +1142,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT ECAL isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'lepton_hltECALisolation',
                 name_prefix = '%s_hltECALIso_' % channel,
                 x_limits = control_plots_bins['relIso'],
@@ -1176,8 +1160,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT HCAL isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'lepton_hltHCALisolation',
                 name_prefix = '%s_hltHCALIso_' % channel,
                 x_limits = control_plots_bins['relIso'],
@@ -1194,8 +1178,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT Tracker isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'lepton_hltTrackerisolation_overPt',
                 name_prefix = '%s_hltTrackerIso_' % channel,
                 x_limits = control_plots_bins['relIso'],
@@ -1217,8 +1201,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % variables_latex['sigmaietaieta'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['sigmaietaieta']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/FitVariables{mode}'.format(ch=label, sel=selection, mode=modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'sigmaIetaIeta',
                 name_prefix = '%s_sigmaIetaIeta_' % label,
                 x_limits = control_plots_bins['sigmaietaieta'],
@@ -1267,8 +1251,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['HT'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['HT']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'HT',
                 name_prefix = '%s_HT_' % channel,
                 x_limits = control_plots_bins['HT'],
@@ -1289,8 +1273,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['MET'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['MET']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'MET',
                 name_prefix = '%s_MET_' % channel,
                 x_limits = control_plots_bins['MET'],
@@ -1311,8 +1295,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['ST'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['ST']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'ST',
                 name_prefix = '%s_ST_' % channel,
                 x_limits = control_plots_bins['ST'],
@@ -1333,8 +1317,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$ [GeV]' % variables_latex['WPT'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['WPT']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'WPT',
                 name_prefix = '%s_WPT_' % channel,
                 x_limits = control_plots_bins['WPT'],
@@ -1354,8 +1338,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['eta'],
                 y_axis_title = 'Events/(%.1f)' % binWidth(control_plots_bins['AbsLeptonEtaQCD']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'abs(lepton_eta)',
                 name_prefix = '%s_AbsLeptonEta_' % channel,
                 x_limits = control_plots_bins['AbsLeptonEtaQCD'],
@@ -1379,8 +1363,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['pt'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins[binsLabel]),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'lepton_pt',
                 name_prefix = '%s_LeptonPt_' % channel,
                 x_limits = control_plots_bins[binsLabel],
@@ -1400,8 +1384,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['NJets'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'NJets',
                 name_prefix = '%s_NJets_' % channel,
                 x_limits = control_plots_bins['NJets'],
@@ -1421,8 +1405,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % control_plots_latex['relIso'],
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = '%s' % 'lepton_isolation',
                 name_prefix = '%s_relIso_' % channel,
                 x_limits = [0,0.5],
@@ -1438,8 +1422,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT ECAL isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'lepton_hltECALisolation',
                 name_prefix = '%s_hltECALIso_' % channel,
                 x_limits = [0,0.5],
@@ -1455,8 +1439,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT HCAL isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'lepton_hltHCALisolation',
                 name_prefix = '%s_hltHCALIso_' % channel,
                 x_limits = [0,0.5],
@@ -1472,8 +1456,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = 'HLT Tracker isolation',
                 y_axis_title = 'Events',
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'lepton_hltTrackerisolation_overPt',
                 name_prefix = '%s_hltTrackerIso_' % channel,
                 x_limits = [0,0.5],
@@ -1494,8 +1478,8 @@ if __name__ == '__main__':
                 channel,
                 x_axis_title = '$%s$' % variables_latex['sigmaietaieta'],
                 y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['sigmaietaieta']),
-                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
-                control_region_tree = 'TTbar_plus_X_analysis/{tree}/FitVariables{mode}'.format(tree = treeName, mode = modeToReplace),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
                 branchName = 'sigmaIetaIeta',
                 name_prefix = '%s_sigmaIetaIeta_' % channel,
                 x_limits = control_plots_bins['sigmaietaieta'],

@@ -380,8 +380,6 @@ class XSectionConfig():
         # categories_and_prefixes = self.categories_and_prefixes
 
         # Used in 01
-        # self.general_trees          = {
-        #     category: path_to_files + category + '/%s' + middle + prefix + '.root' for category, prefix in categories_and_prefixes.iteritems()}
         self.ttbar_trees            = {
             category: path_to_files + 'TTJets_PowhegPythia8_tree.root' for category in self.normalisation_systematics}
         self.SingleTop_trees        = {
@@ -391,7 +389,6 @@ class XSectionConfig():
         self.electron_QCD_MC_trees  = {
             category: path_to_files + 'QCD_Electron_tree.root' for category in self.normalisation_systematics}
             # category: path_to_files + 'QCD_Inclusive_tree.root' for category in self.normalisation_systematics}
-
         self.muon_QCD_MC_trees      = {
             category: path_to_files + 'QCD_Muon_tree.root' for category in self.normalisation_systematics}
             # category: path_to_files + 'QCD_Inclusive_tree.root' for category in self.normalisation_systematics}
@@ -517,10 +514,13 @@ class XSectionConfig():
         self.pdfWeightMax = 100
         self.unfolding_pdfweights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_pdfWeight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.pdfWeightMax )}
 
+        self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_CT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( 0, 54 )}
+        self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_MMHT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( 0, 55 )}
+
         # Used in 01
         self.tree_path = {
-            'electron' : 'TTbar_plus_X_analysis/EPlusJets/Ref selection/FitVariables',
-            'muon' : 'TTbar_plus_X_analysis/MuPlusJets/Ref selection/FitVariables',
+            'electron' : 'TTbar_plus_X_analysis/EPlusJets/Ref selection/AnalysisVariables',
+            'muon' : 'TTbar_plus_X_analysis/MuPlusJets/Ref selection/AnalysisVariables',
         }
         self.qcd_control_region = {
             'electron'  : 'QCD non iso e+jets',
@@ -533,15 +533,15 @@ class XSectionConfig():
 
         # Needed?
         self.variable_path_templates = {
-            'MET' : 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/MET',
-            'HT' : 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/HT',
-            'ST': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/ST',
-            'MT': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/MT',
-            'WPT': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/WPT',
-            'NJets': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/NJets',
-            'lepton_pt': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/lepton_pt',
-            'lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/lepton_eta',
-            'abs_lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/FitVariables/absolute_eta',
+            'MET' : 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/MET',
+            'HT' : 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/HT',
+            'ST': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/ST',
+            'MT': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/MT',
+            'WPT': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/WPT',
+            'NJets': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/NJets',
+            'lepton_pt': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/lepton_pt',
+            'lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/lepton_eta',
+            'abs_lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/absolute_eta',
             'bjets_pt': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/bjet_pt',
             'bjets_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/bjet_eta',
             'abs_bjets_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/abs(bjet_eta)',
@@ -614,9 +614,9 @@ class XSectionConfig():
 
         self.ttbar_xsection = 831.76  # pb
 
-        self.rate_changing_systematics = {#TODO check where this is used
+        self.rate_changing_systematics = {
             'luminosity': 0.025,
-            'SingleTop_cross_section': 0.3,  # Currently same as 8 TeV
+            'SingleTop_cross_section': 0.3, 
             'V+Jets_cross_section': 0.5,
          }
 

@@ -236,28 +236,7 @@ def get_sample_info(options, xsec_config, sample):
     # QCD Contorol Regions (Shape) JES and JER
     sample_info["input_file"] = get_file(xsec_config, sample, options)
     sample_info["tree"], sample_info["qcd_control_region"], sample_info["qcd_normalisation_region"] = get_tree(xsec_config, options)
-    if sample != 'data':
-        if options['category'] == 'JES_up':
-            sample_info["input_file"] = sample_info["input_file"].replace('tree', 'plusJES_tree')
-            sample_info["tree"] = sample_info["tree"].replace('FitVariables', 'FitVariables_JESUp')
-            if sample_info['qcd_control_region'] != None:
-                sample_info["qcd_control_region"] = sample_info["qcd_control_region"].replace('FitVariables', 'FitVariables_JESUp')
-        elif options['category'] == 'JES_down':
-            sample_info["input_file"] = sample_info["input_file"].replace('tree', 'minusJES_tree')
-            sample_info["tree"] = sample_info["tree"].replace('FitVariables', 'FitVariables_JESDown')
-            if sample_info['qcd_control_region'] != None:
-                sample_info["qcd_control_region"] = sample_info["qcd_control_region"].replace('FitVariables', 'FitVariables_JESDown')
-        elif options['category'] == 'JER_up':
-            sample_info["input_file"] = sample_info["input_file"].replace('tree', 'plusJER_tree')
-            sample_info["tree"] = sample_info["tree"].replace('FitVariables', 'FitVariables_JERUp')
-            if sample_info['qcd_control_region'] != None:
-                sample_info["qcd_control_region"] = sample_info["qcd_control_region"].replace('FitVariables', 'FitVariables_JERUp')
-        elif options['category'] == 'JER_down':
-            sample_info["input_file"] = sample_info["input_file"].replace('tree', 'minusJER_tree')
-            sample_info["tree"] = sample_info["tree"].replace('FitVariables', 'FitVariables_JERDown')
-            if sample_info['qcd_control_region'] != None:
-                sample_info["qcd_control_region"] = sample_info["qcd_control_region"].replace('FitVariables', 'FitVariables_JERDown')
-
+    
     if sample_info["qcd_normalisation_region"] is None:
         sample_info["qcd_normalisation_region"] = sample_info["qcd_control_region"]
     return sample_info
