@@ -47,8 +47,10 @@ from rootpy import asrootpy
 from rootpy.io import File
 
 import rootpy.plotting.root2matplotlib as rplt
-import matplotlib.pyplot as plt
+from rootpy.plotting.hist import Hist2D
 
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 
 from dps.config.xsection import XSectionConfig
@@ -138,20 +140,18 @@ def main():
         histogram_information = get_histograms( measurement_config, variableToUse, args )
 
         # Calculate binning criteria from previous binning scheme 
-        if args.from_previous_binning and args.combined:
-            p, s = calculate_purity_stability(histogram_information, bin_edges_vis[variable])
-            r = calculate_resolutions( variable, bin_edges = bin_edges_vis[variable], channel='combined', res_to_plot = args.plotting )
+        if args.from_previous_binning:
+            for hist_info in histogram_information:
+                p, s = calculate_purity_stability(hist_info, bin_edges_vis[variable])
+                r = calculate_resolutions( variable, bin_edges = bin_edges_vis[variable], channel=hist_info['channel'], res_to_plot = args.plotting )
+                bin_criteria = { 'p_i' : p, 's_i' : s, 'res' : r }
+                if args.plotting:
+                    plotting_purity_stability(var, hist_info['channel'], bin_criteria, bin_edges_vis[var])
+                    plotting_response( hist_info,  var, hist_info['channel'], bin_edges_vis[var] )
 
-            bin_criteria = {
-                'p_i' : p,
-                's_i' : s,
-                'res' : r,
-            }
-            if args.plotting:
-                plotting_purity_stability(var, 'combined', bin_criteria, bin_edges_vis[var])
-            f_out = 'unfolding/13TeV/binning_combined_{}.txt'.format(variable)
-            df_bin = dict_to_df(bin_criteria)
-            df_to_file( f_out, df_bin )
+            # f_out = 'unfolding/13TeV/binning_combined_{}.txt'.format(variable)
+            # df_bin = dict_to_df(bin_criteria)
+            # df_to_file( f_out, df_bin )
             continue
 
         # Claculate the best binning
@@ -212,6 +212,7 @@ def main():
                 output_file = 'unfolding/13TeV/binningInfo_%s_%s_VisiblePS.txt' % ( variable, info['channel'] )
             if args.plotting:
                 plotting_purity_stability(variable, info['channel'], outputInfo, bin_choices[variable])
+                plotting_response( histogram_information, variable, info['channel'], bin_choices[variable] )
 
             df_out = dict_to_df(outputInfo)
             df_to_file( output_file, df_out )
@@ -429,17 +430,14 @@ def get_next_end( histogram_information, bin_start, bin_end, p_min, s_min, n_min
         return current_bin_end, p, s, n_reco, res
 
 
-def calculate_purity_stability(hist_infos, bin_edges):
+def calculate_purity_stability(hist_info, bin_edges):
     '''
     Rebin finebinned histograms to current binning standards
     '''
-    hists = []
-    for hist_info in hist_infos:
-        hist = hist_info['hist']
-        binned_hist = rebin_2d( hist, bin_edges, bin_edges ).Clone()
-        p = calculate_purities(binned_hist)
-        s = calculate_stabilities(binned_hist)
-        hists.append(binned_hist)
+    hist = hist_info['hist']
+    binned_hist = rebin_2d( hist, bin_edges, bin_edges ).Clone()
+    p = calculate_purities(binned_hist)
+    s = calculate_stabilities(binned_hist)
     return p, s
 
 
@@ -515,7 +513,6 @@ def plotting_purity_stability(variable, channel, binning_criteria, bin_edges ):
     rplt.hist( hist_stability , stacked=False, axes = axes, label = 'Stability' )
     rplt.hist( hist_purity, stacked=False, axes = axes, label = 'Purity' )
 
-
     plt.tick_params( **CMS.axis_label_major )
     plt.tick_params( **CMS.axis_label_minor )
 
@@ -551,7 +548,6 @@ def plotting_resolution(variable, channel, residual, resolution, bin_number, bin
     plt.axvline(x=bin_width/2, linewidth=1, color='blue', label = 'Bin Width')
 
     axes.set_ylim(ymin = 0)
-    # axes.set_yscale("log", nonposy='clip')
     axes.set_xlabel('Residual')
     axes.set_ylabel('N')
     fig.suptitle('Residual Distribution', fontsize=14, fontweight='bold')
@@ -570,6 +566,79 @@ def plotting_resolution(variable, channel, residual, resolution, bin_number, bin
     plt.close()
     gc.collect()
     return
+
+
+def plotting_response( histogram_information, variable, channel, bin_edges ):
+    global output_folder, output_formats, options
+    my_cmap = cm.get_cmap( 'rainbow' )
+    my_cmap.set_under( 'w' )
+
+    scatter_plot = histogram_information['hist']
+    response_plot = rebin_2d(scatter_plot, bin_edges, bin_edges )
+    norm_response_plot = Hist2D( bin_edges, bin_edges, type = 'D' )
+
+    n_bins = len( bin_edges ) - 1
+    get_bin_content = response_plot.GetBinContent
+    set_bin_content = norm_response_plot.SetBinContent
+
+    # Put into array of values sorted by y columns
+    xy=[]
+    norm_xy = []
+    for bin_j in range( 0, n_bins+1):
+        y = []
+        for bin_i in range( 0, n_bins+1 ):
+            y.append( get_bin_content( bin_j+1, bin_i+1 ) )
+        xy.append(y)
+
+    # Normalise by the reconstructed column and round
+    for y_col in xy:
+        norm_xy.append(y_col / np.sum(y_col))
+    rounded_norm_xy = np.around(np.array(norm_xy), 2)
+
+    # New 2D Hist + Mesh to Plot
+    for bin_i in range( 0, n_bins+1):
+        for bin_j in range( 0, n_bins+1 ):
+            set_bin_content( bin_i, bin_j, rounded_norm_xy.item(bin_j, bin_i) )
+    X, Y = np.meshgrid(list(norm_response_plot.x()), list(norm_response_plot.y()))
+    x = X.ravel()
+    y = Y.ravel()
+    z = np.array(norm_response_plot.z()).ravel()
+
+
+    v_unit = '$'+variables_latex[variable]+'$'
+    if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
+        v_unit += ' [GeV]'
+    x_title = 'Reconstructed ' + v_unit
+    y_title = 'Generated ' + v_unit
+    # title = "channel = {}, variable = ${}$".format(channel, variables_latex[variable])
+    title = "Response matrix normalised wrt reconstructed bins"
+
+    plt.figure( figsize = ( 20, 16 ), dpi = 200, facecolor = 'white' )
+
+    ax0 = plt.axes()
+    ax0.minorticks_on()
+
+    plt.tick_params( **CMS.axis_label_major )
+    plt.tick_params( **CMS.axis_label_minor )
+    ax0.xaxis.labelpad = 12
+    ax0.yaxis.labelpad = 12
+
+    h2d = plt.hist2d(x, y, weights=z, bins=(list(norm_response_plot.xedges()), list(norm_response_plot.yedges())), cmap=my_cmap, vmin=0, vmax=1)
+    colorbar = plt.colorbar()
+    colorbar.ax.tick_params( **CMS.axis_label_major )
+
+    plt.xlabel( x_title, CMS.x_axis_title )
+    plt.ylabel( y_title, CMS.y_axis_title )
+    plt.title( title, CMS.title )
+
+    plt.tight_layout()
+
+    plot_filepath = 'plots/binning/response/'
+    make_folder_if_not_exists(plot_filepath)
+    plot_filename = '{}_{}_Response.pdf'.format(channel, variable)
+    plt.savefig(plot_filepath+plot_filename, bbox_inches='tight')
+    return
+
 
 
 if __name__ == '__main__':
