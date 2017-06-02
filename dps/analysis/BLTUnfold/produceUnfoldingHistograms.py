@@ -156,6 +156,16 @@ def parse_arguments():
         dest='pdfWeight', 
         default=-1 
     )
+    parser.add_argument('--CT14Weight', 
+        type=int, 
+        dest='CT14Weight', 
+        default=-1 
+    )
+    parser.add_argument('--MMHT14Weight', 
+        type=int, 
+        dest='MMHT14Weight', 
+        default=-1 
+    )
     parser.add_argument('--muFmuRWeight', 
         type=int, 
         dest='muFmuRWeight', 
@@ -175,11 +185,6 @@ def parse_arguments():
         type=int, 
         dest='fragWeight', 
         default=0
-    )
-    parser.add_argument('--nGeneratorWeights', 
-        type=int, 
-        dest='nGeneratorWeights', 
-        default=1 
     )
     parser.add_argument('-s', '--sample', 
         dest='sample', 
@@ -220,11 +225,13 @@ def main():
     else:
         print "Error: Unrecognised centre of mass energy."
 
-    pdfWeight    = args.pdfWeight
-    muFmuRWeight = args.muFmuRWeight
-    alphaSWeight = args.alphaSWeight
+    pdfWeight       = args.pdfWeight
+    CT14Weight      = args.CT14Weight
+    MMHT14Weight    = args.MMHTWeight
+    muFmuRWeight    = args.muFmuRWeight
+    alphaSWeight    = args.alphaSWeight
     semiLepBrWeight = args.semiLepBrWeight
-    fragWeight = args.fragWeight
+    fragWeight      = args.fragWeight
 
     # Output file name
     outputFileName = 'crap.root'
@@ -273,6 +280,10 @@ def main():
         outputFileName = outputFileDir+'/unfolding_TTJets_%s_asymmetric_frag_peterson.root' % ( energySuffix )
     elif pdfWeight >= 0 and pdfWeight <= 99:
         outputFileName = outputFileDir+'/unfolding_TTJets_%s_asymmetric_pdfWeight_%i.root' % ( energySuffix, pdfWeight )
+    elif CT14Weight >= 0 and CT14Weight <= 54:
+        outputFileName = outputFileDir+'/unfolding_TTJets_%s_asymmetric_CT14Weight_%i.root' % ( energySuffix, CT14Weight )
+    elif MMHTWeight >= 0 and MMHTWeight <= 55:
+        outputFileName = outputFileDir+'/unfolding_TTJets_%s_asymmetric_MMHTWeight_%i.root' % ( energySuffix, MMHTWeight )
     elif 'central' not in args.sample:
         outputFileName = outputFileDir+'/unfolding_TTJets_%s_%s_asymmetric.root' % ( energySuffix, args.sample  )
     elif args.fineBinned :
@@ -293,15 +304,6 @@ def main():
 
             # Get the tree
             treeName = "TTbar_plus_X_analysis/Unfolding/Unfolding"
-            if args.sample == "jesup":
-                treeName += "_JESUp"
-            elif args.sample == "jesdown":
-                treeName += "_JESDown"
-            elif args.sample == "jerup":
-                treeName += "_JERUp"
-            elif args.sample == "jerdown":
-                treeName += "_JERDown"
-
             tree = f.Get(treeName)
             nEntries = tree.GetEntries()
 
