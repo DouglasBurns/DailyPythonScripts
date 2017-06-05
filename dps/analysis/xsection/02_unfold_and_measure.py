@@ -12,9 +12,12 @@ from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsect
 combine_complex_results
 from dps.utils.hist_utilities import hist_to_value_error_tuplelist, \
 value_error_tuplelist_to_hist
-from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes, \
+plot_probability_matrix
 from dps.utils.ROOT_utils import set_root_defaults
-from dps.utils.pandas_utilities import read_tuple_from_file, write_tuple_to_df, combine_complex_df, create_covariance_matrix
+from dps.utils.pandas_utilities import read_tuple_from_file, write_tuple_to_df, combine_complex_df, \
+create_covariance_matrix
+
 from numpy import array, sqrt
 from copy import deepcopy
 
@@ -44,6 +47,7 @@ def get_unfolding_files(measurement_config):
 
     unfolding_files['file_for_erdOn']            = File( measurement_config.unfolding_erdOn, 'read' )
     unfolding_files['file_for_QCDbased_erdOn']            = File( measurement_config.unfolding_QCDbased_erdOn, 'read' )
+    # unfolding_files['file_for_GluonMove']            = File( measurement_config.unfolding_GluonMove, 'read' )
 
     unfolding_files['file_for_semiLepBrdown']          = File( measurement_config.unfolding_semiLepBr_down, 'read' )
     unfolding_files['file_for_semiLepBrup']            = File( measurement_config.unfolding_semiLepBr_up, 'read' )
@@ -135,10 +139,14 @@ def unfold_results( results, category, channel, tau_value, h_truth, h_measured, 
     h_data_no_fakes = h_data_no_fakes.rebinned(2)
     covariance_matrix = None
     if category == 'central':
-        # Return the covariance matrices (They have been normailsed)
-        covariance_matrix, correlation_matrix = unfolding.get_covariance_matrix()
+        # Return the Probabiliy Matrix
+        probability_matrix = unfolding.return_probability_matrix()
+        plot_probability_matrix(probability_matrix, variable, channel )
 
-        # Write covariance matrices
+        # Return the covariance matrices (They have been normailsed)
+        covariance_matrix, correlation_matrix, inputMC_covariance_matrix = unfolding.get_covariance_matrix()
+
+        # Write data statistical covariance matrices
         covariance_output_template = '{path_to_DF}/central/covarianceMatrices/unfoldedNumberOfEvents/{cat}_{label}_{channel}.txt'
         channelForOutputFile = channel
         if channel == 'combined':
@@ -148,10 +156,10 @@ def unfold_results( results, category, channel, tau_value, h_truth, h_measured, 
         create_covariance_matrix( covariance_matrix, table_outfile)
         table_outfile=covariance_output_template.format( path_to_DF=path_to_DF, channel = channelForOutputFile, label='Correlation', cat='Stat_unfoldedNormalisation' )
         create_covariance_matrix( correlation_matrix, table_outfile)
-
+        table_outfile=covariance_output_template.format( path_to_DF=path_to_DF, channel = channelForOutputFile, label='Covariance', cat='Stat_inputMC' )
+        create_covariance_matrix( covariance_matrix, table_outfile)
     del unfolding
     return hist_to_value_error_tuplelist( h_data_rebinned ), hist_to_value_error_tuplelist( h_unfolded_data ), hist_to_value_error_tuplelist( h_data_no_fakes ), covariance_matrix
-
 
 def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, tau_value, visiblePS ):
     global com, luminosity, ttbar_xsection, method, variable, path_to_DF
@@ -180,6 +188,7 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
         'TTJets_petersonFrag'          :  unfolding_files['file_for_petersonFrag'],
         'TTJets_erdOn'          :  unfolding_files['file_for_erdOn'],
         'TTJets_QCDbased_erdOn'          :  unfolding_files['file_for_QCDbased_erdOn'],
+        # 'TTJets_GluonMove'          :  unfolding_files['file_for_GluonMove'],
 
         'TTJets_isrdown'             :  unfolding_files['file_for_isrdown'],
         'TTJets_isrup'               :  unfolding_files['file_for_isrup'],
