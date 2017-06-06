@@ -121,9 +121,17 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	for v in variables:
 		systematics = file_to_df(inputPath.replace('VAR_TMP', v)+input_file_template.replace('absolute', 'relative').format(type = utype))
 		d_median_variable = {}
+		d_median_variable['Min'] = {}
+		d_median_variable['Max'] = {}
+		d_median_variable['Med'] = {}
+
 		for col in systematics.columns:
+			minimum = np.min(systematics[col])*100
+			maximum = np.max(systematics[col])*100
 			median = np.median(systematics[col])*100
-			d_median_variable[col] = median
+			d_median_variable['Min'][col] = minimum
+			d_median_variable['Max'][col] = maximum
+			d_median_variable['Med'][col] = median
 		d_summarised_syst[v] = d_median_variable
 	# print d_summarised_syst
 
@@ -133,9 +141,10 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexContent 	= ''
 	latexFooter 	= ''
 
+	latexHeader += '\\begin{landscape}\n'
 	latexHeader += '\\begin{table}\n'
 	latexHeader += '\t\label{{tb:syst_condensed_combined_{}}}\n'.format(utype)
-	latexHeader += '\t\caption{{ The median relative uncertainty, in \%, originating from each source of systematic uncertainty in the {t} differential cross section, over all bins of the measurement for each variable.  The median of the total relative uncertainty over all bins is also shown for each variable.}}\n'.format(t=utype)
+	latexHeader += '\t\caption{{ The upper and lower bounds, in \%, from each source of systematic uncertainty in the {t} differential cross section, over all bins of the measurement for each variable.  The bounds of the total relative uncertainty over all bins is also shown for each variable.}}\n'.format(t=utype)
 	# latexHeader += '\t\\tiny\n'
 	latexHeader += '\t\centering\n'
 	latexHeader += '\t\\footnotesize\n'
@@ -157,66 +166,115 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	for col in systematics.columns:
 		if 'central' in col or 'systematic' in col or 'statistical' in col: continue
 
-		HT 				= d_summarised_syst['HT'][col] 
-		ST 				= d_summarised_syst['ST'][col] 
-		MET 			= d_summarised_syst['MET'][col] 
-		WPT 			= d_summarised_syst['WPT'][col] 
-		lepton_pt	 	= d_summarised_syst['lepton_pt'][col] 
-		abs_lepton_eta 	= d_summarised_syst['abs_lepton_eta'][col] 
-		NJets 			= d_summarised_syst['NJets'][col]
+		HT_low 				= d_summarised_syst['HT']['Min'][col] 
+		ST_low 				= d_summarised_syst['ST']['Min'][col] 
+		MET_low 			= d_summarised_syst['MET']['Min'][col] 
+		WPT_low 			= d_summarised_syst['WPT']['Min'][col] 
+		lepton_pt_low	 	= d_summarised_syst['lepton_pt']['Min'][col] 
+		abs_lepton_eta_low 	= d_summarised_syst['abs_lepton_eta']['Min'][col] 
+		NJets_low 			= d_summarised_syst['NJets']['Min'][col]
+		HT_high 			= d_summarised_syst['HT']['Max'][col] 
+		ST_high 			= d_summarised_syst['ST']['Max'][col] 
+		MET_high 			= d_summarised_syst['MET']['Max'][col] 
+		WPT_high 			= d_summarised_syst['WPT']['Max'][col] 
+		lepton_pt_high	 	= d_summarised_syst['lepton_pt']['Max'][col] 
+		abs_lepton_eta_high = d_summarised_syst['abs_lepton_eta']['Max'][col] 
+		NJets_high 			= d_summarised_syst['NJets']['Max'][col]
 
 		# If less than 0.1 replace with '<0.1'
-		HT_dp = ':.1f'
-		if HT < 0.1:
-			HT_dp = ''
-			HT = '$<$ 0.1'
-		ST_dp = ':.1f'
-		if ST < 0.1:
-			ST_dp = ''
-			ST = '$<$ 0.1'
-		MET_dp = ':.1f'
-		if MET < 0.1:
-			MET_dp = ''
-			MET = '$<$ 0.1'
-		WPT_dp = ':.1f'
-		if WPT < 0.1:
-			WPT_dp = ''
-			WPT = '$<$ 0.1'
-		lepton_pt_dp = ':.1f'
-		if lepton_pt < 0.1:
-			lepton_pt_dp = ''
-			lepton_pt = '$<$ 0.1'
-		abs_lepton_eta_dp = ':.1f'
-		if abs_lepton_eta < 0.1:
-			abs_lepton_eta_dp = ''
-			abs_lepton_eta = '$<$ 0.1'
-		NJets_dp = ':.1f'
-		if NJets < 0.1:
-			NJets_dp = ''
-			NJets = '$<$ 0.1'
+		HT_dp_low = '{:.1f}'
+		HT_dp_high = ' - {:.1f}'
+		ST_dp_low = '{:.1f}'
+		ST_dp_high = ' - {:.1f}'
+		MET_dp_low = '{:.1f}'
+		MET_dp_high = ' - {:.1f}'
+		WPT_dp_low = '{:.1f}'
+		WPT_dp_high = ' - {:.1f}'
+		lepton_pt_dp_low = '{:.1f}'
+		lepton_pt_dp_high = ' - {:.1f}'
+		abs_lepton_eta_dp_low = '{:.1f}'
+		abs_lepton_eta_dp_high = ' - {:.1f}'
+		NJets_dp_low = '{:.1f}'
+		NJets_dp_high = ' - {:.1f}'
 
-		latexContent_met = '\t\t{{}}\t&\t{{}}\t&\t{{{ST_dp}}}\t&\t{{{MET_dp}}}\t&\t{{{WPT_dp}}}\t&\t{{}}\t&\t{{}}\t&\t{{}}\\\\ \n'.format(
-			ST_dp = ST_dp,
-			MET_dp = MET_dp,
-			WPT_dp = WPT_dp,
+		if HT_low < 0.1:
+			HT_dp_low = '{}'
+			HT_low = '$<$0.1'
+		if HT_high < 0.1:
+			HT_dp_high = '{}'
+			HT_high = ''
+		if ST_low < 0.1:
+			ST_dp_low = '{}'
+			ST_low = '$<$0.1'
+		if ST_high < 0.1:
+			ST_dp_high = '{}'
+			ST_high = ''
+		if MET_low < 0.1:
+			MET_dp_low = '{}'
+			MET_low = '$<$0.1'
+		if MET_high < 0.1:
+			MET_dp_high = '{}'
+			MET_high = ''
+		if WPT_low < 0.1:
+			WPT_dp_low = '{}'
+			WPT_low = '$<$0.1'
+		if WPT_high < 0.1:
+			WPT_dp_high = '{}'
+			WPT_high = ''
+		if lepton_pt_low < 0.1:
+			lepton_pt_dp_low = '{}'
+			lepton_pt_low = '$<$0.1'
+		if lepton_pt_high < 0.1:
+			lepton_pt_dp_high = '{}'
+			lepton_pt_high = ''
+		if abs_lepton_eta_low < 0.1:
+			abs_lepton_eta_dp_low = '{}'
+			abs_lepton_eta_low = '$<$0.1'
+		if abs_lepton_eta_high < 0.1:
+			abs_lepton_eta_dp_high = '{}'
+			abs_lepton_eta_high = ''
+		if NJets_low < 0.1:
+			NJets_dp_low = '{}'
+			NJets_low = '$<$0.1'
+		if NJets_high < 0.1:
+			NJets_dp_high = '{}'
+			NJets_high = ''
+
+		latexContent_met = '\t\t{{}}\t&\t{{}}\t&\t{ST_dp_low}{ST_dp_high}\t&\t{MET_dp_low}{MET_dp_high}\t&\t{WPT_dp_low}{WPT_dp_high}\t&\t{{}}\t&\t{{}}\t&\t{{}}\\\\ \n'.format(
+			ST_dp_low = ST_dp_low,
+			ST_dp_high = ST_dp_high,
+			MET_dp_low = MET_dp_low,
+			MET_dp_high = MET_dp_high,
+			WPT_dp_low = WPT_dp_low,
+			WPT_dp_high = WPT_dp_high,
 		)
-		latexContent_all = '\t\t{{}}\t&\t{{{HT_dp}}}\t&\t{{{ST_dp}}}\t&\t{{{MET_dp}}}\t&\t{{{WPT_dp}}}\t&\t{{{lepton_pt_dp}}}\t&\t{{{abs_lepton_eta_dp}}}\t&\t{{{NJets_dp}}}\\\\ \n'.format(
-			HT_dp = HT_dp,
-			ST_dp = ST_dp,
-			MET_dp = MET_dp,
-			WPT_dp = WPT_dp,
-			lepton_pt_dp = lepton_pt_dp,
-			abs_lepton_eta_dp = abs_lepton_eta_dp,
-			NJets_dp = NJets_dp,
+		latexContent_all = '\t\t{{}}\t&\t{HT_dp_low}{HT_dp_high}\t&\t{ST_dp_low}{ST_dp_high}\t&\t{MET_dp_low}{MET_dp_high}\t&\t{WPT_dp_low}{WPT_dp_high}\t&\t{lepton_pt_dp_low}{lepton_pt_dp_high}\t&\t{abs_lepton_eta_dp_low}{abs_lepton_eta_dp_high}\t&\t{NJets_dp_low}{NJets_dp_high}\\\\ \n'.format(
+			HT_dp_low = HT_dp_low,
+			HT_dp_high = HT_dp_high,
+			ST_dp_low = ST_dp_low,
+			ST_dp_high = ST_dp_high,
+			MET_dp_low = MET_dp_low,
+			MET_dp_high = MET_dp_high,
+			WPT_dp_low = WPT_dp_low,
+			WPT_dp_high = WPT_dp_high,
+			lepton_pt_dp_low = lepton_pt_dp_low,
+			lepton_pt_dp_high = lepton_pt_dp_high,
+			abs_lepton_eta_dp_low = abs_lepton_eta_dp_low,
+			abs_lepton_eta_dp_high = abs_lepton_eta_dp_high,
+			NJets_dp_low = NJets_dp_low,
+			NJets_dp_high = NJets_dp_high,
 		)
 
 		if col in measurement_config.systematic_group_met:
 			latexContent += latexContent_met.format(
 				systematics_latex[col],
 				'--',
-				ST,
-				MET,
-				WPT,
+				ST_low,
+				ST_high,
+				MET_low,
+				MET_high,
+				WPT_low,
+				WPT_high,
 				'--',
 				'--',
 				'--',
@@ -224,30 +282,45 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 		else:
 			latexContent += latexContent_all.format(
 				systematics_latex[col],
-				HT, 
-				ST, 
-				MET, 
-				WPT, 
-				lepton_pt, 
-				abs_lepton_eta, 
-				NJets,
+				HT_low, 
+				HT_high, 
+				ST_low, 
+				ST_high, 
+				MET_low, 
+				MET_high, 
+				WPT_low, 
+				WPT_high, 
+				lepton_pt_low, 
+				lepton_pt_high, 
+				abs_lepton_eta_low, 
+				abs_lepton_eta_high, 
+				NJets_low,
+				NJets_high,
 			)
 
 	latexContent += '\t\t\hline\n'
-	latexContent += '\t\t{}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\t&\t{:.1f}\\\\ \n'.format(
+	latexContent += '\t\t{}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\\\\ \n'.format(
 		'Total',
-		d_summarised_syst['HT']['systematic'], 
-		d_summarised_syst['ST']['systematic'], 
-		d_summarised_syst['MET']['systematic'], 
-		d_summarised_syst['WPT']['systematic'], 
-		d_summarised_syst['lepton_pt']['systematic'], 
-		d_summarised_syst['abs_lepton_eta']['systematic'], 
-		d_summarised_syst['NJets']['systematic'],
+		d_summarised_syst['HT']['Min']['systematic'], 
+		d_summarised_syst['HT']['Max']['systematic'], 
+		d_summarised_syst['ST']['Min']['systematic'], 
+		d_summarised_syst['ST']['Max']['systematic'], 
+		d_summarised_syst['MET']['Min']['systematic'], 
+		d_summarised_syst['MET']['Max']['systematic'], 
+		d_summarised_syst['WPT']['Min']['systematic'], 
+		d_summarised_syst['WPT']['Max']['systematic'], 
+		d_summarised_syst['lepton_pt']['Min']['systematic'], 
+		d_summarised_syst['lepton_pt']['Max']['systematic'], 
+		d_summarised_syst['abs_lepton_eta']['Min']['systematic'], 
+		d_summarised_syst['abs_lepton_eta']['Max']['systematic'], 
+		d_summarised_syst['NJets']['Min']['systematic'],
+		d_summarised_syst['NJets']['Max']['systematic'],
 	)
 	latexContent += '\t\t\hline\n'
 
 	latexFooter += '\t\end{tabular}\n'
 	latexFooter += '\\end{table}\n'
+	latexFooter += '\\end{landscape}\n'
 	latexFooter += '\clearpage'
 
 	fullTable += latexHeader
