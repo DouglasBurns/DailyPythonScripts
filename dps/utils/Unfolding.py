@@ -129,7 +129,7 @@ class Unfolding:
             corr_matrix = matrix(u.correlation_matrix(values_correlated) )
 
             # Get the input MC statisical covariance for the response from TUnfold
-           inputMC_stat_covariance = asrootpy(
+            inputMC_stat_covariance = asrootpy(
                 self.unfoldObject.GetEmatrixSysUncorr('InputMC_Stat_Covariance'))
             z = list(inputMC_stat_covariance.z())
             inputMC_cov_matrix = matrix(z)
@@ -352,8 +352,11 @@ def plot_probability_matrix(p_matrix, variable, channel):
     mpl.use( 'agg' )
 
     import matplotlib.pyplot as plt
+    from rootpy.plotting import root2matplotlib as rplt
+    # from rootpy.plotting import Hist2D
+
     import matplotlib.cm as cm
-    my_cmap = cm.get_cmap( 'bwr' )
+    my_cmap = cm.get_cmap( 'jet' )
     import gc
 
     from matplotlib import rc
@@ -361,11 +364,6 @@ def plot_probability_matrix(p_matrix, variable, channel):
     rc( 'text', usetex = True )
 
     p_matrix = p_matrix.rebinned( 2, axis = 1 )
-
-    X, Y = np.meshgrid(list(p_matrix.x()), list(p_matrix.y()))
-    x = X.ravel()
-    y = Y.ravel()
-    z = np.array(p_matrix.z()).ravel()
 
     v_unit = '$'+variables_latex[variable]+'$'
     if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
@@ -383,7 +381,7 @@ def plot_probability_matrix(p_matrix, variable, channel):
     ax0.xaxis.labelpad = 12
     ax0.yaxis.labelpad = 12
 
-    h2d = plt.hist2d(x, y, weights=z, bins=(list(p_matrix.xedges()), list(p_matrix.yedges())), cmap=my_cmap)
+    h2d = rplt.hist2d(p_matrix)
     colorbar = plt.colorbar(h2d[3], fraction=0.046, pad=0.04)
     colorbar.ax.tick_params( **CMS.axis_label_major )
 
