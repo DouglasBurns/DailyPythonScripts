@@ -370,6 +370,8 @@ def get_symmetrised_systematic_uncertainty(options, syst_unc_x_secs ):
     if 'TTJets_alphaS' in xsections_with_symmetrised_systematics:
         del xsections_with_symmetrised_systematics['TTJets_alphaS']
 
+    xsections_with_symmetrised_systematics['inputMC'] = add_inputMC_systematic()
+
     return xsections_with_symmetrised_systematics           
 
 
@@ -546,6 +548,17 @@ def generate_covariance_matrix(number_of_bins, systematic, sign):
             correlation_matrix[i,j] = covariance_matrix[i,j] / sqrt( covariance_matrix[i,i] * covariance_matrix[j,j] )
 
     return covariance_matrix, correlation_matrix
+
+def add_inputMC_systematic():
+    '''
+    Add a systematic uncertainty based on the input MC distribution for unfolding
+    '''
+    unc, sign = 0, 0
+    # Paths to statistical Covariance/Correlation matrices.
+    covariance_template = '{path_to_DF}/central/covarianceMatrices/{norm}/Stat_{norm}Xsection_{label}_{channel}.txt'
+    cov_path=covariance_template.format(norm=options['normalisation_type'], path_to_DF=options['path_to_DF'], channel=options['channel'], label='Covariance')
+
+    return unc, sign
 
 # @profile(stream=fp)
 def generate_total_covariance(options, all_covariances, all_correlations):
