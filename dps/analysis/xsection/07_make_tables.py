@@ -49,31 +49,37 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
     ### Table Content
     #########################################################################################################
 	for bin in range (len(bin_edges_vis[variable])-1):
+		precision = '{0:g}'
+		if 'abs_lepton_eta' in variable:
+			precision = '{0:.2f}'
+
 		if 'absolute' in crossSectionType:
 			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = '\ensuremath{{ {0:g} }}'.format(bin_edges_vis[variable][bin]),
-				edge_up = '\ensuremath{{ {0:g} }}'.format(bin_edges_vis[variable][bin+1]),
-				val = '\ensuremath{{ {:.3g} }}'.format(xsections_abs['central'][bin]),
-				stat = '\ensuremath{{ {:.3g} }}'.format(xsections_abs['statistical'][bin]),
-				sys = '\ensuremath{{ {:.3g} }}'.format(xsections_abs['systematic'][bin]),
+				edge_down = precision.format(bin_edges_vis[variable][bin]),
+				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
+				val = '{:.3g}'.format(xsections_abs['central'][bin]),
+				stat = '{:.3g}'.format(xsections_abs['statistical'][bin]),
+				sys = '{:.3g}'.format(xsections_abs['systematic'][bin]),
 				# tot = xsections_rel['total'][bin],
 			)
 		else:
 			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = '\ensuremath{{ {0:g} }}'.format(bin_edges_vis[variable][bin]),
-				edge_up = '\ensuremath{{ {0:g} }}'.format(bin_edges_vis[variable][bin+1]),
-				val = '\ensuremath{{ {:.3g} }}'.format(xsections_abs['central'][bin]),
-				stat = '\ensuremath{{ {:.3g} }}'.format(xsections_rel['statistical'][bin]),
-				sys = '\ensuremath{{ {:.3g} }}'.format(xsections_rel['systematic'][bin]),
+				edge_down = precision.format(bin_edges_vis[variable][bin]),
+				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
+				val = '{:.3g}'.format(xsections_abs['central'][bin]),
+				stat = '{:.3g}'.format(xsections_rel['statistical'][bin]),
+				sys = '{:.3g}'.format(xsections_rel['systematic'][bin]),
 				# tot = xsections_rel['total'][bin],
 			)
 
-		# REPLACE e^ WITH x10^. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
+		# REPLACE e^0N WITH x10^N. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
 		if 'e-' in line_for_bin:
+			print(line_for_bin)
 			power = line_for_bin[line_for_bin.find("e-")+1:].split()[0]
-			new = '\\times 10^{{ {} }}'.format(power)
+			new = '\\times 10^{{ {} }}'.format(power.replace('0', ''))
 			old = 'e'+power
 			line_for_bin = line_for_bin.replace(old, new)
+			print(line_for_bin)
 
 		fullTable += line_for_bin
 
