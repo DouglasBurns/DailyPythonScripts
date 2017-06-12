@@ -293,6 +293,7 @@ class XSectionConfig():
             'TTJets_petersonFrag'           : ['TTJets_petersonFrag', 'TTJets_petersonFrag'],
             'TTJets_CR_erdOn'           : ['TTJets_erdOn', 'TTJets_erdOn'],
             'TTJets_CR_QCDbased_erdOn'           : ['TTJets_QCDbased_erdOn', 'TTJets_QCDbased_erdOn'],
+            # 'TTJets_CR_GluonMove'           : ['TTJets_GluonMove', 'TTJets_GluonMove'],
 
             # Event Reweighting
             'PileUp'                    : ['PileUp_up', 'PileUp_down'],
@@ -350,6 +351,7 @@ class XSectionConfig():
             'TTJets_petersonFrag',
             'TTJets_CR_erdOn',
             'TTJets_CR_QCDbased_erdOn',
+            # 'TTJets_CR_GluonMove',
             'JES',
         ]
         self.systematic_group_otherTheoretical = [
@@ -380,19 +382,14 @@ class XSectionConfig():
         # categories_and_prefixes = self.categories_and_prefixes
 
         # Used in 01
-        self.ttbar_trees            = {
-            category: path_to_files + 'TTJets_PowhegPythia8_tree.root' for category in self.normalisation_systematics}
-        self.SingleTop_trees        = {
-            category: path_to_files + 'SingleTop_tree.root' for category in self.normalisation_systematics}
-        self.VJets_trees            = {
-            category: path_to_files + 'VJets_tree.root' for category in self.normalisation_systematics}
-        self.electron_QCD_MC_trees  = {
-            category: path_to_files + 'QCD_Electron_tree.root' for category in self.normalisation_systematics}
-            # category: path_to_files + 'QCD_Inclusive_tree.root' for category in self.normalisation_systematics}
-        self.muon_QCD_MC_trees      = {
-            category: path_to_files + 'QCD_Muon_tree.root' for category in self.normalisation_systematics}
-            # category: path_to_files + 'QCD_Inclusive_tree.root' for category in self.normalisation_systematics}
-            # category: path_to_files + 'QCD_All_tree.root' for category in self.normalisation_systematics}
+        self.ttbar_trees = path_to_files + 'TTJets_PowhegPythia8_tree.root'
+        self.SingleTop_trees = path_to_files + 'SingleTop_tree.root'
+        self.VJets_trees = path_to_files + 'VJets_tree.root'
+        self.electron_QCD_MC_trees = path_to_files + 'QCD_Electron_tree.root'
+        self.muon_QCD_MC_trees = path_to_files + 'QCD_Muon_tree.root'
+        # self.electron_QCD_MC_trees = path_to_files + 'QCD_Inclusive_tree.root'
+        # self.muon_QCD_MC_trees = path_to_files + 'QCD_Inclusive_tree.root'
+        # self.muon_QCD_MC_trees = path_to_files + 'QCD_All_tree.root'
 
         self.ttbar_amc_trees = path_to_files + '/TTJets_amc_tree.root'
         self.ttbar_madgraph_trees = path_to_files + '/TTJets_madgraph_tree.root'
@@ -406,6 +403,12 @@ class XSectionConfig():
         self.ttbar_jesdown_trees = path_to_files + '/TTJets_PowhegPythia8_minusJES_tree.root'
         self.ttbar_jerup_trees = path_to_files + '/TTJets_PowhegPythia8_plusJER_tree.root'
         self.ttbar_jerdown_trees = path_to_files + '/TTJets_PowhegPythia8_minusJER_tree.root'
+
+        self.st_s_trees = '/scratch/db0268/DPS/DPSTestingGround/DailyPythonScripts/ST_s.root'
+        self.st_t_trees = '/scratch/db0268/DPS/DPSTestingGround/DailyPythonScripts/ST_t.root'
+        self.st_tW_trees = '/scratch/db0268/DPS/DPSTestingGround/DailyPythonScripts/ST_tW.root'
+        self.stbar_t_trees = '/scratch/db0268/DPS/DPSTestingGround/DailyPythonScripts/STbar_t.root'
+        self.stbar_tW_trees = '/scratch/db0268/DPS/DPSTestingGround/DailyPythonScripts/STbar_tW.root'
 
         # Underlying Event trees
         self.ttbar_ueup_trees = path_to_files + '/TTJets_PowhegPythia8_up_tree.root'
@@ -422,6 +425,7 @@ class XSectionConfig():
         # erdOn
         self.ttbar_erdOn_trees = path_to_files + '/TTJets_PowhegPythia8_erdOn_tree.root'
         self.ttbar_QCDbased_erdOn_trees = path_to_files + '/TTJets_PowhegPythia8_QCDbased_erdOn_tree.root'
+        # self.ttbar_GluonMove_trees = path_to_files + '/TTJets_PowhegPythia8_GluonMove_tree.root'
 
         # Unfolding MC Different Generator Samples
         self.unfolding_powheg_pythia8_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV.root' % self.centre_of_mass_energy
@@ -484,6 +488,7 @@ class XSectionConfig():
         self.unfolding_petersonFrag = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_frag_peterson.root' % self.centre_of_mass_energy
         self.unfolding_erdOn = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_erdOn_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_QCDbased_erdOn = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_QCDbased_erdOn_asymmetric.root' % self.centre_of_mass_energy
+        # self.unfolding_GluonMove = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_GluonMove_asymmetric.root' % self.centre_of_mass_energy
 
         self.unfolding_mass_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_massdown_asymmetric.root' % self.centre_of_mass_energy
         self.unfolding_mass_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_massup_asymmetric.root' % self.centre_of_mass_energy
@@ -512,10 +517,11 @@ class XSectionConfig():
 
         self.pdfWeightMin = 0
         self.pdfWeightMax = 100
+        self.ct14WeightMax = 54
+        self.mmht14WeightMax = 55
         self.unfolding_pdfweights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_pdfWeight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.pdfWeightMax )}
-
-        self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_CT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( 0, 54 )}
-        self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_MMHT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( 0, 55 )}
+        self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_CT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.ct14WeightMax )}
+        self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_MMHT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.mmht14WeightMax )}
 
         # Used in 01
         self.tree_path = {

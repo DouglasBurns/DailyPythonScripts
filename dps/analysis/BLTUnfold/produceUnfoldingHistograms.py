@@ -67,13 +67,13 @@ def getFileName( com, sample, measurementConfig ) :
 
     fileNames = {
         '13TeV' : {
-            'central'           : measurementConfig.ttbar_trees['central'],
+            'central'           : measurementConfig.ttbar_trees,
 
-            'central_70pc'           : measurementConfig.ttbar_trees['central'],
-            'central_30pc'           : measurementConfig.ttbar_trees['central'],
+            'central_70pc'           : measurementConfig.ttbar_trees,
+            'central_30pc'           : measurementConfig.ttbar_trees,
 
-            'central_firstHalf'           : measurementConfig.ttbar_trees['central'],
-            'central_secondHalf'           : measurementConfig.ttbar_trees['central'],
+            'central_firstHalf'           : measurementConfig.ttbar_trees,
+            'central_secondHalf'           : measurementConfig.ttbar_trees,
 
             'amcatnlo'          : measurementConfig.ttbar_amc_trees,
             'madgraph'          : measurementConfig.ttbar_madgraph_trees,
@@ -101,26 +101,26 @@ def getFileName( com, sample, measurementConfig ) :
             'jerdown'           : measurementConfig.ttbar_jerdown_trees,
             'jerup'             : measurementConfig.ttbar_jerup_trees,
 
-            'bjetdown'          : measurementConfig.ttbar_trees['central'],
-            'bjetup'            : measurementConfig.ttbar_trees['central'],
-            'lightjetdown'      : measurementConfig.ttbar_trees['central'],
-            'lightjetup'        : measurementConfig.ttbar_trees['central'],
+            'bjetdown'          : measurementConfig.ttbar_trees,
+            'bjetup'            : measurementConfig.ttbar_trees,
+            'lightjetdown'      : measurementConfig.ttbar_trees,
+            'lightjetup'        : measurementConfig.ttbar_trees,
 
-            'leptondown'        : measurementConfig.ttbar_trees['central'],
-            'leptonup'          : measurementConfig.ttbar_trees['central'],
-            'pileupUp'          : measurementConfig.ttbar_trees['central'],
-            'pileupDown'        : measurementConfig.ttbar_trees['central'],
+            'leptondown'        : measurementConfig.ttbar_trees,
+            'leptonup'          : measurementConfig.ttbar_trees,
+            'pileupUp'          : measurementConfig.ttbar_trees,
+            'pileupDown'        : measurementConfig.ttbar_trees,
 
-            'ElectronEnUp'      : measurementConfig.ttbar_trees['central'],
-            'ElectronEnDown'    : measurementConfig.ttbar_trees['central'],
-            'MuonEnUp'          : measurementConfig.ttbar_trees['central'],
-            'MuonEnDown'        : measurementConfig.ttbar_trees['central'],
-            'TauEnUp'           : measurementConfig.ttbar_trees['central'],
-            'TauEnDown'         : measurementConfig.ttbar_trees['central'],
-            'UnclusteredEnUp'   : measurementConfig.ttbar_trees['central'],
-            'UnclusteredEnDown' : measurementConfig.ttbar_trees['central'],
+            'ElectronEnUp'      : measurementConfig.ttbar_trees,
+            'ElectronEnDown'    : measurementConfig.ttbar_trees,
+            'MuonEnUp'          : measurementConfig.ttbar_trees,
+            'MuonEnDown'        : measurementConfig.ttbar_trees,
+            'TauEnUp'           : measurementConfig.ttbar_trees,
+            'TauEnDown'         : measurementConfig.ttbar_trees,
+            'UnclusteredEnUp'   : measurementConfig.ttbar_trees,
+            'UnclusteredEnDown' : measurementConfig.ttbar_trees,
 
-            'topPtSystematic'   : measurementConfig.ttbar_trees['central'],
+            'topPtSystematic'   : measurementConfig.ttbar_trees,
 
         },
     }

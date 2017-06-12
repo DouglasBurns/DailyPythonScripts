@@ -258,16 +258,16 @@ def get_file(config, sample, options):
     Return a specific sample file
     '''
     if options['channel'] == 'electron':
-        qcd = config.electron_QCD_MC_trees[options['category']]
+        qcd = config.electron_QCD_MC_trees
         data = config.data_file_electron
     else:
-        qcd = config.muon_QCD_MC_trees[options['category']]
+        qcd = config.muon_QCD_MC_trees
         data = config.data_file_muon
 
     files = {
-        'TTBar': config.ttbar_trees[options['category']],
-        'V+Jets': config.VJets_trees[options['category']],
-        'SingleTop': config.SingleTop_trees[options['category']],
+        'TTBar': config.ttbar_trees,
+        'V+Jets': config.VJets_trees,
+        'SingleTop': config.SingleTop_trees,
         'QCD': qcd,
         'data': data
     }
