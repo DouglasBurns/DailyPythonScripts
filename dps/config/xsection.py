@@ -361,6 +361,12 @@ class XSectionConfig():
             'TTJets_topPt'
         ]
 
+        self.systematic_group_pdf = [
+            'PDF',
+            'CT14',
+            'MMHT14',
+        ]
+
         self.samplesForChi2Comparison = [
             'powhegPythia8',
             'powhegHerwig',
@@ -520,8 +526,10 @@ class XSectionConfig():
         self.ct14WeightMax = 54
         self.mmht14WeightMax = 55
         self.unfolding_pdfweights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_pdfWeight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.pdfWeightMax )}
-        self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_CT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.ct14WeightMax )}
-        self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_MMHT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.mmht14WeightMax )}
+        # self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_CT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.ct14WeightMax )}
+        # self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_MMHT14Weight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.mmht14WeightMax )}
+        self.unfolding_CT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_pdfWeight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.ct14WeightMax )}
+        self.unfolding_MMHT14weights = {index : path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_pdfWeight_%d.root' % (self.centre_of_mass_energy, index) for index in range( self.pdfWeightMin, self.mmht14WeightMax )}
 
         # Used in 01
         self.tree_path = {

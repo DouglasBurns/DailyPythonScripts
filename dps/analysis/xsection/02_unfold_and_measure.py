@@ -143,6 +143,7 @@ def unfold_results( results, category, channel, tau_value, h_truth, h_measured, 
     h_unfolded_data = unfolding.unfold()
     h_data_no_fakes = h_data_no_fakes.rebinned(2)
     covariance_matrix = None
+    inputMC_covariance_matrix = None
     if category == 'central':
         # Return the Probabiliy Matrix
         probability_matrix = unfolding.return_probability_matrix()
@@ -282,7 +283,7 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
     elif additionalPDFSets and category in mmht14_uncertainties :
         print 'Doing category',category,'by changing response matrix'
         h_truth, h_measured, h_response, h_fakes = get_unfold_histogram_tuple( 
-            inputfile = unfolding_files['files_for_mmhtpdfs'][category],
+            inputfile = unfolding_files['files_for_mmht14pdfs'][category],
             variable = variable,
             channel = channel,
             centre_of_mass = com,

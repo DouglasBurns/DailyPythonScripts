@@ -64,6 +64,7 @@ def write_systematic_xsection_measurement(options, systematic, total_syst, summa
     all_uncertainties['central']        = list_to_series( central )
     # Add the total systematic
     all_uncertainties['systematic']     = list_to_series( syst_total )
+
     # Output to absolute file
     d_abs = dict_to_df(all_uncertainties)
     df_to_file(output_file, d_abs)
@@ -87,14 +88,30 @@ def write_systematic_xsection_measurement(options, systematic, total_syst, summa
     return
 
 # @profile(stream=fp)
-def append_PDF_uncertainties(all_systematics, minPdfWeight, maxPdfWeight):
+def append_PDF_uncertainties(all_systematics, pdfset=''):
     '''
     Replace 'PDF' entry in list of all systematics with actual PDF variations
+    pdfset= CT14 or MMHT14
     '''
+    minPdfWeight = measurement_config.pdfWeightMin 
+    maxPdfWeight = measurement_config.pdfWeightMax
+
+    pdf = ''
+    if pdfset:
+        pdf = pdfset
+        if 'CT14' in pdfset:
+            maxPdfWeight = measurement_config.ct14WeightMax
+        elif 'MMHT14' in pdfset:
+            maxPdfWeight = measurement_config.mmht14WeightMax
+        else:
+            print("Unknown PDFSet")
+    else:
+        pdf = 'PDF'
+
     variation = []
     for index in xrange (minPdfWeight, maxPdfWeight):
-        variation.append('PDFWeights_'+str(index))
-    all_systematics['PDF'] = variation
+        variation.append(pdf+'Weights_'+str(index))
+    all_systematics[pdf] = variation
     return all_systematics
 
 # @profile(stream=fp)
@@ -198,7 +215,7 @@ def get_cross_sections(options, list_of_systematics):
     unfolded_systematic_uncertainty_x_sections['central'] = central_measurement_unfolded
 
     for systematic, variation in list_of_systematics.iteritems():
-        if (systematic == 'PDF'):
+        if (systematic in ['PDF', 'CT14', 'MMHT14']):
             unf_syst_unc_x_sec = read_xsection_systematics(options, variation, is_multiple_sources=True)
             unfolded_systematic_uncertainty_x_sections[systematic] = []
             for weight, vals in unf_syst_unc_x_sec.iteritems():
@@ -317,7 +334,7 @@ def get_symmetrised_systematic_uncertainty(options, syst_unc_x_secs ):
     xsections_with_symmetrised_systematics = deepcopy(syst_unc_x_secs)
     central_measurement = syst_unc_x_secs['central']
     for systematic, variation in syst_unc_x_secs.iteritems():
-        if (systematic == 'PDF'):
+        if (systematic in ['PDF', 'CT14', 'MMHT14']):
             # Replace all PDF weights with full PDF combination
             pdf_sym, pdf_sign = calculate_total_PDFuncertainty(
                 options, 
@@ -364,13 +381,17 @@ def get_symmetrised_systematic_uncertainty(options, syst_unc_x_secs ):
         xsections_with_symmetrised_systematics['PDF'][0] = pdf_tot
         # TODO combine the signs....
 
+    # Add additional 50% uncertainty in QCD normalisation
+    if 'QCD_cross_section' in xsections_with_symmetrised_systematics:
+        xsections_with_symmetrised_systematics['QCD_cross_section'][0] = [1.5*val for val in xsections_with_symmetrised_systematics['QCD_cross_section'][0]]
+
     # Now alphaS is combined with pdfs dont need it in dictionary anymore. nor LightJet
     if 'LightJet' in xsections_with_symmetrised_systematics:
         del xsections_with_symmetrised_systematics['LightJet']
     if 'TTJets_alphaS' in xsections_with_symmetrised_systematics:
         del xsections_with_symmetrised_systematics['TTJets_alphaS']
 
-    xsections_with_symmetrised_systematics['inputMC'] = add_inputMC_systematic()
+    # xsections_with_symmetrised_systematics['inputMC'] = add_inputMC_systematic(options)
 
     return xsections_with_symmetrised_systematics           
 
@@ -462,7 +483,7 @@ def get_measurement_with_total_systematic_uncertainty(options, xsec_with_symmetr
         sys_unc = 0
         central = xsec_with_symmetrised_systematics['central'][bin_i] # Still [Value, Error]
         for systematic, measurement in xsec_with_symmetrised_systematics.iteritems():
-            if (systematic == 'central'): continue
+            if systematic in ['central','CT14', 'MMHT14']: continue
             sys_unc += measurement[0][bin_i]**2
         measurement_with_total_uncertainty.append( [central[0], sqrt(sys_unc), sqrt(sys_unc)] )
     return measurement_with_total_uncertainty
@@ -490,7 +511,7 @@ def generate_covariance_matrices(options, xsec_with_symmetrised_systematics):
     covariance_output_template  = '{path_to_DF}/central/covarianceMatrices/{norm}/{sys}_{label}_{channel}.txt'
 
     for syst_name, measurement in xsec_with_symmetrised_systematics.iteritems():
-        if syst_name == 'central': continue
+        if syst_name in ['central','CT14', 'MMHT14']: continue
 
         systematic = measurement[0]
         sign = measurement[1]
@@ -549,7 +570,7 @@ def generate_covariance_matrix(number_of_bins, systematic, sign):
 
     return covariance_matrix, correlation_matrix
 
-def add_inputMC_systematic():
+def add_inputMC_systematic(options):
     '''
     Add a systematic uncertainty based on the input MC distribution for unfolding
     '''
