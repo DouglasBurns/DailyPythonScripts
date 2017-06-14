@@ -344,17 +344,16 @@ def plot_probability_matrix(p_matrix, variable, channel):
     '''
     Plot the probability matrix
     '''
+    from dps.config.variable_binning import bin_edges_vis
     from dps.config.latex_labels import variables_latex
     from dps.config import CMS
     from dps.utils.file_utilities import make_folder_if_not_exists
+    from root_numpy import hist2array
 
     import matplotlib as mpl
     mpl.use( 'agg' )
 
     import matplotlib.pyplot as plt
-    from rootpy.plotting import root2matplotlib as rplt
-    # from rootpy.plotting import Hist2D
-
     import matplotlib.cm as cm
     my_cmap = cm.get_cmap( 'jet' )
     import gc
@@ -363,7 +362,35 @@ def plot_probability_matrix(p_matrix, variable, channel):
     rc( 'font', **CMS.font )
     rc( 'text', usetex = True )
 
-    p_matrix = p_matrix.rebinned( 2, axis = 1 )
+    # hist to numpy array
+    values = hist2array(p_matrix)
+    edges = bin_edges_vis[variable]
+    bin_centres = [np.mean([edges[j],edges[j+1]]) for j in range(0, len(edges)-1)]
+    n_gen_bins  = len(values)
+
+    # Get underflow and strip underflow/overflow bins
+    underflow = p_matrix.underflow(axis=1)[1:-1]
+
+    # Fix array such that underflow is included
+    i=0
+    for u, row in zip(underflow, values):
+        newrow = row[:-1]
+        newrow = np.insert(newrow, 0, u)
+        values[i] = newrow
+        i+=1
+
+    # Cant easily rebin any more so done manually
+    rebinned_values = np.zeros((n_gen_bins,n_gen_bins))
+    i=0
+    for row in values:
+        newrow = [ row[j]+row[j+1] for j in range(0, len(row), 2)]
+        rebinned_values[i] = newrow
+        i+=1
+
+    X, Y = np.meshgrid(bin_centres, bin_centres)
+    x = X.ravel()
+    y = Y.ravel()
+    z = rebinned_values.ravel()
 
     v_unit = '$'+variables_latex[variable]+'$'
     if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
@@ -381,7 +408,7 @@ def plot_probability_matrix(p_matrix, variable, channel):
     ax0.xaxis.labelpad = 12
     ax0.yaxis.labelpad = 12
 
-    h2d = rplt.hist2d(p_matrix)
+    h2d = plt.hist2d(x, y, weights=z, bins=(edges, edges), cmap=my_cmap)
     colorbar = plt.colorbar(h2d[3], fraction=0.046, pad=0.04)
     colorbar.ax.tick_params( **CMS.axis_label_major )
 
