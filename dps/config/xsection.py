@@ -360,11 +360,13 @@ class XSectionConfig():
             'TTJets_mass',
             'TTJets_topPt'
         ]
-
         self.systematic_group_pdf = [
             'PDF',
             'CT14',
             'MMHT14',
+        ]
+        self.systematic_other = [
+            'inputMC',
         ]
 
         self.samplesForChi2Comparison = [

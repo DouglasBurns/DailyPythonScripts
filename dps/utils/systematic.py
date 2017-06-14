@@ -391,7 +391,7 @@ def get_symmetrised_systematic_uncertainty(options, syst_unc_x_secs ):
     if 'TTJets_alphaS' in xsections_with_symmetrised_systematics:
         del xsections_with_symmetrised_systematics['TTJets_alphaS']
 
-    # xsections_with_symmetrised_systematics['inputMC'] = add_inputMC_systematic(options)
+    xsections_with_symmetrised_systematics['inputMC'], _ = add_inputMC_systematic(options)
 
     return xsections_with_symmetrised_systematics           
 
@@ -512,6 +512,7 @@ def generate_covariance_matrices(options, xsec_with_symmetrised_systematics):
 
     for syst_name, measurement in xsec_with_symmetrised_systematics.iteritems():
         if syst_name in ['central','CT14', 'MMHT14']: continue
+        if syst_name in ['inputMC']: continue
 
         systematic = measurement[0]
         sign = measurement[1]
@@ -576,10 +577,23 @@ def add_inputMC_systematic(options):
     '''
     unc, sign = 0, 0
     # Paths to statistical Covariance/Correlation matrices.
-    covariance_template = '{path_to_DF}/central/covarianceMatrices/{norm}/Stat_{norm}Xsection_{label}_{channel}.txt'
-    cov_path=covariance_template.format(norm=options['normalisation_type'], path_to_DF=options['path_to_DF'], channel=options['channel'], label='Covariance')
+    covariance_template = '{path_to_DF}/central/covarianceMatrices/{norm}/Stat_{norm}Xsection_inputMC_{label}_{channel}.txt'
+    cov_path=covariance_template.format(
+        norm=options['normalisation_type'], 
+        path_to_DF=options['path_to_DF'], 
+        channel=options['channel'], 
+        label='Covariance',
+    )
+    # Convert to numpy matrix and create total
+    cov_inputMC = file_to_df(cov_path)
+    cov_inputMC = matrix_from_df(cov_inputMC)
+    unc2 = np.diagonal(cov_inputMC)
+    unc = np.sqrt(unc2)
 
-    return unc, sign
+    # Retain structure
+    sign = np.zeros(len(unc))
+
+    return [unc, sign], cov_inputMC
 
 # @profile(stream=fp)
 def generate_total_covariance(options, all_covariances, all_correlations):
@@ -594,10 +608,14 @@ def generate_total_covariance(options, all_covariances, all_correlations):
     cov_path=covariance_template.format(norm=options['normalisation_type'], path_to_DF=options['path_to_DF'], channel=options['channel'], label='Covariance')
     cor_path=covariance_template.format(norm=options['normalisation_type'], path_to_DF=options['path_to_DF'], channel=options['channel'], label='Correlation')
 
+    # inputMC covariance matrix
+    _, cov_inputMC = add_inputMC_systematic(options)
+
     # Convert to numpy matrix and create total
     cov_stat = file_to_df(cov_path)
     cov_stat = matrix_from_df(cov_stat)
     cov_tot = cov_stat
+    cov_tot += cov_inputMC
     for m in all_covariances:
         cov_tot+=m
 
