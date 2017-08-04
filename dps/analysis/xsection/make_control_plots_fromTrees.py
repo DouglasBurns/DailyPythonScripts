@@ -12,10 +12,19 @@ from dps.utils.pandas_utilities import dict_to_df, df_to_file
 from dps.utils.latex import setup_matplotlib
 from uncertainties import ufloat
 import pandas as pd 
+import glob
 
 # latex, font, etc
 setup_matplotlib()
 title_template = '%.1f fb$^{-1}$ (%d TeV)'
+
+def getUnmergedDirectory( f ) :
+    baseDir = f.split('combined')[0]
+    sampleName = f.split('combined')[-1].strip('/').split('_tree.root')[0]
+    print baseDir
+    print sampleName
+    new_f = baseDir + '/' + sampleName + '/analysis_central_job_*/*root'
+    return new_f
 
 def binWidth(binning):
     return  ( binning[-1] - binning[0] ) / ( len(binning)-1 )
@@ -42,6 +51,7 @@ def getHistograms( histogram_files,
 
     # Channel specific files and weights
     if 'electron' in channel:
+        print measurement_config.data_file_electron
         histogram_files['data'] = measurement_config.data_file_electron
         histogram_files['QCD']  = measurement_config.electron_QCD_MC_trees
         if use_qcd_data_region:
@@ -49,14 +59,17 @@ def getHistograms( histogram_files,
         # No Lepton Eff in QCD CR and PU distributions
         if not 'QCD' in channel:
             weightBranchSignalRegion += ' * ElectronEfficiencyCorrection'
+            # weightBranchSignalRegion += ' * ElectronUp'
 
     if 'muon' in channel:
+        print  measurement_config.data_file_muon
         histogram_files['data'] = measurement_config.data_file_muon
         histogram_files['QCD']  = measurement_config.muon_QCD_MC_trees
         if use_qcd_data_region:
             qcd_data_region     = qcd_data_region_muon
         if not 'QCD' in channel:
             weightBranchSignalRegion += ' * MuonEfficiencyCorrection'
+            # weightBranchSignalRegion += ' * MuonEfficiencyCorrection_etaBins'
     
     # Print all the weights applied to this plot 
     print "Weight applied : {}".format(weightBranchSignalRegion)
@@ -82,6 +95,7 @@ def getHistograms( histogram_files,
             trees = [signal_region_tree.replace('COMBINED','EPlusJets')], 
             branch = branchName, 
             weightBranch = weightBranchSignalRegion + ' * ElectronEfficiencyCorrection', 
+            # weightBranch = weightBranchSignalRegion + ' * ElectronDown', 
             # weightBranch = weightBranchSignalRegion, 
             files = histogram_files_electron, 
             nBins = nBins, 
@@ -263,8 +277,10 @@ def make_plot( channel, x_axis_title, y_axis_title,
         else: weightBranchSignalRegion += ' * BJetWeight'
 
     # Selections
-    if branchName == 'abs(lepton_eta)' :
+    if branchName == 'abs(lepton_eta)' or branchName == 'lepton_eta' :
         selectionSignalRegion = 'lepton_eta > -10'
+        # selectionSignalRegion = 'lepton_eta >= 0'
+        # selectionSignalRegion = 'lepton_eta > -10 && lepton_eta <= 0'
     else:
         selectionSignalRegion = '%s >= 0' % branchName
     if "_JetPtAdd" in name_prefix:
@@ -324,6 +340,8 @@ def make_plot( channel, x_axis_title, y_axis_title,
         histogram_properties.name               += '_' + category
     if normalise_to_data:
         histogram_properties.name               += '_normToData'
+    if data_period != '':
+        histogram_properties.name               += '_dataPeriod_{period}'.format(period=data_period)
 
     variation_dependent_text=''
     if 'PU' in name_prefix:
@@ -348,7 +366,6 @@ def make_plot( channel, x_axis_title, y_axis_title,
         elif 'JetPt2' in name_prefix: variation_dependent_text='3rd jet'
         elif 'JetPt3' in name_prefix: variation_dependent_text='4th jet'
         elif 'JetPtAdd' in name_prefix: variation_dependent_text='Additional jets'
-
 
     histogram_properties.title                  = title
     histogram_properties.x_axis_title           = x_axis_title
@@ -516,6 +533,11 @@ def parse_arguments():
         dest = "additional_QCD_plots",
         help = "creates a set of QCD plots for exclusive bins for all variables" 
     )
+    parser.add_argument( "-p", "--data_period", 
+        dest = "data_period", 
+        default = '',
+        help = "Use specific data taking period, and normalise MC to data" 
+    )
     args = parser.parse_args()
     return args
 
@@ -527,7 +549,16 @@ if __name__ == '__main__':
     measurement_config = XSectionConfig( args.CoM )
     
     normalise_to_data = args.normalise_to_data
-    
+    data_period = args.data_period
+
+    if data_period != '':
+        measurement_config.data_file_electron = measurement_config.data_file_electron.replace('tree','{period}_tree'.format(period=data_period))
+        measurement_config.data_file_muon = measurement_config.data_file_muon.replace('tree','{period}_tree'.format(period=data_period))
+        measurement_config.new_luminosity = measurement_config.new_luminosity_periods[data_period]
+        measurement_config.luminosity_scale = float( measurement_config.new_luminosity ) / measurement_config.luminosity
+        print measurement_config.new_luminosity
+        print measurement_config.luminosity_scale
+        # normalise_to_data = True
 
     category = args.category
     generator = args.generator
@@ -542,6 +573,13 @@ if __name__ == '__main__':
         'SingleTop' : measurement_config.SingleTop_trees,
     }
 
+    # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory(histogram_files['TTJet']) )
+    # print histogram_files['TTJet']
+    # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory(histogram_files['TTJet']) )
+
+    # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory('/hdfs/TopQuarkGroup/ec6821/1.0.12/atOutput/combined/TTJets_PowhegPythia8_tree.root') )
+
+    print histogram_files['TTJet']
     # Swap between plotting different generators
     if 'PowhegPythia8' not in generator:
         histogram_files['TTJet'] = measurement_config.ttbar_trees.replace('PowhegPythia8', generator)
@@ -574,6 +612,10 @@ if __name__ == '__main__':
         # 'NVertexUp',
         # 'NVertexDown',
         # 'LeptonPt',
+<<<<<<< 91af36ca2e8d37247958687786552d25b72adeb8
+=======
+        'LeptonEta',
+>>>>>>> Debugging lepton eta.  Coarser binning.
         # 'AbsLeptonEta',
         # 'NJets',
         # 'NBJets',
@@ -632,8 +674,13 @@ if __name__ == '__main__':
 
     for channel, label in {
         # 'electron' : 'EPlusJets',
+<<<<<<< 91af36ca2e8d37247958687786552d25b72adeb8
         # 'muon'     : 'MuPlusJets',
         'combined' : 'COMBINED'
+=======
+        'muon'     : 'MuPlusJets',
+        # 'combined' : 'COMBINED'
+>>>>>>> Debugging lepton eta.  Coarser binning.
         }.iteritems() : 
 
         # Set folder for this batch of plots
@@ -759,9 +806,6 @@ if __name__ == '__main__':
         ###################################################
         if 'LeptonEta' in include_plots:
             print '---> Lepton Eta'
-            treeName = 'Electron/Electrons'
-            if channel == 'muon':
-                treeName = 'Muon/Muons'
 
             make_plot( 
                 channel,
@@ -772,10 +816,11 @@ if __name__ == '__main__':
                 branchName = 'lepton_eta',
                 name_prefix = '%s_LeptonEta_' % label,
                 x_limits = control_plots_bins['LeptonEta'],
+                y_max_scale = 1.4,
                 nBins = len(control_plots_bins['LeptonEta'])-1,
                 rebin = 1,
-                legend_location = ( 0.9, 0.73 ),
-                cms_logo_location = 'right',
+                legend_location = ( 0.99, 0.79 ),
+                cms_logo_location = 'left',
                 use_qcd_data_region = useQCDControl,
             )
 
