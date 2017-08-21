@@ -51,7 +51,6 @@ def getHistograms( histogram_files,
 
     # Channel specific files and weights
     if 'electron' in channel:
-        print measurement_config.data_file_electron
         histogram_files['data'] = measurement_config.data_file_electron
         histogram_files['QCD']  = measurement_config.electron_QCD_MC_trees
         if use_qcd_data_region:
@@ -59,17 +58,14 @@ def getHistograms( histogram_files,
         # No Lepton Eff in QCD CR and PU distributions
         if not 'QCD' in channel:
             weightBranchSignalRegion += ' * ElectronEfficiencyCorrection'
-            # weightBranchSignalRegion += ' * ElectronUp'
 
     if 'muon' in channel:
-        print  measurement_config.data_file_muon
         histogram_files['data'] = measurement_config.data_file_muon
         histogram_files['QCD']  = measurement_config.muon_QCD_MC_trees
         if use_qcd_data_region:
             qcd_data_region     = qcd_data_region_muon
         if not 'QCD' in channel:
             weightBranchSignalRegion += ' * MuonEfficiencyCorrection'
-            # weightBranchSignalRegion += ' * MuonEfficiencyCorrection_etaBins'
     
     # Print all the weights applied to this plot 
     print "Weight applied : {}".format(weightBranchSignalRegion)
@@ -95,8 +91,6 @@ def getHistograms( histogram_files,
             trees = [signal_region_tree.replace('COMBINED','EPlusJets')], 
             branch = branchName, 
             weightBranch = weightBranchSignalRegion + ' * ElectronEfficiencyCorrection', 
-            # weightBranch = weightBranchSignalRegion + ' * ElectronDown', 
-            # weightBranch = weightBranchSignalRegion, 
             files = histogram_files_electron, 
             nBins = nBins, 
             xMin = x_limits[0], 
@@ -107,7 +101,6 @@ def getHistograms( histogram_files,
             trees = [signal_region_tree.replace('COMBINED','MuPlusJets')], 
             branch = branchName, 
             weightBranch = weightBranchSignalRegion + ' * MuonEfficiencyCorrection', 
-            # weightBranch = weightBranchSignalRegion, 
             files = histogram_files_muon, 
             nBins = nBins, 
             xMin = x_limits[0], 
@@ -279,8 +272,6 @@ def make_plot( channel, x_axis_title, y_axis_title,
     # Selections
     if branchName == 'abs(lepton_eta)' or branchName == 'lepton_eta' :
         selectionSignalRegion = 'lepton_eta > -10'
-        # selectionSignalRegion = 'lepton_eta >= 0'
-        # selectionSignalRegion = 'lepton_eta > -10 && lepton_eta <= 0'
     else:
         selectionSignalRegion = '%s >= 0' % branchName
     if "_JetPtAdd" in name_prefix:
@@ -556,9 +547,6 @@ if __name__ == '__main__':
         measurement_config.data_file_muon = measurement_config.data_file_muon.replace('tree','{period}_tree'.format(period=data_period))
         measurement_config.new_luminosity = measurement_config.new_luminosity_periods[data_period]
         measurement_config.luminosity_scale = float( measurement_config.new_luminosity ) / measurement_config.luminosity
-        print measurement_config.new_luminosity
-        print measurement_config.luminosity_scale
-        # normalise_to_data = True
 
     category = args.category
     generator = args.generator
@@ -573,13 +561,9 @@ if __name__ == '__main__':
         'SingleTop' : measurement_config.SingleTop_trees,
     }
 
-    # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory(histogram_files['TTJet']) )
-    # print histogram_files['TTJet']
+    # If you want to run over the unmerged output from AT, you can try this:
     # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory(histogram_files['TTJet']) )
 
-    # histogram_files['TTJet'] = glob.glob( getUnmergedDirectory('/hdfs/TopQuarkGroup/ec6821/1.0.12/atOutput/combined/TTJets_PowhegPythia8_tree.root') )
-
-    print histogram_files['TTJet']
     # Swap between plotting different generators
     if 'PowhegPythia8' not in generator:
         histogram_files['TTJet'] = measurement_config.ttbar_trees.replace('PowhegPythia8', generator)
@@ -603,30 +587,27 @@ if __name__ == '__main__':
 
     # comment out plots you don't want
     include_plots = [
-        # 'HT',
-        # 'MET',
-        # 'ST',
-        # 'WPT',
-        # 'NVertex',
-        # 'NVertexNoWeight',
-        # 'NVertexUp',
-        # 'NVertexDown',
-        # 'LeptonPt',
-<<<<<<< 91af36ca2e8d37247958687786552d25b72adeb8
-=======
+        'HT',
+        'MET',
+        'ST',
+        'WPT',
+        'NVertex',
+        'NVertexNoWeight',
+        'NVertexUp',
+        'NVertexDown',
+        'LeptonPt',
         'LeptonEta',
->>>>>>> Debugging lepton eta.  Coarser binning.
-        # 'AbsLeptonEta',
-        # 'NJets',
-        # 'NBJets',
-        # 'Tau',
+        'AbsLeptonEta',
+        'NJets',
+        'NBJets',
+        'Tau',
 
-        # 'NBJetsNoWeight',
-        # 'NBJetsUp',
-        # 'NBJetsDown',
-        # 'NBJets_LightUp',
-        # 'NBJets_LightDown',
-        # 'JetPt',
+        'NBJetsNoWeight',
+        'NBJetsUp',
+        'NBJetsDown',
+        'NBJets_LightUp',
+        'NBJets_LightDown',
+        'JetPt',
         
         # 'sigmaietaieta',
 
@@ -673,14 +654,9 @@ if __name__ == '__main__':
     )
 
     for channel, label in {
-        # 'electron' : 'EPlusJets',
-<<<<<<< 91af36ca2e8d37247958687786552d25b72adeb8
-        # 'muon'     : 'MuPlusJets',
-        'combined' : 'COMBINED'
-=======
+        'electron' : 'EPlusJets',
         'muon'     : 'MuPlusJets',
-        # 'combined' : 'COMBINED'
->>>>>>> Debugging lepton eta.  Coarser binning.
+        'combined' : 'COMBINED'
         }.iteritems() : 
 
         # Set folder for this batch of plots
