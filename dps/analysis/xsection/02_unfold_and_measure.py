@@ -104,7 +104,7 @@ def get_unfolding_files(measurement_config):
     unfolding_files['file_for_ptreweight']          = File( measurement_config.unfolding_ptreweight, 'read' )
 
     unfolding_files['file_for_powhegPythia8']       = File( measurement_config.unfolding_powheg_pythia8, 'read')
-    unfolding_files['file_for_amcatnlo']            = File( measurement_config.unfolding_amcatnlo, 'read')
+    unfolding_files['file_for_amcatnloPythia8']            = File( measurement_config.unfolding_amcatnlo_pythia8, 'read')
     unfolding_files['file_for_madgraphMLM']         = File( measurement_config.unfolding_madgraphMLM, 'read')
     unfolding_files['file_for_powheg_herwig']       = File( measurement_config.unfolding_powheg_herwig, 'read' )
     return unfolding_files
@@ -420,8 +420,8 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
             load_fakes = True,
             visiblePS = visiblePS,
         )
-        h_truth_amcatnlo, _, _, _ = get_unfold_histogram_tuple( 
-            inputfile = unfolding_files['file_for_amcatnlo'],
+        h_truth_amcatnloPythia8, _, _, _ = get_unfold_histogram_tuple( 
+            inputfile = unfolding_files['file_for_amcatnloPythia8'],
             variable = variable,
             channel = channel,
             centre_of_mass = com,
@@ -642,7 +642,7 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
         )   
 
         normalisation_unfolded['TTJets_powhegPythia8'] = hist_to_value_error_tuplelist( h_truth_powhegPythia8 )
-        normalisation_unfolded['TTJets_amcatnloPythia8']      = hist_to_value_error_tuplelist( h_truth_amcatnlo )
+        normalisation_unfolded['TTJets_amcatnloPythia8']      = hist_to_value_error_tuplelist( h_truth_amcatnloPythia8 )
         normalisation_unfolded['TTJets_madgraphMLM']   = hist_to_value_error_tuplelist( h_truth_madgraphMLM )
         normalisation_unfolded['TTJets_powhegHerwig']  = hist_to_value_error_tuplelist( h_truth_powheg_herwig )
 
@@ -1330,5 +1330,4 @@ if __name__ == '__main__':
             inputMC_covariance_combined = inputMC_covariance_electron + inputMC_covariance_muon
         # measure xsection
         calculate_xsections( unfolded_normalisation_combined, category, channel, covariance_matrix=covariance_combined, input_mc_covariance_matrix = inputMC_covariance_combined  )
-        calculate_normalised_xsections( unfolded_normalisation_combined, category, channel, covariance_matrix=covariance_combined, input_mc_covariance_matrix = inputMC_covariance_combined )
-        calculate_normalised_xsections( unfolded_normalisation_combined, category, channel , True )
+        calculate_normalised_xsections( u
