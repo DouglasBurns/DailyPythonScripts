@@ -55,16 +55,20 @@ def main():
                 # Read in Measurement JSON
                 config = read_data_from_JSON(f)
 
+                # Create Measurement Class using JSON
                 if 'electron' in ch:
-                    # Create Measurement Class using JSON
                     electron_measurement = Measurement(config)
+                    if args.forControlPlots:
+                        electron_measurement.output_folder = electron_measurement.output_folder.replace('data', 'data_for_01')
                     electron_measurement.calculate_normalisation()
                     electron_measurement.save(ps)
                     qcd_transfer_factor[sample] = [electron_measurement.t_factor]
 
                 elif 'muon' in ch:
-                    # Create Measurement Class using JSON
                     muon_measurement = Measurement(config)
+                    if args.forControlPlots:
+                        muon_measurement.output_folder = muon_measurement.output_folder.replace('data', 'data_for_01')
+
                     muon_measurement.calculate_normalisation()
                     muon_measurement.save(ps)
                     qcd_transfer_factor[sample] = [muon_measurement.t_factor]
@@ -91,6 +95,8 @@ def parse_arguments():
                             help="set the centre of mass energy for analysis. Default = 13 [TeV]")
     parser.add_argument('--visiblePS', dest="visiblePS", action="store_true",
                             help="Unfold to visible phase space")
+    parser.add_argument('--forControlPlots', dest="forControlPlots", action="store_true",
+                            help="Store 01 for use in make_controlPlots_from01")
     parser.add_argument('--test', dest="test", action="store_true",
                             help="test on central only.")
     args = parser.parse_args()

@@ -216,7 +216,7 @@ for variable in config.variables:
     for channel in config.analysis_types.keys():
         if channel == 'combined': continue
 
-        path_to_DF = 'data/normalisation/background_subtraction/13TeV/{variable}/VisiblePS/'.format( variable = variable )
+        path_to_DF = 'data_for_01/normalisation/background_subtraction/13TeV/{variable}/VisiblePS/'.format( variable = variable )
         normalisation_fileName = 'normalisation_{channel}.txt'.format(channel=channel)
         normalisation_results_electron  = read_tuple_from_file( '{path}/central/{filename}'.format(path=path_to_DF,filename=normalisation_fileName)  )
 
