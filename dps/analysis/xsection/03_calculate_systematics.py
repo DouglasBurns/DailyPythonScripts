@@ -104,7 +104,6 @@ if __name__ == '__main__':
 
     # Get list of all systematics
     all_systematics = measurement_config.list_of_systematics
-
     if variable in measurement_config.variables_no_met:
         all_systematics = remove_MET_uncertainties(all_systematics)
 
@@ -112,9 +111,6 @@ if __name__ == '__main__':
     all_systematics = append_PDF_uncertainties(all_systematics)
     # all_systematics = append_PDF_uncertainties(all_systematics, pdfset='CT14')
     # all_systematics = append_PDF_uncertainties(all_systematics, pdfset='MMHT14')
-
-    list_of_systematics = all_systematics
-    # If you want different lists of systematics can just do some manipulation here
 
     channel = [
         'electron', 
@@ -129,16 +125,16 @@ if __name__ == '__main__':
 
     for ch in channel:
         for utype in unc_type:
-            print "Calculating uncertainties for {} in the {} {} channel".format(variable, utype, unc_type)
+            print "Calculating uncertainties for {} in the {} {} channel".format(variable, utype, ch)
 
             # Add channel specific args to list of args
             args['channel'] = ch
             args['normalisation_type'] = utype
 
-            # Retreive the normalised cross sections, for all groups in list_of_systematics.
+            # Retreive the normalised cross sections, for all groups in all_systematics.
             unfolded_systematic_uncertainty, mc_xsection_variations = get_cross_sections(
                 args, 
-                list_of_systematics
+                all_systematics
             )
             # print_dictionary("Unfolded normalised cross sections of the systematics in use", unfolded_systematic_uncertainty)
 

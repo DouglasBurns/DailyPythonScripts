@@ -20,6 +20,9 @@ def make_folder_if_not_exists(folder):
         except:
             print "Could not create a folder ", folder
 
+def file_exists(f):
+    return os.path.isfile(f)
+
 def get_filename_without_extension(filename_with_path):
     filename = os.path.basename(filename_with_path)
     filename_without_extension = os.path.splitext(filename)[0]

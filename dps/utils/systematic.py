@@ -930,7 +930,9 @@ def make_covariance_plot( options, syst_name, matrix, label='Covariance' ):
     plt.ylabel( y_title, CMS.y_axis_title )
     plt.tick_params( **CMS.axis_label_major )
     plt.tick_params( **CMS.axis_label_minor ) 
-    plt.colorbar(im,fraction=0.046, pad=0.04)
+    cbar = plt.colorbar(im,fraction=0.046, pad=0.04)
+    cbar.ax.tick_params(labelsize=30) 
+
     plt.tight_layout()
 
     # Output folder of covariance matrices

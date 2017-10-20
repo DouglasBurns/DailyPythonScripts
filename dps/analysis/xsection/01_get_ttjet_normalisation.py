@@ -20,7 +20,6 @@ def main():
 
     # config file template
     input_template          = 'config/measurements/background_subtraction/{com}TeV/{ch}/{var}/{ps}/'
-    output_folder_template  = 'data/normalisation/background_subtraction/{com}TeV/{var}/{ps}/{cat}/'
 
     ps = 'FullPS'
     if args.visiblePS:
@@ -33,7 +32,7 @@ def main():
 
     for ch in channels:
         for var in measurement_config.variables:
-            if not args.variable == var: continue
+            if args.variable and args.variable != var: continue
             qcd_transfer_factor = {}
 
             # Create measurement_filepath
@@ -70,7 +69,7 @@ def main():
                     muon_measurement.save(ps)
                     qcd_transfer_factor[sample] = [muon_measurement.t_factor]
 
-            output_folder = output_folder_template.format(
+            output_folder = electron_measurement.output_folder.format(
                 com = args.CoM,  var = var,
                 ps  = ps,   cat = 'central',
             )
@@ -86,14 +85,14 @@ def store_transfer_factor(tf, output_file, channel):
 
 def parse_arguments():
     parser = ArgumentParser(__doc__)
-    parser.add_argument("-v", "--variable", dest="variable", default='HT',
+    parser.add_argument("-v", "--variable", dest="variable", default=None,
                             help="set the variable to analyse (MET, HT, ST, MT, WPT). Default is MET.")
     parser.add_argument("-c", "--centre-of-mass-energy", dest="CoM", default=13, type=int,
                             help="set the centre of mass energy for analysis. Default = 13 [TeV]")
     parser.add_argument('--visiblePS', dest="visiblePS", action="store_true",
                             help="Unfold to visible phase space")
     parser.add_argument('--test', dest="test", action="store_true",
-                            help="Unfold to visible phase space")
+                            help="test on central only.")
     args = parser.parse_args()
     return args
 

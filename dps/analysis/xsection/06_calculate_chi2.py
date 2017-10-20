@@ -60,7 +60,7 @@ def calculateChi2ForModels( modelsForComparing, variable, channel, path_to_input
 
 	# Collect the cross section measured/unfolded results from dataframes
 	xsections = read_tuple_from_file( xsections_filename )
-	xsection_unfolded    = [ i[0] for i in xsections['TTJets_unfolded'] ]
+	xsection_unfolded    = np.array([ i[0] for i in xsections['TTJets_unfolded'] ])
 
 	xsectionsOfmodels = {}
 	chi2OfModels = {}

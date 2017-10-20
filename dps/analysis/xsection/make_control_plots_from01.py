@@ -141,7 +141,7 @@ def drawHistograms( dictionaryOfHistograms, uncertaintyBand, config, channel, va
     histogram_properties.name                   = '{channel}_{variable}'.format(channel = channel, variable=variable)
     histogram_properties.title                  = '$%.1f$ fb$^{-1}$ (%d TeV)' % ( config.new_luminosity/1000., config.centre_of_mass_energy )
     histogram_properties.x_axis_title           = variables_latex[variable]
-    histogram_properties.y_axis_title           = 'Events'
+    histogram_properties.y_axis_title           = 'Events / Bin'
     if variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
         histogram_properties.y_axis_title       = 'Events / {binWidth} GeV'.format( binWidth=binWidth )
         histogram_properties.x_axis_title           = '{variable} (GeV)'.format( variable = variables_latex[variable] )

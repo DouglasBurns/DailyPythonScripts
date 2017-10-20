@@ -220,8 +220,6 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
         'LightJet_up'                :  unfolding_files['file_for_lightjetup'],
         'LightJet_down'              :  unfolding_files['file_for_lightjetdown'],
 
-        'TTJets_hadronisation'       :  unfolding_files['file_for_powheg_herwig'],
-
         'ElectronEnUp'               :  unfolding_files['file_for_ElectronEnUp'],
         'ElectronEnDown'             :  unfolding_files['file_for_ElectronEnDown'],
         'MuonEnUp'                   :  unfolding_files['file_for_MuonEnUp'],

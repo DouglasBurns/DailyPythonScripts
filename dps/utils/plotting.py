@@ -38,6 +38,7 @@ class Histogram_properties:
     legend_columns = 1
     has_ratio = False
     ratio_y_limits = [0.7, 1.3] #[min, max]
+    ratio_y_fontsize = 25
     rebin = 1
     additional_text = ''
     additional_text2 = ''
@@ -431,8 +432,7 @@ def make_data_mc_comparison_plot( histograms = [],
                                zorder = 0
                                 )
 
-    if CMS.tight_layout:
-        plt.tight_layout()
+    plt.tight_layout()
     
     for save in save_as:
         if save == 'root':
@@ -807,7 +807,7 @@ def compare_measurements( models = {}, measurements = {},
         axes_ratio.grid( True, 'major', linewidth = 1)
         axes_ratio.axhline(y=1, linewidth = 1, linestyle = 'dashed', color = 'black')
         set_labels( plt, histogram_properties, show_x_label = True, show_title = False )
-        plt.ylabel(histogram_properties.ratio_y_title, fontsize=25)
+        plt.ylabel(histogram_properties.ratio_y_title, fontsize=histogram_properties.ratio_y_fontsize)
         axes_ratio.yaxis.set_label_coords(-0.115, 0.8)
         for label, ratio in ratios.items():
             rplt.hist( ratio, axes = axes_ratio, label = label )
