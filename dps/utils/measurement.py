@@ -137,6 +137,9 @@ class Measurement():
                 if 'Electron' in weight: weights.remove(weight)
                 elif 'Muon'   in weight: weights.remove(weight)
 
+        if 'topPtWeight' in weights:
+            self.output_folder  = 'data/normalisation/background_subtraction/{com}TeV/{var}_ptReweight/{ps}/{cat}/'
+
         weights = "*".join(weights)
         # Selection will return a weight 0 or 1 depending on whether event passes selection
         weights_and_selection = '( {0} ) * ( {1} )'.format(weights, selection)

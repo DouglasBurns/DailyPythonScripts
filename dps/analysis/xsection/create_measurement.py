@@ -50,12 +50,19 @@ def main():
         action="store_true",
         help="Use the binning for the control plots"
     )
+    parser.add_argument(
+        '--apply_top_pt_reweighting', 
+        dest="apply_top_pt_reweighting", 
+        action="store_true",
+        help="Apply top pt reweighting"
+    )
     args = parser.parse_args()
 
     options = {}
     options['com'] = args.CoM
     options['data_driven_qcd'] = args.data_driven_qcd
     options['control_plot_binning'] = args.control_plot_binning
+    options['apply_top_pt_reweighting'] = args.apply_top_pt_reweighting
     if args.debug: log.setLevel(log.DEBUG)
 
 
@@ -206,6 +213,10 @@ def get_sample_info(options, xsec_config, sample):
         weight_branches.append('1')
     else:
         weight_branches.append('EventWeight')
+
+        # Apply top pt reweighting if wanted
+        if options['apply_top_pt_reweighting']:
+            weight_branches.append('topPtWeight')
 
         # PU Weights
         if options['category'] == 'PileUp_up':
