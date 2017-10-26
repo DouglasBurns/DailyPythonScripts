@@ -1,4 +1,4 @@
-from tools.file_utilities import make_folder_if_not_exists, read_data_from_JSON
+from dps.utils.file_utilities import make_folder_if_not_exists, read_data_from_JSON
 from dps.config.variable_binning import bin_edges_vis
 from dps.config.xsection import XSectionConfig
 from dps.utils.pandas_utilities import file_to_df
@@ -202,3 +202,249 @@ for variable in measurement_config.variables:
 		print line
 	print "# END YODA_SCATTER2D"
 	print "\n"
+
+
+print '---> Powheg Herwig normalised cross section\n'
+for variable in measurement_config.variables:
+	if variable not in normalised_number.keys(): continue
+
+	input_file 	= "xsection_normalised_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	normalised_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_PP8 = normalised_unfolded_xsections['TTJets_powhegHerwig']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_PP8 ) ):
+		xsec = xsections_PP8[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
+print '---> Powheg Herwig absolute cross section\n'
+for variable in measurement_config.variables:
+	if variable not in absolute_number.keys(): continue
+
+	input_file 	= "xsection_absolute_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	absolute_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_PP8 = absolute_unfolded_xsections['TTJets_powhegHerwig']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_PP8 ) ):
+		xsec = xsections_PP8[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
+
+print '---> Madgraph LO normalised cross section\n'
+for variable in measurement_config.variables:
+	if variable not in normalised_number.keys(): continue
+
+	input_file 	= "xsection_normalised_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	normalised_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_madgraphLO = normalised_unfolded_xsections['TTJets_madgraphMLM']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_madgraphLO ) ):
+		xsec = xsections_madgraphLO[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
+
+print '---> Madgraph LO absolute cross section\n'
+for variable in measurement_config.variables:
+	if variable not in absolute_number.keys(): continue
+
+	input_file 	= "xsection_absolute_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	absolute_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_madgraphLO = absolute_unfolded_xsections['TTJets_madgraphMLM']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_madgraphLO ) ):
+		xsec = xsections_madgraphLO[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
+
+print '---> Madgraph NLO normalised cross section\n'
+for variable in measurement_config.variables:
+	if variable not in normalised_number.keys(): continue
+
+	input_file 	= "xsection_normalised_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	normalised_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_madgraphLO = normalised_unfolded_xsections['TTJets_amcatnloPythia8']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % normalised_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_madgraphLO ) ):
+		xsec = xsections_madgraphLO[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
+
+print '---> Madgraph NLO absolute cross section\n'
+for variable in measurement_config.variables:
+	if variable not in absolute_number.keys(): continue
+
+	input_file 	= "xsection_absolute_combined_TUnfold.txt"
+	path_to_input  = '{path}/13TeV/{variable}/VisiblePS/central/'.format(
+		path = path,
+		variable = variable,
+		)
+
+	absolute_unfolded_xsections = file_to_df( path_to_input+input_file )
+	xsections_madgraphLO = absolute_unfolded_xsections['TTJets_amcatnloPythia8']
+	edges = bin_edges_vis[variable]
+
+	print "# BEGIN YODA_SCATTER2D /CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Path=/CMS_2017_PAS_TOP_16_014/d%s-x01-y01" % absolute_number[variable]
+	print "Type=Scatter2D"
+	print "# xval   xerr-   xerr+   yval  yerr-   yerr+"
+
+	for i_xsec in range ( 0, len( xsections_madgraphLO ) ):
+		xsec = xsections_madgraphLO[i_xsec]
+		xsec_unc = 0
+		xlow = edges[i_xsec]
+		xup = edges[i_xsec+1]
+		xwidth = xup - xlow
+		xcentre = xlow + xwidth / 2
+
+		line = '{xcentre} {xerr_down} {xerr_up} {y} {yerr_down} {yerr_up}'.format(
+			xcentre = xcentre,
+			xerr_down = xwidth / 2, 
+			xerr_up = xwidth / 2,
+			y = xsec,
+			yerr_down = xsec_unc,
+			yerr_up = xsec_unc
+			)
+
+		print line
+	print "# END YODA_SCATTER2D"
+	print "\n"
+
