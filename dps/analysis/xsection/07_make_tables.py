@@ -6,6 +6,7 @@ from dps.config.variable_binning import bin_edges_vis
 from dps.utils.file_utilities import make_folder_if_not_exists
 import numpy as np
 import os
+import math
 
 def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, crossSectionType ):
 	'''
@@ -26,57 +27,58 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 	else:
 		dxsec 	 = ' \\ensuremath{{ \\frac{{ 1 }}{{ \\text{{d}}\\sigma }} \\frac{{ \\text{{d}}\\sigma }}{{ \\text{{d}}{var} }} }} '.format(var = variables_latex[variable])
 
-    #########################################################################################################
-    ### Round XSection Values
-    #########################################################################################################
+	#########################################################################################################
+	### Round XSection Values
+	#########################################################################################################
 	xsections_rel['statistical'] = xsections_rel['statistical']*100
 	xsections_rel['systematic'] = xsections_rel['systematic']*100
 	# xsections_abs = round_df(xsections_abs, 2)
 	# xsections_rel = round_df(xsections_rel, 2)
 
-    #########################################################################################################
-    ### Table Header
-    #########################################################################################################
+	#########################################################################################################
+	### Table Header
+	#########################################################################################################
 	latexHeader =  '\\begin{table}[!htbp]\n'
 	latexHeader += '\t\centering\n'
 	latexHeader += '\t\\begin{tabular}{cccc}\n'
 	latexHeader += '\t\t\hline\n'
-	latexHeader += '\t\t\hline\n'
 	latexHeader += '\t\t{var}'.format(var=variables_latex[variable]) + ' \t& ' + dxsec + ' \t& \ensuremath{\pm} Stat. \t& \ensuremath{\pm} Syst. \\\\ \n'
-	if 'absolute' in crossSectionType:
-		latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (N) \t& (N) \\\\ \n'
-	else:
-		latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (\%) \t& (\%) \\\\ \n'
+	latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (\%) \t& (\%) \\\\ \n'
 	latexHeader += '\t\t\hline\n'
 
 	fullTable += latexHeader
 
-    #########################################################################################################
-    ### Table Content
-    #########################################################################################################
+	#########################################################################################################
+	### Table Content
+	#########################################################################################################
 	for bin in range (len(bin_edges_vis[variable])-1):
 		precision = '{0:g}'
 		if 'abs_lepton_eta' in variable:
 			precision = '{0:.2f}'
+		edge_down = precision.format(bin_edges_vis[variable][bin])
+		edge_up = precision.format(bin_edges_vis[variable][bin+1])
 
 		if 'absolute' in crossSectionType:
-			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = precision.format(bin_edges_vis[variable][bin]),
-				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
-				val = '{:.3g}'.format(xsections_abs['central'][bin]),
-				stat = '{:.3g}'.format(xsections_abs['statistical'][bin]),
-				sys = '{:.3g}'.format(xsections_abs['systematic'][bin]),
-				# tot = xsections_rel['total'][bin],
-			)
+			# val = '{:.3g}'.format(xsections_abs['central'][bin])
+			# stat = '{:.3g}'.format(xsections_abs['statistical'][bin])
+			# sys = '{:.3g}'.format(xsections_abs['systematic'][bin])
+			val = to_scientific_notation(to_precision(xsections_abs['central'][bin], 3))
+			stat = to_scientific_notation(to_precision(xsections_rel['statistical'][bin], 2))
+			sys = to_scientific_notation(to_precision(xsections_rel['systematic'][bin], 2))
 		else:
-			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = precision.format(bin_edges_vis[variable][bin]),
-				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
-				val = '{:.3g}'.format(xsections_abs['central'][bin]),
-				stat = '{:.3g}'.format(xsections_rel['statistical'][bin]),
-				sys = '{:.3g}'.format(xsections_rel['systematic'][bin]),
-				# tot = xsections_rel['total'][bin],
-			)
+			val = to_scientific_notation(to_precision(xsections_abs['central'][bin], 3))
+			stat = to_scientific_notation(to_precision(xsections_rel['statistical'][bin], 2))
+			sys = to_scientific_notation(to_precision(xsections_rel['systematic'][bin], 2))
+			# print "{} ---> {}".format(xsections_abs['central'][bin], val)
+
+		line_for_bin = '\t\t{edge_down}--{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
+			edge_down = edge_down,
+			edge_up = edge_up,
+			val = val,
+			stat = stat,
+			sys = sys,
+			# tot = xsections_rel['total'][bin],
+		)
 
 		# REPLACE e^0N WITH x10^N. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
 		# if 'e-' in line_for_bin:
@@ -89,9 +91,9 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 
 		fullTable += line_for_bin
 
-    #########################################################################################################
-    ### Table Footer
-    #########################################################################################################
+	#########################################################################################################
+	### Table Footer
+	#########################################################################################################
 	tableFooter = '\t\t\hline\n'
 	tableFooter += '\t\end{tabular}\n'
 	if 'absolute' in crossSectionType:
@@ -112,9 +114,9 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 	fullTable += tableFooter
 	# fullTable += '\clearpage'
 
-    #########################################################################################################
-    ### Write Table
-    #########################################################################################################
+	#########################################################################################################
+	### Write Table
+	#########################################################################################################
 	make_folder_if_not_exists(outputPath)
 	file_template = outputPath + '/{var}_XSections.tex'.format(var=variable)
 	output_file = open(file_template, 'w')
@@ -132,6 +134,7 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 
 	for v in variables:
 		systematics = file_to_df(inputPath.replace('VAR_TMP', v)+input_file_template.replace('absolute', 'relative').format(type = utype))
+
 		d_median_variable = {}
 		d_median_variable['Min'] = {}
 		d_median_variable['Max'] = {}
@@ -162,9 +165,8 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexHeader += '\t\\footnotesize\n'
 	latexHeader += '\t\\begin{tabular}{lccccccc}\n'
 	latexHeader += '\t\t\hline\n'
-	latexHeader += '\t\t\hline\n'
 
-	latexTitle += '\t\tRelative Uncertainty Source$(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
+	latexTitle += '\t\tRelative Uncertainty Source $(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
 		variables_latex['HT'], 
 		variables_latex['ST'], 
 		variables_latex['MET'], 
@@ -195,62 +197,69 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 
 		# If less than 0.1 replace with '<0.1'
 		HT_dp_low = '{:.1f}'
-		HT_dp_high = ' - {:.1f}'
+		HT_dp_high = ' -- {:.1f}'
 		ST_dp_low = '{:.1f}'
-		ST_dp_high = ' - {:.1f}'
+		ST_dp_high = ' -- {:.1f}'
 		MET_dp_low = '{:.1f}'
-		MET_dp_high = ' - {:.1f}'
+		MET_dp_high = ' -- {:.1f}'
 		WPT_dp_low = '{:.1f}'
-		WPT_dp_high = ' - {:.1f}'
+		WPT_dp_high = ' -- {:.1f}'
 		lepton_pt_dp_low = '{:.1f}'
-		lepton_pt_dp_high = ' - {:.1f}'
+		lepton_pt_dp_high = ' -- {:.1f}'
 		abs_lepton_eta_coarse_dp_low = '{:.1f}'
-		abs_lepton_eta_coarse_dp_high = ' - {:.1f}'
+		abs_lepton_eta_coarse_dp_high = ' -- {:.1f}'
 		NJets_dp_low = '{:.1f}'
-		NJets_dp_high = ' - {:.1f}'
+		NJets_dp_high = ' -- {:.1f}'
 
 		if HT_low < 0.1:
 			HT_dp_low = '{}'
-			HT_low = '$<$0.1'
+			HT_low = '0.1'
 		if HT_high < 0.1:
 			HT_dp_high = '{}'
-			HT_high = ''
+			HT_low = ''
+			HT_high = '$<$0.1'
 		if ST_low < 0.1:
 			ST_dp_low = '{}'
-			ST_low = '$<$0.1'
+			ST_low = '0.1'
 		if ST_high < 0.1:
 			ST_dp_high = '{}'
-			ST_high = ''
+			ST_low = ''
+			ST_high = '$<$0.1'
 		if MET_low < 0.1:
 			MET_dp_low = '{}'
-			MET_low = '$<$0.1'
+			MET_low = '0.1'
 		if MET_high < 0.1:
 			MET_dp_high = '{}'
-			MET_high = ''
+			MET_low = ''
+			MET_high = '$<$0.1'
 		if WPT_low < 0.1:
 			WPT_dp_low = '{}'
-			WPT_low = '$<$0.1'
+			WPT_low = '0.1'
 		if WPT_high < 0.1:
 			WPT_dp_high = '{}'
-			WPT_high = ''
+			WPT_low = ''
+			WPT_high = '$<$0.1'
 		if lepton_pt_low < 0.1:
 			lepton_pt_dp_low = '{}'
-			lepton_pt_low = '$<$0.1'
+			lepton_pt_low = '0.1'
 		if lepton_pt_high < 0.1:
 			lepton_pt_dp_high = '{}'
-			lepton_pt_high = ''
+			lepton_pt_low = ''
+			lepton_pt_high = '$<$0.1'
 		if abs_lepton_eta_coarse_low < 0.1:
 			abs_lepton_eta_coarse_dp_low = '{}'
-			abs_lepton_eta_coarse_low = '$<$0.1'
+			abs_lepton_eta_coarse_low = '0.1'
 		if abs_lepton_eta_coarse_high < 0.1:
 			abs_lepton_eta_coarse_dp_high = '{}'
-			abs_lepton_eta_coarse_high = ''
+			abs_lepton_eta_coarse_low = ''
+			abs_lepton_eta_coarse_high = '$<$0.1'
 		if NJets_low < 0.1:
 			NJets_dp_low = '{}'
-			NJets_low = '$<$0.1'
+			NJets_low = '0.1'
 		if NJets_high < 0.1:
 			NJets_dp_high = '{}'
-			NJets_high = ''
+			NJets_low = ''
+			NJets_high = '$<$0.1'
 
 		latexContent_met = '\t\t{{}}\t&\t{{}}\t&\t{ST_dp_low}{ST_dp_high}\t&\t{MET_dp_low}{MET_dp_high}\t&\t{WPT_dp_low}{WPT_dp_high}\t&\t{{}}\t&\t{{}}\t&\t{{}}\\\\ \n'.format(
 			ST_dp_low = ST_dp_low,
@@ -311,7 +320,7 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 			)
 
 	latexContent += '\t\t\hline\n'
-	latexContent += '\t\t{}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\\\\ \n'.format(
+	latexContent += '\t\t{}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\\\\ \n'.format(
 		'Total',
 		d_summarised_syst['HT']['Min']['systematic'], 
 		d_summarised_syst['HT']['Max']['systematic'], 
@@ -340,9 +349,9 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	fullTable += latexContent
 	fullTable += latexFooter
 
-    #########################################################################################################
-    ### Write Table
-    #########################################################################################################
+	#########################################################################################################
+	### Write Table
+	#########################################################################################################
 	make_folder_if_not_exists(outputPath)
 	if 'normalised' in utype:
 		file_template = outputPath + '/CondensedNormalisedSystematics.tex'
@@ -369,23 +378,22 @@ def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 
 	dxsec 	 = ' \\ensuremath{{ \\frac{{ 1 }}{{ \\text{{d}}\\sigma }} \\frac{{ \\text{{d}}\\sigma }}{{ \\text{{d}}{var} }} }} '.format(var = variables_latex[variable])
 
-    #########################################################################################################
-    ### Round XSection Values
-    #########################################################################################################
+	#########################################################################################################
+	### Round XSection Values
+	#########################################################################################################
 	xsections_rel['statistical'] = xsections_rel['statistical']*100
 	xsections_rel['systematic'] = xsections_rel['systematic']*100
 
 	ncols = 'c'*(len(bin_edges_vis[variable]))
-    #########################################################################################################
-    ### Table Header
-    #########################################################################################################
+	#########################################################################################################
+	### Table Header
+	#########################################################################################################
 
 	latexHeader =  '\\begin{landscape}\n'
 	latexHeader += '\\begin{table}\n'
 	latexHeader += '\t\\tiny\n'
 	latexHeader += '\t\centering\n'
 	latexHeader += '\t\\begin{{tabular}}{{{}}}\n'.format(ncols)
-	latexHeader += '\t\t\hline\n'
 	latexHeader += '\t\t\hline\n'
 
 	colHeader = '\t\t{var} '.format(var=variables_latex[variable])
@@ -400,9 +408,9 @@ def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 	fullTable += latexHeader
 	fullTable += colHeader
 
-    #########################################################################################################
-    ### Table Content
-    #########################################################################################################
+	#########################################################################################################
+	### Table Content
+	#########################################################################################################
 	for col in xsections_rel.columns:
 		if 'central' in col or 'systematic' in col or 'statistical' in col: continue
 		line_for_bin = '\t\t'+col.replace('_', '\_')
@@ -411,18 +419,11 @@ def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 			line_for_bin += '\t & \t \ensuremath{{ {:.2g} }}'.format(xsec)
 		line_for_bin += ' \\\\ \n'
 
-	# 	# REPLACE e^ WITH x10^. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
-	# 	if 'e-' in line_for_bin:
-	# 		power = line_for_bin[line_for_bin.find("e-")+1:].split()[0]
-	# 		new = '\\times 10^{{ {} }}'.format(power)
-	# 		old = 'e'+power
-	# 		line_for_bin = line_for_bin.replace(old, new)
-
 		fullTable += line_for_bin
 
-    #########################################################################################################
-    ### Table Footer
-    #########################################################################################################
+	#########################################################################################################
+	### Table Footer
+	#########################################################################################################
 	tableFooter = '\t\t\hline\n'
 	tableFooter += '\t\end{tabular}\n'
 	tableFooter += '\t\caption{{ Breakdown of the relative uncertainties in the combined channel with respect to {var}.}}\n'.format( var = variables_latex[variable] )
@@ -432,9 +433,9 @@ def makeExpandedSystematicLatexTable( xsections_rel, outputPath, variable ):
 	fullTable += tableFooter
 	fullTable += '\clearpage'
 
-    #########################################################################################################
-    ### Write Table
-    #########################################################################################################
+	#########################################################################################################
+	### Write Table
+	#########################################################################################################
 	make_folder_if_not_exists(outputPath)
 	file_template = outputPath + '/{var}_ExpandedXSections.tex'.format(var=variable)
 	output_file = open(file_template, 'w')
@@ -463,7 +464,6 @@ def makeBinningLatexTable():
 
 	colHeader =  ''
 	colHeader += '\t\\begin{tabular}{cccc}\n'
-	colHeader += '\t\t\hline\n'
 	colHeader += '\t\t\hline\n'
 	colHeader += '\t\t  & \t Bin Width \t & \t Resolution \t & $\\frac{\\text{Resolution}}{\\text{Bin Width}}$\\\\ \n'
 
@@ -568,27 +568,105 @@ def makeBinningLatexTable():
 	print "Written Binning Table"
 	return
 
+def to_precision(x,p):
+	"""
+	returns a string representation of x formatted with a precision of p
+
+	Based on the webkit javascript implementation taken from here:
+	https://code.google.com/p/webkit-mirror/source/browse/JavaScriptCore/kjs/number_object.cpp
+	"""
+
+	x = float(x)
+
+	if x == 0.:
+		return "0." + "0"*(p-1)
+
+	out = []
+
+	if x < 0:
+		out.append("-")
+		x = -x
+
+	e = int(math.log10(x))
+	tens = math.pow(10, e - p + 1)
+	n = math.floor(x/tens)
+
+	if n < math.pow(10, p - 1):
+		e = e -1
+		tens = math.pow(10, e - p+1)
+		n = math.floor(x / tens)
+
+	if abs((n + 1.) * tens - x) <= abs(n * tens -x):
+		n = n + 1
+
+	if n >= math.pow(10,p):
+		n = n / 10.
+		e = e + 1
+
+	m = "%.*g" % (p, n)
+
+	if e <= -2 or e >= p:
+		out.append(m[0])
+		if p > 1:
+			out.append(".")
+			out.extend(m[1:p])
+		out.append('e')
+		if e > 0:
+			out.append("+")
+		out.append(str(e))
+	elif e == (p -1):
+		out.append(m)
+	elif e >= 0:
+		out.append(m[:e+1])
+		if e+1 < len(m):
+			out.append(".")
+			out.extend(m[e+1:])
+	else:
+		out.append("0.")
+		out.extend(["0"]*-(e+1))
+		out.append(m)
+
+	return "".join(out)
+
+def to_scientific_notation(number):
+	'''
+	Write number in Latex scientific notation
+	'''
+	# REPLACE e^ WITH x10^. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
+	if 'e' in number:
+		power = number.split("e")[1]
+		new = '$\\times 10^{{ {} }}$'.format(power)
+		old = 'e'+power
+		number = number.replace(old, new)
+		return number
+	else:
+		return number
 
 
 def parse_arguments():
-    parser = ArgumentParser()
-    parser.add_argument( "-p", "--path", 
-        dest    = "path", 
-        default = 'data/normalisation/background_subtraction/',
-        help    = "set path to files containing dataframes" 
-    )
-    parser.add_argument( '--visiblePS', 
-        dest    = "visiblePS", 
-        action  = "store_true",
-        help    = "Unfold to visible phase space" 
-    )
-    parser.add_argument( '--outputTablePath','-o', 
-        dest    = "outputTablePath",
-        default = 'tables/xsections/',
-        help    = "Output path for chi2 tables" 
-    )
-    args = parser.parse_args()
-    return args
+	parser = ArgumentParser()
+	parser.add_argument( "-p", "--path", 
+		dest    = "path", 
+		default = 'data_beforeRoundingFix/normalisation/background_subtraction/',
+		help    = "set path to files containing dataframes" 
+	)
+	parser.add_argument( '--visiblePS', 
+		dest    = "visiblePS", 
+		action  = "store_true",
+		help    = "Unfold to visible phase space" 
+	)
+	parser.add_argument( '--outputTablePath','-o', 
+		dest    = "outputTablePath",
+		default = 'tables/xsections/',
+		help    = "Output path for chi2 tables" 
+	)
+	parser.add_argument( '-v', '--variable', 
+		dest    = "variable", 
+		default = None,
+		help    = "Variable to use" 
+	)
+	args = parser.parse_args()
+	return args
 
 if __name__ == '__main__':
 	args = parse_arguments()
@@ -611,16 +689,17 @@ if __name__ == '__main__':
 	path_to_output_template = '{path}/{crossSectionType}/'
 	for utype in unc_type:
 		for variable in measurement_config.variables:
+			if args.variable and variable != args.variable: continue
 			print "Writing the {type} {var} cross sections to Latex Tables".format(type = utype, var=variable)
 			path_to_output = path_to_output_template.format(
 				path=outputTablePath, 
 				crossSectionType=utype,
 			)
 			path_to_input = path_to_input_template.format(
-			    path = args.path, 
-			    com = 13,
-			    variable = variable,
-			    phase_space = phase_space,
+				path = args.path, 
+				com = 13,
+				variable = variable,
+				phase_space = phase_space,
 			)
 
 			# Read cross sections and write tables
@@ -640,11 +719,12 @@ if __name__ == '__main__':
 		########################################################################################################################
 		### CONDENSED SYSTEMATIC UNCERTAINTIES (MEDIAN VALUES)
 		########################################################################################################################
+		print "\nCondensing Systematics"
 		condensed_path_to_input = path_to_input_template.format(
-		    path = args.path, 
-		    com = 13,
-		    variable = 'VAR_TMP',
-		    phase_space = phase_space,
+			path = args.path, 
+			com = 13,
+			variable = 'VAR_TMP',
+			phase_space = phase_space,
 		)
 		makeCondensedSystematicLatexTable( measurement_config.variables, condensed_path_to_input, input_file_template, 'tables/systematics/', utype )
 
@@ -652,6 +732,7 @@ if __name__ == '__main__':
 	### PURITY/STABILITY/RESOLUTION 
 	########################################################################################################################
 	# makeBinningLatexTable()
+
 
 
 

@@ -129,7 +129,6 @@ def makeTableContent(chi2, gChi2, models=[], spacing=False):
 	for i in range(0,len(models)): latexHeader += 'cc'
 	latexHeader += '}\n'
 	latexHeader += '\t\t\hline\n'
-	latexHeader += '\t\t\hline\n'
 
 	model_header = '\t\t&\t'
 	label_header = '\t\t&\t'
