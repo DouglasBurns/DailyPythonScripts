@@ -86,6 +86,20 @@ def read_xsection_measurement_results( category, channel, unc_type, scale_uncert
             central,
         )
 
+    # Add one-sided envelope of colour reconnection
+    d_scale_syst = {}
+    for crUnc in [
+        'TTJets_erdOn', 
+        'TTJets_QCDbased_erdOn', 
+        'TTJets_GluonMove', 
+        # 'TTJets_GluonMove_erdOn',
+        ]:
+        d_scale_syst[crUnc] = [value for value, error in normalised_xsection_unfolded[crUnc]]
+    normalised_xsection_unfolded['TTJets_CR'], _ = get_scale_envelope(
+        d_scale_syst, 
+        normalised_xsection_unfolded['TTJets_powhegPythia8'],
+    )
+
     # h_normalised_xsection           = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_measured'], edges )
     h_normalised_xsection_unfolded  = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_unfolded'], edges )
 
@@ -125,7 +139,8 @@ def read_xsection_measurement_results( category, channel, unc_type, scale_uncert
         h_normalised_xsection_hdampdown         = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_hdampdown'], edges )
         h_normalised_xsection_erdOn             = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_erdOn'], edges )
         h_normalised_xsection_QCDbased_erdOn    = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_QCDbased_erdOn'], edges )
-        # h_normalised_xsection_GluonMove         = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_GluonMove'], edges )
+        h_normalised_xsection_GluonMove         = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_GluonMove'], edges )
+        h_normalised_xsection_CR                = value_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_CR'], edges )
         h_normalised_xsection_semiLepBrup       = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_semiLepBrup'], edges )
         h_normalised_xsection_semiLepBrdown     = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_semiLepBrdown'], edges )
         h_normalised_xsection_fragup            = value_error_tuplelist_to_hist( normalised_xsection_unfolded['TTJets_fragup'], edges )
@@ -174,6 +189,8 @@ def read_xsection_measurement_results( category, channel, unc_type, scale_uncert
                     # 'TTJets_uedown'         : h_normalised_xsection_uedown,
                     'TTJets_hdampup'        : h_normalised_xsection_hdampup,
                     'TTJets_hdampdown'      : h_normalised_xsection_hdampdown,
+
+                    # 'TTJets_CR'             : h_normalised_xsection_CR,
                     # 'TTJets_erdOn'          : h_normalised_xsection_erdOn,
                     # 'TTJets_QCDbased_erdOn' : h_normalised_xsection_QCDbased_erdOn,
                     # 'TTJets_GluonMove'      : h_normalised_xsection_GluonMove,
@@ -381,10 +398,12 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
             elif 'frag' in key or 'Frag' in key:
                 hist.SetLineColor( 400 )
                 dashes[key] = [10,10,5,5]
-            elif 'erdOn' in key:
+            elif 'erdOn' in key or 'GluonMove' in key:
                 hist.SetLineColor( 500 )
                 dashes[key] = [10,10,5,5,5,5]
-
+            elif 'CR' in key:
+                dashes[key] = [10,10,5,5,5,5]
+                hist.SetLineColor( 600 )
             if linestyle != None:
                 hist.linestyle = linestyle
 
@@ -435,6 +454,7 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
         measurements_latex['TTJets_combineddown'],
         measurements_latex['TTJets_hdampup'],
         measurements_latex['TTJets_hdampdown'],
+        measurements_latex['TTJets_CR'],
         measurements_latex['TTJets_erdOn'],
         measurements_latex['TTJets_QCDbased_erdOn'],
         measurements_latex['TTJets_GluonMove'],
@@ -990,8 +1010,9 @@ if __name__ == '__main__':
     phase_space = 'FullPS'
     if visiblePS:
         phase_space = 'VisiblePS'
-
-    path_to_DF = '{path}/{com}TeV/{variable}/{phase_space}/'
+    # base_path = '/storage/ec6821/DailyPythonScripts/new/DailyPythonScripts/'
+    base_path = ''
+    path_to_DF = base_path+'{path}/{com}TeV/{variable}/{phase_space}/'
     path_to_DF = path_to_DF.format(
         path = args.path, 
         com = args.CoM,
