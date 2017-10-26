@@ -2,7 +2,7 @@ from __future__ import division
 import dps.utils.measurement
 
 class XSectionConfig():
-    current_analysis_path = '/hdfs/TopQuarkGroup/ec6821/1.0.14/atOutput/combined/'
+    current_analysis_path = '/hdfs/TopQuarkGroup/db0268/1.0.14/atOutput/combined/'
     known_centre_of_mass_energies = [13]
     # has to be separate as many variables depend on it
     luminosities = {13:35900}
@@ -10,7 +10,6 @@ class XSectionConfig():
     parameters = [
         'SingleTop_trees', 'SingleTop_file',
         'VJets_trees', 'analysis_types',
-        'categories_and_prefixes', 'central_general_template',
         'centre_of_mass_energy', 'current_analysis_path',
         'data_file_electron', 'data_file_muon',
         'general_trees', 'higgs_file', 'include_higgs',
@@ -55,7 +54,12 @@ class XSectionConfig():
         'abs_lepton_eta',
         'abs_lepton_eta_coarse',
         'abs_lepton_eta_muonBins',
-
+        'tau1',
+        'tau2',
+        'tau3',
+        'tau4',
+        'tau5',
+        'tau6',
     ]
 
     # Used in 01
@@ -70,6 +74,12 @@ class XSectionConfig():
         'abs_bjets_eta',
         'abs_lepton_eta_coarse',
         'abs_lepton_eta_muonBins'
+        'tau1',
+        'tau2',
+        'tau3',
+        'tau4',
+        'tau5',
+        'tau6',
     ]
 
     def __init__( self, centre_of_mass_energy ):
@@ -86,7 +96,8 @@ class XSectionConfig():
 
         # self.path_to_unfolding_histograms = '/hdfs/TopQuarkGroup/run2/unfolding/13TeV/Moriond2017/'
         # self.path_to_unfolding_histograms = '/hdfs/TopQuarkGroup/run2/unfolding/13TeV/EPS2017/'
-        self.path_to_unfolding_histograms = 'unfolding/13TeV_debug/'
+
+        self.path_to_unfolding_histograms = 'unfolding/13TeV/'
 
         path_to_unfolding_histograms = self.path_to_unfolding_histograms
 
@@ -147,21 +158,13 @@ class XSectionConfig():
             'pf':'PFMET',
             'type1':'patType1CorrectedPFMet',
         }
-
-        # Needed?
-        self.ttbar_theory_systematic_prefix = 'TTJets_'
-        self.vjets_theory_systematic_prefix = 'VJets_'
+        
         # files
-        self.middle = '_' + str( self.luminosity ) + 'pb_PFElectron_PFMuon_PF2PATJets_PFMET'
-        middle = self.middle
-
         self.data_file_muon = path_to_files + 'data_muon_tree.root'
         self.data_file_electron = path_to_files + 'data_electron_tree.root'
-
-        self.higgs_file = path_to_files + 'central/TTH_Inclusive_M-125' + middle + '.root'
+        self.higgs_file = path_to_files + 'central/TTH_Inclusive_M-125_' + str( self.luminosity ) + 'pb_PFElectron_PFMuon_PF2PATJets_PFMET.root'
 
         # Used in 01
-        # Rename to normalisation_measurements?
         self.normalisation_systematics = [
             'central',
 
@@ -213,7 +216,6 @@ class XSectionConfig():
             'QCD_signal_MC'
         ]
 
-        # Rename to generator_measurements?
         self.generator_systematics = [ 
             'TTJets_massup',
             'TTJets_massdown',
@@ -276,10 +278,8 @@ class XSectionConfig():
                                             'TTJets_fsrup', 'TTJets_fsrdown',
                                             'TTJets_isrup', 'TTJets_isrdown'
                                             ],
-            # # 'TTJets_fsr'                   :    ['TTJets_fsrup', 'TTJets_fsrdown'],
-            # # 'TTJets_isr'                   :    ['TTJets_isrup', 'TTJets_isrdown'],
+            'TTJets_alphaS'             : ['TTJets_alphaSup', 'TTJets_alphaSdown'],
 
-            # 'TTJets_alphaS'             : ['TTJets_alphaSup', 'TTJets_alphaSdown'],
             'TTJets_hdamp'              : ['TTJets_hdampup', 'TTJets_hdampdown'],
             'TTJets_semiLepBr'          : ['TTJets_semiLepBrup', 'TTJets_semiLepBrdown'],
             'TTJets_frag'               : ['TTJets_fragup', 'TTJets_fragdown'],
@@ -405,10 +405,11 @@ class XSectionConfig():
             'TTJets_amcatnloPythia8',
             'TTJets_madgraphMLM'
         ]
-        # now fill in the centre of mass dependent values
-        self.__fill_defaults_13TeV__()
 
-        self.topMass_systematics = [ 'TTJets_massup', 'TTJets_massdown']
+        self.topMass_systematics = [ 
+            'TTJets_massup', 
+            'TTJets_massdown'
+        ]
 
         self.topMasses = [
             169.5, 
@@ -417,7 +418,10 @@ class XSectionConfig():
         ]
         self.topMassUncertainty = 1.0 # GeV from https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO
 
-        # categories_and_prefixes = self.categories_and_prefixes
+
+        # now fill in the centre of mass dependent values
+        self.__fill_defaults_13TeV__()
+
 
         # Used in 01
         self.ttbar_trees = path_to_files + 'TTJets_PowhegPythia8_tree.root'
@@ -426,9 +430,6 @@ class XSectionConfig():
         self.VJets_trees = path_to_files + 'VJets_tree.root'
         self.electron_QCD_MC_trees = path_to_files + 'QCD_Electron_tree.root'
         self.muon_QCD_MC_trees = path_to_files + 'QCD_Muon_tree.root'
-        # self.electron_QCD_MC_trees = path_to_files + 'QCD_Inclusive_tree.root'
-        # self.muon_QCD_MC_trees = path_to_files + 'QCD_Inclusive_tree.root'
-        # self.muon_QCD_MC_trees = path_to_files + 'QCD_All_tree.root'
 
         self.ttbar_amc_trees = path_to_files + '/TTJets_amc_tree.root'
         self.ttbar_madgraph_trees = path_to_files + '/TTJets_madgraph_tree.root'
@@ -467,6 +468,7 @@ class XSectionConfig():
         self.ttbar_GluonMove_trees = path_to_files + '/TTJets_PowhegPythia8_GluonMove_tree.root'
         self.ttbar_GluonMove_erdOn_trees = path_to_files + '/TTJets_PowhegPythia8_GluonMove_erdOn_tree.root'
 
+
         # Unfolding MC Different Generator Samples
         self.unfolding_powheg_pythia8_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV.root' % self.centre_of_mass_energy
         self.unfolding_amcatnlo_pythia8_raw = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_amcatnloPythia8.root' % self.centre_of_mass_energy
@@ -479,7 +481,6 @@ class XSectionConfig():
 
         # Raw --> asymmetric
         self.unfolding_powheg_pythia8 = self.unfolding_powheg_pythia8_raw.replace( '.root', '_asymmetric_newPS.root' )
-
         self.unfolding_amcatnlo_pythia8 = self.unfolding_amcatnlo_pythia8_raw.replace( '.root', '_asymmetric_newPS.root' )
         self.unfolding_madgraphMLM = self.unfolding_madgraphMLM_raw.replace( '.root', '_asymmetric_newPS.root' )
         self.unfolding_powheg_herwig = self.unfolding_powheg_herwig_raw.replace( '.root', '_asymmetric_newPS.root' )
@@ -488,7 +489,6 @@ class XSectionConfig():
         self.unfolding_central = self.unfolding_powheg_pythia8
 
         self.unfolding_ptreweight = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_withTopPtReweighting.root' % self.centre_of_mass_energy
-
         self.unfolding_ptreweight_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_withTopPtReweighting_up.root' % self.centre_of_mass_energy
         self.unfolding_ptreweight_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_withTopPtReweighting_down.root' % self.centre_of_mass_energy
         self.unfolding_etareweight_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_withTopEtaReweighting_up.root' % self.centre_of_mass_energy
@@ -499,10 +499,8 @@ class XSectionConfig():
 
         self.unfolding_ptreweight_up_firstHalf = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_firstHalf_withTopPtReweighting_up.root' % self.centre_of_mass_energy
         self.unfolding_ptreweight_down_firstHalf = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_firstHalf_withTopPtReweighting_down.root' % self.centre_of_mass_energy
-
         self.unfolding_ptreweight_up_secondHalf = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_secondHalf_withTopPtReweighting_up.root' % self.centre_of_mass_energy
         self.unfolding_ptreweight_down_secondHalf = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_secondHalf_withTopPtReweighting_down.root' % self.centre_of_mass_energy
-
 
         self.unfolding_renormalisation_down = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_05muR1muF.root' % self.centre_of_mass_energy
         self.unfolding_renormalisation_up = path_to_unfolding_histograms + 'unfolding_TTJets_%dTeV_asymmetric_newPS_2muR1muF.root' % self.centre_of_mass_energy
@@ -581,90 +579,17 @@ class XSectionConfig():
             'muon'      : 'QCD non iso mu+jets 3toInf',
         }
 
-        # Needed?
-        self.variable_path_templates = {
-            'MET' : 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/MET',
-            'HT' : 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/HT',
-            'ST': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/ST',
-            'MT': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/MT',
-            'WPT': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/WPT',
-            'NJets': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/NJets',
-            'lepton_pt': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/lepton_pt',
-            'lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/lepton_eta',
-            'abs_lepton_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/AnalysisVariables/absolute_eta',
-            'bjets_pt': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/bjet_pt',
-            'bjets_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/bjet_eta',
-            'abs_bjets_eta': 'TTbar_plus_X_analysis/{channel}/{selection}/Jets/abs(bjet_eta)',
-        }
-
         self.include_higgs = False
 
         self.luminosity_scale = self.new_luminosity / self.luminosity
 
-        # Needed?
-        # structure
-        # { summary_name : [(Electron_down, Electron_up)), (TTJets_hadronisation, TTJets_hadronisation)
-        self.typical_systematics_summary = {
-            'Lepton selection efficiency': [
-                ('Electron_down', 'Electron_up'), 
-                ('Muon_down', 'Muon_up')
-            ],
-            'Jet energy \& resolution': [
-                ('JES_down', 'JES_up', 'JER_down', 'JER_up')
-            ],
-            'B-tagging' : [
-                ('BJet_down', 'BJet_up'),
-                ('LightJet_down', 'LightJet_up')
-            ],
-            '\met' : [
-                ('ElectronEnDown', 'ElectronEnUp'), 
-                ('MuonEnDown','MuonEnUp'),
-                ('TauEnDown','TauEnUp'),
-                ('UnclusteredEnDown','UnclusteredEnUp')
-            ],
-            'Background Normalisation (non-QCD)': [
-                # ('TTJet_cross_section-', 'TTJet_cross_section+'),
-                ('SingleTop_cross_section-', 'SingleTop_cross_section+'),
-                ('luminosity-', 'luminosity+'),
-            ],
-            'QCD Normalisation': [
-                ('QCD_cross_section', 'QCD_cross_section'),
-            ],
-            'QCD shape': [
-                ('QCD_shape', 'QCD_shape')
-            ],
-            'Theory': [
-                ('TTJets_scaledown', 'TTJets_scaleup'),
-                ('TTJets_massdown', 'TTJets_massup')
-            ],
-            'NLO generator': [
-                ('TTJets_NLOgenerator', 'TTJets_NLOgenerator')
-            ],
-            'PDF': [
-                ('PDF_total_lower', 'PDF_total_upper')
-            ],
-            'Pileup' : [
-                ('PileUpSystematic','PileUpSystematic')
-            ],
-        }
-        self.typical_systematics = []
-        for _, values in self.typical_systematics_summary.items():
-            for tuple in values:
-                if tuple[0] == tuple[1]:
-                    self.typical_systematics.append(tuple[0])
-                else:
-                    self.typical_systematics.extend(tuple)
-
 
     def __fill_defaults_13TeV__( self ):
-        middle = self.middle
         path_to_files = self.path_to_files
 
         self.new_luminosity = 35900
-        # self.new_luminosity = 8610
 
         ### Estimated luminosity for each period
-        # B
         self.new_luminosity_periods = {
             'B' : 5790,
             'C' : 2570,
@@ -716,7 +641,4 @@ class XSectionConfig():
             "abs_lepton_eta" : 0,
             "abs_lepton_eta_coarse" : 0,
             "abs_lepton_eta_muonBins" : 0,
-           }
-
-        # self.categories_and_prefixes['PU_down'] = '_PU_65835mb'
-        # self.categories_and_prefixes['PU_up'] = '_PU_72765mb'
+        }

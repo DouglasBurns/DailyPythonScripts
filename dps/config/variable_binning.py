@@ -28,6 +28,12 @@ bin_edges_full = {
 'abs_lepton_eta' : [0.0, 0.14, 0.27, 0.39, 0.53, 0.65, 0.78, 0.92, 1.05, 1.16, 1.27, 1.38, 1.48, 1.62, 1.72, 1.83, 2.0, 2.4],
 'abs_lepton_eta_coarse' : [0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.0, 2.4],
 'abs_lepton_eta_muonBins' : [0.0, 0.3, 0.9, 1.2, 1.6, 2.1, 2.4],
+'tau2' : [0.0, 40.0, 85.0, 125.0, 150.0],
+'tau3' : [0.0, 40.0, 85.0, 125.0, 150.0],
+'tau1' : [0.0, 45.0, 90.0, 125.0, 150.0],
+'tau6' : [0.0, 10.0, 35.0, 125.0, 150.0],
+'tau4' : [0.0, 30.0, 70.0, 125.0, 150.0],
+'tau5' : [0.0, 20.0, 55.0, 125.0, 150.0],
 }
 
 bin_edges_vis = {
@@ -40,6 +46,12 @@ bin_edges_vis = {
 'abs_lepton_eta' : [0.0, 0.14, 0.27, 0.39, 0.53, 0.65, 0.78, 0.92, 1.05, 1.16, 1.27, 1.38, 1.48, 1.62, 1.72, 1.83, 2.0, 2.4],
 'abs_lepton_eta_coarse' : [0.0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.0, 2.4],
 'abs_lepton_eta_muonBins' : [0.0, 0.3, 0.9, 1.2, 1.6, 2.1, 2.4],
+'tau2' : [0.0, 40.0, 85.0, 125.0, 150.0],
+'tau3' : [0.0, 40.0, 85.0, 125.0, 150.0],
+'tau1' : [0.0, 45.0, 90.0, 125.0, 150.0],
+'tau6' : [0.0, 10.0, 35.0, 125.0, 150.0],
+'tau4' : [0.0, 30.0, 70.0, 125.0, 150.0],
+'tau5' : [0.0, 20.0, 55.0, 125.0, 150.0],
 }
 
 reco_bin_edges_vis = produce_reco_bin_edges( bin_edges_vis )
@@ -53,6 +65,12 @@ minimum_bin_width = {
   'ST' : 20.,
   'lepton_pt' : 10.,
   'abs_lepton_eta' : 0.1,
+  'tau1' : 5,
+  'tau2' : 5,
+  'tau3' : 5,
+  'tau4' : 5,
+  'tau5' : 5,
+  'tau6' : 5,
 }
 
 nice_bin_width = {
@@ -63,6 +81,12 @@ nice_bin_width = {
   'ST' : 5.,
   'lepton_pt' : 5.,
   'abs_lepton_eta' : 0.005,
+  'tau1' : 5,
+  'tau2' : 5,
+  'tau3' : 5,
+  'tau4' : 5,
+  'tau5' : 5,
+  'tau6' : 5,
 }
 
 control_plots_bins = {
@@ -89,6 +113,16 @@ control_plots_bins = {
 
   'MT' : [i * 25  for i in range ( 0, 35 )],
   'sigmaietaieta' : [i * 0.002  for i in range ( 0, 20 )],
+
+  'jet_csv'           : [i * 0.05  for i in range ( 0, 20 )],
+  'jet_eta'           : [i * 0.15  for i in range ( 0, 20 )],
+
+  'tau1'          : [i * 10  for i in range ( 0, 20 )],
+  'tau2'          : [i * 10  for i in range ( 0, 20 )],
+  'tau3'          : [i * 10  for i in range ( 0, 20 )],
+  'tau4'          : [i * 5  for i in range ( 0, 10 )],
+  'tau5'          : [i * 5  for i in range ( 0, 10 )],
+  'tau6'          : [i * 5  for i in range ( 0, 10 )],
 }
 
 control_plots_bins_for01 = {
@@ -102,6 +136,14 @@ control_plots_bins_for01 = {
   'ST'              : [100,2000],
   'Tau'             : [0,10000],
   'MT'              : [0, 900],
+
+  'tau1'          : [0, 200],
+  'tau2'          : [0, 200],
+  'tau3'          : [0, 200],
+  'tau4'          : [0, 100],
+  'tau5'          : [0, 100],
+  'tau6'          : [0, 100],
+
 }
 
 control_plot_nbins = {
@@ -115,6 +157,12 @@ control_plot_nbins = {
   'ST' : 20,
   'Tau' : 25,
   'MT' : 36,
+  'tau1'          : 30,
+  'tau2'          : 30,
+  'tau3'          : 30,
+  'tau4'          : 15,
+  'tau5'          : 15,
+  'tau6'          : 15,
 }
 
 # [Low, High, NBins]

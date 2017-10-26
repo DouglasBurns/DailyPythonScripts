@@ -609,6 +609,9 @@ if __name__ == '__main__':
         'NBJets_LightUp',
         'NBJets_LightDown',
         'JetPt',
+
+        # 'JetCSV',
+        # 'JetEta',
         
         # 'sigmaietaieta',
 
@@ -627,6 +630,7 @@ if __name__ == '__main__':
         'QCDAbsLeptonEta',
         'QCDLeptonPt',
         'QCDNJets',
+        'QCDTau',
 
         'QCDRelIso',
         # 'QCDHLTECALIso',
@@ -647,6 +651,7 @@ if __name__ == '__main__':
     modeToReplace = ''
     if 'central' not in mode: 
         special = mode
+
 
     output_folder_tmp = '{base}/{special}/Variables/{sel}/'.format(
         base = args.output_folder,
@@ -863,19 +868,54 @@ if __name__ == '__main__':
                 log_y = True,
             )
         ###################################################
+        # CSV
+        ###################################################
+        if 'JetCSV' in include_plots:
+            print '---> Jet CSV'
+            make_plot( channel,
+                x_axis_title = 'Jet CSV',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['jet_csv']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                branchName = 'jet_csv',
+                name_prefix = '%s_CSV_' % label,
+                x_limits = control_plots_bins['jet_csv'],
+                nBins = len(control_plots_bins['jet_csv'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+                use_qcd_data_region = False,
+            )
+        if 'JetEta' in include_plots:
+            print '---> Jet Eta'
+            make_plot( channel,
+                x_axis_title = 'Jet Eta',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['jet_eta']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                branchName = 'jet_eta',
+                name_prefix = '%s_JetEta_' % label,
+                x_limits = control_plots_bins['jet_eta'],
+                nBins = len(control_plots_bins['jet_eta'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+                use_qcd_data_region = False,
+            )
+        ###################################################
         # TauN
         ###################################################
         if 'Tau' in include_plots:
             print '---> Tau1'
             make_plot( channel,
                 x_axis_title = 'Tau 1',
-                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['Tau']),
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau1']),
                 signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'tau1',
                 name_prefix = '%s_tau1_' % label,
-                x_limits = control_plots_bins['Tau'],
-                nBins = len(control_plots_bins['Tau'])-1,
+                x_limits = control_plots_bins['tau1'],
+                nBins = len(control_plots_bins['tau1'])-1,
                 rebin = 1,
                 legend_location = ( 0.9, 0.78 ),
                 cms_logo_location = 'right',
@@ -884,13 +924,13 @@ if __name__ == '__main__':
             print '---> Tau2'
             make_plot( channel,
                 x_axis_title = 'Tau 2',
-                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['Tau']),
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau2']),
                 signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'tau2',
                 name_prefix = '%s_tau2_' % label,
-                x_limits = control_plots_bins['Tau'],
-                nBins = len(control_plots_bins['Tau'])-1,
+                x_limits = control_plots_bins['tau2'],
+                nBins = len(control_plots_bins['tau2'])-1,
                 rebin = 1,
                 legend_location = ( 0.9, 0.78 ),
                 cms_logo_location = 'right',
@@ -899,13 +939,13 @@ if __name__ == '__main__':
             print '---> Tau3'
             make_plot( channel,
                 x_axis_title = 'Tau 3',
-                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['Tau']),
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau3']),
                 signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'tau3',
                 name_prefix = '%s_tau3_' % label,
-                x_limits = control_plots_bins['Tau'],
-                nBins = len(control_plots_bins['Tau'])-1,
+                x_limits = control_plots_bins['tau3'],
+                nBins = len(control_plots_bins['tau3'])-1,
                 rebin = 1,
                 legend_location = ( 0.9, 0.78 ),
                 cms_logo_location = 'right',
@@ -914,13 +954,43 @@ if __name__ == '__main__':
             print '---> Tau4'
             make_plot( channel,
                 x_axis_title = 'Tau 4',
-                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['Tau']),
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau4']),
                 signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
                 branchName = 'tau4',
                 name_prefix = '%s_tau4_' % label,
-                x_limits = control_plots_bins['Tau'],
-                nBins = len(control_plots_bins['Tau'])-1,
+                x_limits = control_plots_bins['tau4'],
+                nBins = len(control_plots_bins['tau4'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+                use_qcd_data_region = useQCDControl,
+            )
+            print '---> Tau5'
+            make_plot( channel,
+                x_axis_title = 'Tau 5',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau5']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                branchName = 'tau5',
+                name_prefix = '%s_tau5_' % label,
+                x_limits = control_plots_bins['tau5'],
+                nBins = len(control_plots_bins['tau5'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+                use_qcd_data_region = useQCDControl,
+            )
+            print '---> Tau6'
+            make_plot( channel,
+                x_axis_title = 'Tau 6',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau6']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                control_region_tree = 'TTbar_plus_X_analysis/{ch}/{sel}/AnalysisVariables'.format(ch=label, sel=selection),
+                branchName = 'tau6',
+                name_prefix = '%s_tau6_' % label,
+                x_limits = control_plots_bins['tau6'],
+                nBins = len(control_plots_bins['tau6'])-1,
                 rebin = 1,
                 legend_location = ( 0.9, 0.78 ),
                 cms_logo_location = 'right',
@@ -1660,3 +1730,90 @@ if __name__ == '__main__':
                 legend_location = ( 0.95, 0.85 ),
                 cms_logo_location = 'left',
             )
+
+        if 'QCDTau' in include_plots:
+            print '---> QCDTau1'
+            make_plot( channel,
+                x_axis_title = 'Tau 1',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau1']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau1',
+                name_prefix = '%s_tau1_' % channel,
+                x_limits = control_plots_bins['tau1'],
+                nBins = len(control_plots_bins['tau1'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+            print '---> QCDTau2'
+            make_plot( channel,
+                x_axis_title = 'Tau 2',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau2']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau2',
+                name_prefix = '%s_tau2_' % channel,
+                x_limits = control_plots_bins['tau2'],
+                nBins = len(control_plots_bins['tau2'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+            print '---> QCDTau3'
+            make_plot( channel,
+                x_axis_title = 'Tau 3',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau3']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau3',
+                name_prefix = '%s_tau3_' % channel,
+                x_limits = control_plots_bins['tau3'],
+                nBins = len(control_plots_bins['tau3'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+            print '---> QCDTau4'
+            make_plot( channel,
+                x_axis_title = 'Tau 4',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau4']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau4',
+                name_prefix = '%s_tau4_' % channel,
+                x_limits = control_plots_bins['tau4'],
+                nBins = len(control_plots_bins['tau4'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+            print '---> QCDTau5'
+            make_plot( channel,
+                x_axis_title = 'Tau 5',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau5']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau5',
+                name_prefix = '%s_tau5_' % channel,
+                x_limits = control_plots_bins['tau5'],
+                nBins = len(control_plots_bins['tau5'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+            print '---> QCDTau6'
+            make_plot( channel,
+                x_axis_title = 'Tau 6',
+                y_axis_title = 'Events/(%i GeV)' % binWidth(control_plots_bins['tau6']),
+                signal_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                control_region_tree = 'TTbar_plus_X_analysis/{tree}/AnalysisVariables'.format(tree = treeName),
+                branchName = 'tau6',
+                name_prefix = '%s_tau6_' % channel,
+                x_limits = control_plots_bins['tau6'],
+                nBins = len(control_plots_bins['tau6'])-1,
+                rebin = 1,
+                legend_location = ( 0.9, 0.78 ),
+                cms_logo_location = 'right',
+            )
+        # ####################

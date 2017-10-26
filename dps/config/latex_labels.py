@@ -38,6 +38,12 @@ variables_latex = {
     'bjets_pt': '\ensuremath{ \mathrm{b-jet} p_{\mathrm{T}} }',
     'bjets_eta': '\ensuremath{ \mathrm{b-jet} \eta }',
     'sigmaietaieta' : '\ensuremath{\sigma_{i\eta i \eta}}',
+    'tau1' : '\ensuremath{ \\tau_{1} }',
+    'tau2' : '\ensuremath{ \\tau_{2} }',
+    'tau3' : '\ensuremath{ \\tau_{3} }',
+    'tau4' : '\ensuremath{ \\tau_{4} }',
+    'tau5' : '\ensuremath{ \\tau_{5} }',
+    'tau6' : '\ensuremath{ \\tau_{6} }',
 }
 
 variables_NonLatex = {
@@ -50,6 +56,12 @@ variables_NonLatex = {
     'abs_lepton_eta': 'lepton eta',
     'abs_lepton_eta_coarse': 'lepton eta',
     'abs_lepton_eta_muonBins': 'lepton eta',
+    'tau1' : 'tau1',
+    'tau2' : 'tau2',
+    'tau3' : 'tau3',
+    'tau4' : 'tau4',
+    'tau5' : 'tau5',
+    'tau6' : 'tau6',
 }
 
 control_plots_latex = {
@@ -256,6 +268,11 @@ systematics_latex = {
     'central'                   : '',
     'systematic'                : '',
     'statistical'               : '',
+    'Stat_normalisedXsection_inputMC' : 'MC statistics',
+    'Stat' : 'statistics',
+    'Stat_normalisedXsection' : 'MC statistics',
+    'Total' : 'Combined',
+
 }
 
 
