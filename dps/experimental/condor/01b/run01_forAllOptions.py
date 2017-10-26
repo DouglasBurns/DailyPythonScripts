@@ -18,7 +18,15 @@ vars = [
 	'lepton_pt --visiblePS',
 	'abs_lepton_eta --visiblePS',
 	'abs_lepton_eta_coarse --visiblePS',
-	'abs_lepton_eta_muonBins --visiblePS',
+
+	'tau1 --visiblePS',
+	'tau2 --visiblePS',
+	'tau3 --visiblePS',
+	'tau4 --visiblePS',
+	'tau5 --visiblePS',
+	'tau6 --visiblePS',
+
+	# 'abs_lepton_eta_muonBins --visiblePS',
 
 	# 'hadTopRap',
 	# 'lepTopPt',
