@@ -9,18 +9,25 @@ from dps.config.variable_binning import reco_bin_edges_vis
 from dps.utils.plotting import compare_measurements, Histogram_properties
 from dps.config import latex_labels
 from dps.utils.pandas_utilities import read_tuple_from_file
+
 from collections import OrderedDict
 def main():
 
 	config = XSectionConfig(13)
 
-	file_for_powhegPythia  		= File(config.unfolding_central_firstHalf, 'read')
-	file_for_ptReweight_up 		= File(config.unfolding_ptreweight_up_firstHalf, 'read')
-	file_for_ptReweight_down 	= File(config.unfolding_ptreweight_down_firstHalf, 'read')
-	file_for_amcatnlo_pythia8 			= File(config.unfolding_amcatnlo_pythia8, 'read')
-	file_for_powhegHerwig 		= File(config.unfolding_powheg_herwig, 'read')
-	file_for_etaReweight_up 	= File(config.unfolding_etareweight_up, 'read')
-	file_for_etaReweight_down 	= File(config.unfolding_etareweight_down, 'read')
+	# file_for_powhegPythia  	= File(config.unfolding_central_firstHalf, 'read')
+	# file_for_ptReweight_up 	= File(config.unfolding_ptreweight_up_firstHalf, 'read')
+	# file_for_ptReweight_down 	= File(config.unfolding_ptreweight_down_firstHalf, 'read')
+
+	file_for_powhegPythia  		= File("/storage/ec6821/DailyPythonScripts/new/DailyPythonScripts/unfolding/13TeV/unfolding_TTJets_13TeV_asymmetric_newPS_firstHalf.root", 'read')
+	file_for_ptReweight_up 		= File("/storage/ec6821/DailyPythonScripts/new/DailyPythonScripts/unfolding/13TeV/unfolding_TTJets_13TeV_asymmetric_newPS_firstHalf_withTopPtReweighting_up.root", 'read')
+	file_for_ptReweight_down 	= File("/storage/ec6821/DailyPythonScripts/new/DailyPythonScripts/unfolding/13TeV/unfolding_TTJets_13TeV_asymmetric_newPS_firstHalf_withTopPtReweighting_down.root", 'read')
+
+	# file_for_amcatnlo_pythia8 = File(config.unfolding_amcatnlo_pythia8, 'read')
+	# file_for_powhegHerwig 	= File(config.unfolding_powheg_herwig, 'read')
+	# file_for_etaReweight_up 	= File(config.unfolding_etareweight_up, 'read')
+	# file_for_etaReweight_down = File(config.unfolding_etareweight_down, 'read')
+
 	file_for_data_template 		= 'data/normalisation/background_subtraction/13TeV/{variable}/VisiblePS/central/normalisation_{channel}.txt'
 
 	for channel in config.analysis_types.keys():
@@ -91,30 +98,30 @@ def main():
 			# measured_eta_reweighted_down = asrootpy(response_eta_reweighted_down.ProjectionX('px',1))
 			# truth_eta_reweighted_down = asrootpy(response_eta_reweighted_down.ProjectionY())
 
-			# Get the distributions for other MC models
-			_, _, response_amcatnlo_pythia8, _ = get_unfold_histogram_tuple(
-				inputfile=file_for_amcatnlo_pythia8,
-				variable=variable,
-				channel=channel,
-				centre_of_mass=13,
-				load_fakes=False,
-				visiblePS=True
-			)
+			# # Get the distributions for other MC models
+			# _, _, response_amcatnlo_pythia8, _ = get_unfold_histogram_tuple(
+			# 	inputfile=file_for_amcatnlo_pythia8,
+			# 	variable=variable,
+			# 	channel=channel,
+			# 	centre_of_mass=13,
+			# 	load_fakes=False,
+			# 	visiblePS=True
+			# )
 
-			measured_amcatnlo_pythia8 = asrootpy(response_amcatnlo_pythia8.ProjectionX('px',1))
-			truth_amcatnlo_pythia8 = asrootpy(response_amcatnlo_pythia8.ProjectionY())
+			# measured_amcatnlo_pythia8 = asrootpy(response_amcatnlo_pythia8.ProjectionX('px',1))
+			# truth_amcatnlo_pythia8 = asrootpy(response_amcatnlo_pythia8.ProjectionY())
 
-			_, _, response_powhegHerwig, _ = get_unfold_histogram_tuple(
-				inputfile=file_for_powhegHerwig,
-				variable=variable,
-				channel=channel,
-				centre_of_mass=13,
-				load_fakes=False,
-				visiblePS=True
-			)
+			# _, _, response_powhegHerwig, _ = get_unfold_histogram_tuple(
+			# 	inputfile=file_for_powhegHerwig,
+			# 	variable=variable,
+			# 	channel=channel,
+			# 	centre_of_mass=13,
+			# 	load_fakes=False,
+			# 	visiblePS=True
+			# )
 
-			measured_powhegHerwig = asrootpy(response_powhegHerwig.ProjectionX('px',1))
-			truth_powhegHerwig = asrootpy(response_powhegHerwig.ProjectionY())
+			# measured_powhegHerwig = asrootpy(response_powhegHerwig.ProjectionX('px',1))
+			# truth_powhegHerwig = asrootpy(response_powhegHerwig.ProjectionY())
 
 			# Get the data input (data after background subtraction, and fake removal)
 			file_for_data = file_for_data_template.format( variable = variable, channel = channel )
@@ -138,37 +145,41 @@ def main():
 			hp.x_axis_title = v_latex + unit
 			hp.x_limits = [ reco_bin_edges_vis[variable][0], reco_bin_edges_vis[variable][-1]]
 			hp.ratio_y_limits = [0.1,1.9]
-			hp.ratio_y_title = 'Reweighted / Central'
+			hp.ratio_y_title = '$\\frac{\\text{Reweighted}}{\\text{Central}}$'
 			hp.y_axis_title = 'Number of events'
 			hp.title = 'Reweighting check for {variable}'.format(variable=v_latex)
+			hp.ratio_y_fontsize       = 40
+			hp.additional_text        = latex_labels.channel_latex[channel.lower()]
+			hp.preliminary            = False
+
 
 			measured_central.Rebin(2)
 			measured_pt_reweighted_up.Rebin(2)
 			measured_pt_reweighted_down.Rebin(2)
 			# measured_eta_reweighted_up.Rebin(2)
 			# measured_eta_reweighted_down.Rebin(2)
-			measured_amcatnlo_pythia8.Rebin(2)
-			measured_powhegHerwig.Rebin(2)
+			# measured_amcatnlo_pythia8.Rebin(2)
+			# measured_powhegHerwig.Rebin(2)
 			data.Rebin(2)
 
 			measured_central.Scale( 1 / measured_central.Integral() )
 			measured_pt_reweighted_up.Scale( 1 / measured_pt_reweighted_up.Integral() )
 			measured_pt_reweighted_down.Scale( 1 / measured_pt_reweighted_down.Integral() )
-			measured_amcatnlo_pythia8.Scale( 1 / measured_amcatnlo_pythia8.Integral() )
-			measured_powhegHerwig.Scale( 1 / measured_powhegHerwig.Integral() )
 
+			# measured_amcatnlo_pythia8.Scale( 1 / measured_amcatnlo_pythia8.Integral() )
+			# measured_powhegHerwig.Scale( 1 / measured_powhegHerwig.Integral() )
 			# measured_eta_reweighted_up.Scale( 1 / measured_eta_reweighted_up.Integral() )
 			# measured_eta_reweighted_down.Scale( 1/ measured_eta_reweighted_down.Integral() )
 
 			data.Scale( 1 / data.Integral() )
 
-			print list(measured_central.y())
-			print list(measured_amcatnlo_pythia8.y())
-			print list(measured_powhegHerwig.y())
-			print list(data.y())
+			# print list(measured_central.y())
+			# print list(measured_amcatnlo_pythia8.y())
+			# print list(measured_powhegHerwig.y())
+			# print list(data.y())
 			compare_measurements(
-				# models = {'Central' : measured_central, 'PtReweighted Up' : measured_pt_reweighted_up, 'PtReweighted Down' : measured_pt_reweighted_down, 'EtaReweighted Up' : measured_eta_reweighted_up, 'EtaReweighted Down' : measured_eta_reweighted_down},
-				models = OrderedDict([('Central' , measured_central), ('PtReweighted Up' , measured_pt_reweighted_up), ('PtReweighted Down' , measured_pt_reweighted_down), ('amc@nlo' , measured_amcatnlo_pythia8), ('powhegHerwig' , measured_powhegHerwig) ] ),
+				# models = OrderedDict([('Central' , measured_central), ('PtReweighted Up' , measured_pt_reweighted_up), ('PtReweighted Down' , measured_pt_reweighted_down), ('amc@nlo' , measured_amcatnlo_pythia8), ('powhegHerwig' , measured_powhegHerwig) ] ),
+				models = OrderedDict([('Central' , measured_central), ('PtReweighted Up' , measured_pt_reweighted_up), ('PtReweighted Down' , measured_pt_reweighted_down) ] ),
 				measurements = {'Data' : data},
 				show_measurement_errors=True,
 				histogram_properties=hp,
@@ -178,8 +189,8 @@ def main():
 				show_ratio_for_pairs = OrderedDict( [ 
 					('PtUpVsCentral' , [ measured_pt_reweighted_up, measured_central ] ),
 					('PtDownVsCentral' , [ measured_pt_reweighted_down, measured_central ] ),
-					('amcatnloVsCentral' , [ measured_amcatnlo_pythia8, measured_central ] ),
-					('powhegHerwigVsCentral' , [ measured_powhegHerwig, measured_central ] ),
+					# ('amcatnloVsCentral' , [ measured_amcatnlo_pythia8, measured_central ] ),
+					# ('powhegHerwigVsCentral' , [ measured_powhegHerwig, measured_central ] ),
 					('DataVsCentral' , [data, measured_central] ) 
 					]),
 			)
