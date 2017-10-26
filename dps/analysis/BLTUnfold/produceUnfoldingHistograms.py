@@ -4,7 +4,7 @@ from rootpy.io import root_open
 #from rootpy.interactive import wait
 from argparse import ArgumentParser
 from dps.config.xsection import XSectionConfig
-from dps.config.variable_binning import bin_edges_vis, reco_bin_edges_vis
+from dps.config.variable_binning import bin_edges_vis, reco_bin_edges_vis, fine_bins
 from dps.config.variableBranchNames import branchNames, genBranchNames_particle, genBranchNames_parton
 from dps.utils.file_utilities import make_folder_if_not_exists
 from math import trunc, exp, sqrt
@@ -55,20 +55,14 @@ def calculateTopPtSystematicWeight( lepTopPt, hadTopPt ):
 def ptWeight( pt ):
     return exp( 0.0615 - 0.0005 * pt ) 
  
-
 def calculateTopPtSystematicWeight( lepTopPt, hadTopPt ):
     lepTopWeight = ptWeight( lepTopPt )
     hadTopWeight = ptWeight( hadTopPt )
     return sqrt( lepTopWeight * hadTopWeight )
 
-def ptWeight( pt ):
-    return exp( 0.0615 - 0.0005 * pt )
-
 def getUnmergedDirectory( f ) :
     baseDir = f.split('combined')[0]
     sampleName = f.split('combined')[-1].strip('/').split('_tree.root')[0]
-    print baseDir
-    print sampleName
 
     if 'TTJets_amc' in sampleName:
         sampleName = 'TTJets_amcatnloFXFX'
@@ -337,9 +331,7 @@ def main():
 
     # Get the tree/chain
     treeName = "TTbar_plus_X_analysis/Unfolding/Unfolding"
-    print file_name
     file_name = getUnmergedDirectory(file_name)
-    print file_name
     tree = ROOT.TChain(treeName);
     filenames = glob.glob( file_name )
     for f in filenames:
@@ -419,56 +411,20 @@ def main():
                     outputDirName = variable+'_'+channel.outputDirName
                     outputDir = out.mkdir(outputDirName)
                     outputDirs[variable][channel.channelName] = outputDir
-
+                    
+                    histograms[variable][channel.channelName] = {}
+                    h = histograms[variable][channel.channelName]
+                    #
+                    # Book histograms
+                    #
                     if args.fineBinned:
                         outputDirResName = outputDirName + '/residuals/'
                         outputDirRes = out.mkdir(outputDirResName)
                         outputDirsRes[variable][channel.channelName] = outputDirRes
 
-                    #
-                    # Book histograms
-                    #
-                    # 1D histograms
-                    histograms[variable][channel.channelName] = {}
-                    h = histograms[variable][channel.channelName]
-                    h['truth']                          = Hist( allVariablesBins[variable], name='truth', type='D')
-                    h['truthVis']                       = Hist( allVariablesBins[variable], name='truthVis', type='D')
-                    h['truthVis_noWeight']                       = Hist( allVariablesBins[variable], name='truthVis_noWeight', type='D')
-                    h['truth_parton']                   = Hist( allVariablesBins[variable], name='truth_parton', type='D')                
-                    h['measured']                       = Hist( reco_bin_edges_vis_to_use, name='measured', type='D')
-                    h['measuredVis']                    = Hist( reco_bin_edges_vis_to_use, name='measuredVis', type='D')
-                    h['measured_without_fakes']         = Hist( reco_bin_edges_vis_to_use, name='measured_without_fakes', type='D')
-                    h['measuredVis_without_fakes']      = Hist( reco_bin_edges_vis_to_use, name='measuredVis_without_fakes', type='D')
-                    h['fake']                           = Hist( reco_bin_edges_vis_to_use, name='fake', type='D')
-                    h['fakeVis']                        = Hist( reco_bin_edges_vis_to_use, name='fakeVis', type='D')
-                    # 2D histograms
-                    h['response']                       = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response', type='D')
-                    h['response_without_fakes']         = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_without_fakes', type='D')
-                    h['responseVis_without_fakes']      = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='responseVis_without_fakes', type='D')
-                    h['response_parton']                = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_parton', type='D')
-                    h['response_without_fakes_parton']  = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_without_fakes_parton', type='D')
-
-                    if args.fineBinned:
-                        minVar = trunc( allVariablesBins[variable][0] )
-                        maxVar = trunc( max( tree.GetMaximum(genVariable_particle_names[variable]), tree.GetMaximum( reco_bin_edges_vis_to_use ) ) * 1.2 )
-                        nBins = int(maxVar - minVar)
-                        if variable is 'lepton_eta' or variable is 'bjets_eta':
-                            maxVar = 2.4
-                            minVar = -2.4
-                            nBins = 1000
-                        # nBins = 960 so that small bin width is usable in 00. [0.0025]
-                        elif 'abs' in variable and 'eta' in variable:
-                            maxVar = 2.4
-                            minVar = 0.
-                            nBins = 960
-                        elif 'Rap' in variable:
-                            maxVar = 2.4
-                            minVar = -2.4
-                            nBins = 1000
-                        elif 'NJets' in variable:
-                            maxVar = 20.5
-                            minVar = 3.5
-                            nBins = 17
+                        minVar = fine_bins[variable][0]
+                        maxVar = fine_bins[variable][1]
+                        nBins  = fine_bins[variable][2]
 
                         h['truth']                          = Hist( nBins, minVar, maxVar, name='truth')
                         h['truthVis']                       = Hist( nBins, minVar, maxVar, name='truthVis')
@@ -489,8 +445,12 @@ def main():
 
                         residuals[variable][channel.channelName] = {}
                         r = residuals[variable][channel.channelName]
+                        
+                        residual_cutoff_multiplier = 0.1
+                        if 'tau' in variable: residual_cutoff_multiplier = 0.2
+
                         for i in range (1, nBins+1):
-                            r[i] = Hist(100, 0, maxVar*0.1, name='Residuals_Bin_'+str(i))
+                            r[i] = Hist(100, 0, maxVar*residual_cutoff_multiplier, name='Residuals_Bin_'+str(i))
 
                         residual_options[variable][channel.channelName] = {}
                         o = residual_options[variable][channel.channelName]
@@ -499,6 +459,25 @@ def main():
                         o['nbins']      = nBins
                         o['step']       = (maxVar-minVar)/nBins
                         o['bin_edges']  = np.arange(minVar, maxVar, (maxVar-minVar)/nBins)
+                    else:
+                        # 1D histograms
+                        h['truth']                          = Hist( allVariablesBins[variable], name='truth', type='D')
+                        h['truthVis']                       = Hist( allVariablesBins[variable], name='truthVis', type='D')
+                        h['truthVis_noWeight']              = Hist( allVariablesBins[variable], name='truthVis_noWeight', type='D')
+                        h['truth_parton']                   = Hist( allVariablesBins[variable], name='truth_parton', type='D')                
+                        h['measured']                       = Hist( reco_bin_edges_vis_to_use, name='measured', type='D')
+                        h['measuredVis']                    = Hist( reco_bin_edges_vis_to_use, name='measuredVis', type='D')
+                        h['measured_without_fakes']         = Hist( reco_bin_edges_vis_to_use, name='measured_without_fakes', type='D')
+                        h['measuredVis_without_fakes']      = Hist( reco_bin_edges_vis_to_use, name='measuredVis_without_fakes', type='D')
+                        h['fake']                           = Hist( reco_bin_edges_vis_to_use, name='fake', type='D')
+                        h['fakeVis']                        = Hist( reco_bin_edges_vis_to_use, name='fakeVis', type='D')
+                        # 2D histograms
+                        h['response']                       = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response', type='D')
+                        h['response_without_fakes']         = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_without_fakes', type='D')
+                        h['responseVis_without_fakes']      = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='responseVis_without_fakes', type='D')
+                        h['response_parton']                = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_parton', type='D')
+                        h['response_without_fakes_parton']  = Hist2D( reco_bin_edges_vis_to_use, allVariablesBins[variable], name='response_without_fakes_parton', type='D')
+
 
                     # Some interesting histograms
                     h['puOffline']          = Hist( 20, 0, 2, name='puWeights_offline')
@@ -793,9 +772,11 @@ def main():
                                     for i, edge in enumerate(options['bin_edges']):
                                         if recoVariable > edge: continue
                                         else: break
-                                    residual = abs(recoVariable - genVariable_particle)                                 
-                                    if not residual > options['max']*0.1: 
-                                        residuals[variable][channel.channelName][i].Fill(residual, offlineWeight_toUse*genWeight)
+                                    residual = abs(recoVariable - genVariable_particle)  
+                                    residual_cutoff_multiplier = 0.1
+                                    if 'tau' in variable: residual_cutoff_multiplier = 0.2                            
+                                    if not residual > options['max']*residual_cutoff_multiplier: 
+                                        residuals[variable][channel.channelName][i+1].Fill(residual, offlineWeight_toUse*genWeight)
 
             #
             # Output histgorams to file
@@ -841,7 +822,7 @@ def main():
         # Done all channels, now combine the two channels, and output to the same file
         for path, dirs, objects in out.walk():
             if 'electron' in path:
-                if 'coarse' in path: continue
+                # if 'coarse' in path: continue
                 outputDir = out.mkdir(path.replace('electron','combined'))
                 outputDir.cd()
                 for h in objects:

@@ -95,15 +95,13 @@ control_plots_bins_for01 = {
   'NJets'           : [3.5,16.5],
   'lepton_pt'       : [10, 390],
   'abs_lepton_eta'  : [0,2.4],  
+  'abs_lepton_eta_coarse'  : [0,2.4],  
   'MET'             : [0,585],
   'WPT'             : [0,864],
   'HT'              : [0,2000],
   'ST'              : [100,2000],
   'Tau'             : [0,10000],
   'MT'              : [0, 900],
-
-  'abs_lepton_eta_coarse' : bin_edges_vis['abs_lepton_eta_coarse'],
-
 }
 
 control_plot_nbins = {
@@ -119,6 +117,24 @@ control_plot_nbins = {
   'MT' : 36,
 }
 
+# [Low, High, NBins]
+# Used in bltUnfold for fine binning scheme
+fine_bins = {
+'NJets'         : [3.5, 20.5, 17],
+'WPT'           : [0.0, 850.0, 850],
+'lepton_pt'     : [25.0, 500.0, 475],
+'HT'            : [110.0, 2000.0, 1890],
+'ST'            : [135.0, 2500.0, 2365],
+'MET'           : [0.0, 600.0, 600],
+'lepton_eta'    : [-2.4, 2.4, 960],
+'abs_lepton_eta': [0.0, 2.4, 960],
+'tau1'          : [0.0, 150.0, 150],
+'tau2'          : [0.0, 150.0, 150],
+'tau3'          : [0.0, 150.0, 150],
+'tau4'          : [0.0, 150.0, 150],
+'tau5'          : [0.0, 150.0, 150],
+'tau6'          : [0.0, 150.0, 150],
+}
 
 # should we want separate binning for different centre of mass energies
 # we can put the logic here, maybe as a function:
