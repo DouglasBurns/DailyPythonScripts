@@ -182,14 +182,35 @@ def plot_pull_distribution(pullHistogram, var, ch, n):
 	plt.tick_params(**CMS.axis_label_major)
 	plt.tick_params(**CMS.axis_label_minor)
 
-	title_template = 'Total Pull Distribution for {variable}\n'
-	title_template += '$\sqrt{{s}}$ = 13 TeV, {channel}, $N^{{\\text{{pseudo experiments}}}}_{{\\text{{bin}}}}$ = {exp}'
-	title = title_template.format(
-	    variable=latex_labels.variables_latex[var],
-	    channel=latex_labels.channel_latex[ch],
-	    exp=n
+	# title_template = 'Total Pull Distribution for {variable}\n'
+	# title_template += '$\sqrt{{s}}$ = 13 TeV, {channel}, $N^{{\\text{{pseudo experiments}}}}_{{\\text{{bin}}}}$ = {exp}'
+	# title = title_template.format(
+	#     variable=latex_labels.variables_latex[var],
+	#     channel=latex_labels.channel_latex[ch],
+	#     exp=n
+	# )
+	# plt.title(title, CMS.title)
+
+	template = 'Total Pull Distribution for {}'
+	label = template.format( latex_labels.variables_latex[var] )
+	plt.title( label,loc='right', **CMS.title )
+
+	logo_location = (0.05, 0.98)
+	channel_location = ( 0.05, 0.92)
+	plt.text(logo_location[0], logo_location[1], 
+		"CMS", 
+		transform=axes.transAxes, 
+		fontsize=42,
+		verticalalignment='top',
+		horizontalalignment='left'
 	)
-	plt.title(title, CMS.title)
+	plt.text(channel_location[0], channel_location[1], 
+		latex_labels.channel_latex[ch], 
+		transform=axes.transAxes, 
+		fontsize=40,
+		verticalalignment='top',
+		horizontalalignment='left'
+	)
 
 	text_template = 'mean = ${mean} \pm  {mean_error}$\n'
 	text_template += '$\sigma = {sigma} \pm  {sigma_error}$'
@@ -204,6 +225,7 @@ def plot_pull_distribution(pullHistogram, var, ch, n):
 		transform=axes.transAxes,
 		color='black', fontsize=40, bbox=dict(facecolor='white', edgecolor='none', alpha=0.5)
 	)
+
 	plt.tight_layout()
 
 	outputDir = 'plots/unfolding/pulls/new/'
