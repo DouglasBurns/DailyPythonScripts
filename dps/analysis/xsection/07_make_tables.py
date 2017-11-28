@@ -15,11 +15,14 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 	var_unit = ''
 	xsec_unit = ''
 
-	if 'absolute' in crossSectionType:
-		xsec_unit += 'pb '
-	if variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
+	if 'absolute' in crossSectionType and variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
 		var_unit  += '(GeV)'
-		xsec_unit += '\\ensuremath{\\text{(GeV)}^{-1}}'
+		xsec_unit += '(pb \\ensuremath{\\text{GeV}^{-1}})'
+	elif 'absolute' in crossSectionType:
+		xsec_unit += '(pb)'
+	elif variable in ['HT', 'ST', 'MET', 'WPT', 'lepton_pt']:
+		var_unit  += '(GeV)'
+		xsec_unit += '(\\ensuremath{\\text{GeV}^{-1}})'
 
 	if 'absolute' in crossSectionType:
 		dxsec 	 = ' \\ensuremath{{ \\frac{{ \\text{{d}}\\sigma }}{{ \\text{{d}}{var} }} }} '.format(var = variables_latex[variable])
@@ -38,10 +41,24 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
     ### Table Header
     #########################################################################################################
 	latexHeader =  '\\begin{table}[!htbp]\n'
+	if 'absolute' in crossSectionType:
+		latexHeader += '\t\caption{{Results of the {type} differential cross sections with absolute uncertainties in the combined channel with respect to {var}.}}\n'.format(
+			type 	= crossSectionType,
+			var 	= variables_latex[variable],
+		)
+	else:
+		latexHeader += '\t\caption{{Results of the {type} differential cross sections with relative uncertainties in the combined channel with respect to {var}.}}\n'.format(
+			type 	= crossSectionType,
+			var 	= variables_latex[variable],
+		)
+	latexHeader += '\t\label{{tb:xsection_{type}_{var}_combined}}\n'.format(
+		type 	= crossSectionType,
+		var 	= variable,
+	)
 	latexHeader += '\t\centering\n'
 	latexHeader += '\t\\begin{tabular}{cccc}\n'
 	latexHeader += '\t\t\hline\n'
-	latexHeader += '\t\t\hline\n'
+
 	latexHeader += '\t\t{var}'.format(var=variables_latex[variable]) + ' \t& ' + dxsec + ' \t& \ensuremath{\pm} Stat. \t& \ensuremath{\pm} Syst. \\\\ \n'
 	if 'absolute' in crossSectionType:
 		latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (N) \t& (N) \\\\ \n'
@@ -93,21 +110,7 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
     ### Table Footer
     #########################################################################################################
 	tableFooter = '\t\t\hline\n'
-	tableFooter += '\t\end{tabular}\n'
-	if 'absolute' in crossSectionType:
-		tableFooter += '\t\caption{{Results of the {type} differential cross sections with absolute uncertainties in the combined channel with respect to {var}.}}\n'.format(
-			type 	= crossSectionType,
-			var 	= variables_latex[variable],
-		)
-	else:
-		tableFooter += '\t\caption{{Results of the {type} differential cross sections with relative uncertainties in the combined channel with respect to {var}.}}\n'.format(
-			type 	= crossSectionType,
-			var 	= variables_latex[variable],
-		)
-	tableFooter += '\t\label{{tb:xsection_{type}_{var}_combined}}\n'.format(
-		type 	= crossSectionType,
-		var 	= variable,
-	)	
+	tableFooter += '\t\end{tabular}\n'	
 	tableFooter += '\\end{table}\n'
 	fullTable += tableFooter
 	# fullTable += '\clearpage'
@@ -164,7 +167,7 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexHeader += '\t\t\hline\n'
 	latexHeader += '\t\t\hline\n'
 
-	latexTitle += '\t\tRelative Uncertainty Source$(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
+	latexTitle += '\t\tRelative uncertainty source$(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
 		variables_latex['HT'], 
 		variables_latex['ST'], 
 		variables_latex['MET'], 

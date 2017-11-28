@@ -304,10 +304,10 @@ def make_plot( channel, x_axis_title, y_axis_title,
         signal_region_hists['TTJet'],
     ]
     histogram_lables   = [
-        'data',
+        'Data',
         'QCD', 
         'V+jets', 
-        'single top',  
+        'Single top',  
         samples_latex['TTJet'],
     ]
     histogram_colors   = [

@@ -99,10 +99,10 @@ def makeLatexTable( chi2, gChi2, outputPath, channel, crossSectionType ):
 	models = chi2[chi2.keys()[0]]['Model']
 	latexHeader = '\\begin{table}\n'
 	if crossSectionType == 'normalised':
-		latexHeader += '\t\caption{Results of a $\chi^{2}$ test between the normalised cross sections in data and several MC models.}\n'
+		latexHeader += '\t\caption{Results of a $\chi^{2}$ test per number of degrees of freedom (ndf) between the normalized cross sections in data and several MC models.}\n'
 		latexHeader += '\t\label{tb:Chi2_normalised}\n'
 	elif crossSectionType == 'absolute':
-		latexHeader += '\t\caption{Results of a $\chi^{2}$ test between the absolute cross sections in data and several MC models.}\n'
+		latexHeader += '\t\caption{Results of a $\chi^{2}$ test per number of degrees of freedom (ndf) between the absolute cross sections in data and several MC models.}\n'
 		latexHeader += '\t\label{tb:Chi2_absolute}\n'	
 	latexHeader += '\t\centering\n'
 	latexHeader += '\t\\scriptsize\n'
@@ -129,14 +129,13 @@ def makeTableContent(chi2, gChi2, models=[], spacing=False):
 	for i in range(0,len(models)): latexHeader += 'cc'
 	latexHeader += '}\n'
 	latexHeader += '\t\t\hline\n'
-	latexHeader += '\t\t\hline\n'
 
 	model_header = '\t\t&\t'
 	label_header = '\t\t&\t'
 	for model in chi2[chi2.keys()[0]]['Model']:
 		if model in models:
 			model_header += ' \multicolumn{{2}}{{c}}{{{model}}} & \t'.format(model=measurements_latex[model])
-			label_header += '$\\chi^{2}$ / ndf & p-value &\t'
+			label_header += '$\\chi^{2}$/ndf & $\\textit{p}-value &\t'
 	model_header = model_header.rstrip().rstrip('&')
 	model_header += '\\\\ \n'
 	# if 'TTJets_powhegPythia8_withMCTheoryUnc' in models:
@@ -262,8 +261,8 @@ if __name__ == '__main__':
 	    phase_space = 'VisiblePS'
 
 	channels = [
-		# 'electron', 
-		# 'muon', 
+		'electron', 
+		'muon', 
 		'combined', 
 	]
 	unc_type = [

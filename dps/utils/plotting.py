@@ -193,6 +193,7 @@ def make_data_mc_comparison_plot( histograms = [],
                                  systematics_for_ratio = None,
                                  systematics_for_plot = None,
                                  histograms_to_compare = None,
+                                 debug = False,
                                  ):
     '''
     systematics_for_plot takes the same input as systematics_for_ratio. There may be some repition with reagrds to 
@@ -319,6 +320,10 @@ def make_data_mc_comparison_plot( histograms = [],
                    xerr = histogram_properties.xerr,
                    elinewidth = 2, capsize = 10, capthick = 2,
                    zorder = len(histograms_) + 2 )
+    if debug:
+        # for x in [0, 0.8, 1.444, 1.566, 2.0]:
+        for x in [0.0, 0.2, 0.4, 0.6, 1.0, 1.2, 1.444, 1.566, 1.63, 1.8, 2.0, 2.2]:
+           axes.axvline(x=x, linewidth = 3, color='black')
 
     if histograms_to_compare:
         h_compare = {}
@@ -337,11 +342,11 @@ def make_data_mc_comparison_plot( histograms = [],
 
     # put legend into the correct order (data is always first!)
     handles, labels = axes.get_legend_handles_labels()
-    data_label_index = labels.index( 'data' )
+    data_label_index = labels.index( 'Data' )
     data_handle = handles[data_label_index]
-    labels.remove( 'data' )
+    labels.remove( 'Data' )
     handles.remove( data_handle )
-    labels.insert( 0, 'data' )
+    labels.insert( 0, 'Data' )
     handles.insert( 0, data_handle )
     if mc_error > 0 or ( not mc_error > 0 and show_stat_errors_on_mc ):
         p1 = Rectangle( ( 0, 0 ), 1, 1, fc = "0.75", alpha = 0.5, hatch = '/' )
@@ -383,6 +388,10 @@ def make_data_mc_comparison_plot( histograms = [],
         ax1.minorticks_on()
         ax1.grid( True, 'major', linewidth = 1 )
         ax1.axhline(y=1, linewidth = 1)
+        if debug:
+            # for x in [0, 0.8, 1.444, 1.566, 2.0]:
+            for x in [0.0, 0.2, 0.4, 0.6, 1.0, 1.2, 1.444, 1.566, 1.63, 1.8, 2.0, 2.2]:
+                ax1.axvline(x=x, linewidth = 3, color='black')
         set_labels( plt, histogram_properties, show_x_label = True, show_title = False )
         plt.ylabel( r'$\frac{\mathrm{data}}{\mathrm{pred.}}$', CMS.y_axis_title )
         ax1.yaxis.set_label_coords(-0.115, 0.8)

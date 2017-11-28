@@ -116,10 +116,10 @@ def drawHistograms( dictionaryOfHistograms, uncertaintyBand, config, channel, va
     ]
 
     histogram_lables   = [
-        'data',
+        'Data',
         'QCD', 
         'V+jets', 
-        'single-top', 
+        'Single top', 
         samples_latex['TTJet'],
     ]
 
@@ -156,8 +156,8 @@ def drawHistograms( dictionaryOfHistograms, uncertaintyBand, config, channel, va
     histogram_properties.additional_text        = channel_latex[channel.lower()]
     histogram_properties.legend_location        = ( 0.9, 0.73 )
     histogram_properties.cms_logo_location      = 'left'
-    histogram_properties.preliminary            = True
-    # histogram_properties.preliminary            = False
+    # histogram_properties.preliminary            = True
+    histogram_properties.preliminary            = False
     histogram_properties.set_log_y              = False
     histogram_properties.legend_color           = False
     histogram_properties.ratio_y_limits     = [0.5, 1.5]
@@ -178,6 +178,7 @@ def drawHistograms( dictionaryOfHistograms, uncertaintyBand, config, channel, va
         normalise = False,
         systematics_for_ratio = uncertaintyBand,
         systematics_for_plot = uncertaintyBand,
+        debug = False,
     )
 
     histogram_properties.set_log_y = True
@@ -217,6 +218,7 @@ for variable in config.variables:
         if channel == 'combined': continue
 
         path_to_DF = 'data_for_01/normalisation/background_subtraction/13TeV/{variable}/VisiblePS/'.format( variable = variable )
+
         normalisation_fileName = 'normalisation_{channel}.txt'.format(channel=channel)
         normalisation_results_electron  = read_tuple_from_file( '{path}/central/{filename}'.format(path=path_to_DF,filename=normalisation_fileName)  )
 
