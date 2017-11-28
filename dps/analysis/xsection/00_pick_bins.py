@@ -131,6 +131,7 @@ def main():
 	for variable in variables:
 		if args.variable_to_run and variable not in args.variable_to_run: continue
 		global var
+		if 'tau' not in variable: continue
 
 		var=variable
 		print('--- Doing variable',variable)
@@ -581,43 +582,48 @@ def plotting_resolution(variable, channel, residual, resolution, bin_number, bin
 	gc.collect()
 	return
 
-
-def plotting_response( histogram_information, variable, channel, bin_edges ):
+def plotting_response( histogram_information, variable, channel, bin_edges, plot_finebin=False ):
 	global output_folder, output_formats, options
 	my_cmap = cm.get_cmap( 'rainbow' )
 	my_cmap.set_under( 'w' )
 
 	scatter_plot = histogram_information['hist']
 	response_plot = rebin_2d(scatter_plot, bin_edges, bin_edges )
-	norm_response_plot = Hist2D( bin_edges, bin_edges, type = 'D' )
+	
+	# norm_response_plot = Hist2D( bin_edges, bin_edges, type = 'D' )
 
-	n_bins = len( bin_edges ) - 1
-	get_bin_content = response_plot.GetBinContent
-	set_bin_content = norm_response_plot.SetBinContent
+	# n_bins = len( bin_edges ) - 1
+	# get_bin_content = response_plot.GetBinContent
+	# set_bin_content = norm_response_plot.SetBinContent
 
-	# Put into array of values sorted by y columns
-	xy=[]
-	norm_xy = []
-	for bin_j in range( 0, n_bins+1):
-		y = []
-		for bin_i in range( 0, n_bins+1 ):
-			y.append( get_bin_content( bin_j+1, bin_i+1 ) )
-		xy.append(y)
+	# # Put into array of values sorted by y columns
+	# xy=[]
+	# norm_xy = []
+	# for bin_j in range( 0, n_bins+1):
+	#     y = []
+	#     for bin_i in range( 0, n_bins+1 ):
+	#         y.append( get_bin_content( bin_j+1, bin_i+1 ) )
+	#     xy.append(y)
 
-	# Normalise by the reconstructed column and round
-	for y_col in xy:
-		norm_xy.append(y_col / np.sum(y_col))
-	rounded_norm_xy = np.around(np.array(norm_xy), 2)
+	# # Normalise by the reconstructed column and round
+	# for y_col in xy:
+	#     norm_xy.append(y_col / np.sum(y_col))
+	# rounded_norm_xy = np.around(np.array(norm_xy), 2)
 
-	# New 2D Hist + Mesh to Plot
-	for bin_i in range( 0, n_bins+1):
-		for bin_j in range( 0, n_bins+1 ):
-			set_bin_content( bin_i, bin_j, rounded_norm_xy.item(bin_j, bin_i) )
-	X, Y = np.meshgrid(list(norm_response_plot.x()), list(norm_response_plot.y()))
+	# # New 2D Hist + Mesh to Plot
+	# for bin_i in range( 0, n_bins+1):
+	#     for bin_j in range( 0, n_bins+1 ):
+	#         set_bin_content( bin_i, bin_j, rounded_norm_xy.item(bin_j, bin_i) )
+
+	# X, Y = np.meshgrid(list(norm_response_plot.x()), list(norm_response_plot.y()))
+	# x = X.ravel()
+	# y = Y.ravel()
+	# z = np.array(norm_response_plot.z()).ravel()
+
+	X, Y = np.meshgrid(list(response_plot.x()), list(response_plot.y()))
 	x = X.ravel()
 	y = Y.ravel()
-	z = np.array(norm_response_plot.z()).ravel()
-
+	z = np.array(response_plot.z()).ravel()
 
 	v_unit = '$'+variables_latex[variable]+'$'
 	if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
@@ -625,7 +631,7 @@ def plotting_response( histogram_information, variable, channel, bin_edges ):
 	x_title = 'Reconstructed ' + v_unit
 	y_title = 'Generated ' + v_unit
 	# title = "channel = {}, variable = ${}$".format(channel, variables_latex[variable])
-	title = "Response matrix normalised wrt reconstructed bins"
+	title = "Response matrix"
 
 	plt.figure( figsize = ( 20, 16 ), dpi = 200, facecolor = 'white' )
 
@@ -637,7 +643,7 @@ def plotting_response( histogram_information, variable, channel, bin_edges ):
 	ax0.xaxis.labelpad = 12
 	ax0.yaxis.labelpad = 12
 
-	h2d = plt.hist2d(x, y, weights=z, bins=(list(norm_response_plot.xedges()), list(norm_response_plot.yedges())), cmap=my_cmap, vmin=0, vmax=1)
+	h2d = plt.hist2d(x, y, weights=z, bins=(list(response_plot.xedges()), list(response_plot.yedges())), cmap=my_cmap, vmin=0)
 	colorbar = plt.colorbar()
 	colorbar.ax.tick_params( **CMS.axis_label_major )
 
@@ -651,6 +657,47 @@ def plotting_response( histogram_information, variable, channel, bin_edges ):
 	make_folder_if_not_exists(plot_filepath)
 	plot_filename = '{}_{}_Response.pdf'.format(channel, variable)
 	plt.savefig(plot_filepath+plot_filename, bbox_inches='tight')
+
+	if plot_finebin:
+		X, Y = np.meshgrid(list(scatter_plot.x()), list(scatter_plot.y()))
+		x = X.ravel()
+		y = Y.ravel()
+		z = np.array(scatter_plot.z()).ravel()
+
+		v_unit = '$'+variables_latex[variable]+'$'
+		if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
+			v_unit += ' [GeV]'
+		x_title = 'Reconstructed ' + v_unit
+		y_title = 'Generated ' + v_unit
+		# title = "channel = {}, variable = ${}$".format(channel, variables_latex[variable])
+		title = "Response matrix"
+
+		plt.figure( figsize = ( 20, 16 ), dpi = 200, facecolor = 'white' )
+
+		ax0 = plt.axes()
+		ax0.minorticks_on()
+
+		plt.tick_params( **CMS.axis_label_major )
+		plt.tick_params( **CMS.axis_label_minor )
+		ax0.xaxis.labelpad = 12
+		ax0.yaxis.labelpad = 12
+
+		h2d = plt.hist2d(x, y, weights=z, bins=(list(scatter_plot.xedges()), list(scatter_plot.yedges())), cmap=my_cmap, vmin=0)
+		ax0.plot(ax0.get_xlim(), ax0.get_ylim(), ls="-", color="black")
+
+		colorbar = plt.colorbar()
+		colorbar.ax.tick_params( **CMS.axis_label_major )
+
+		plt.xlabel( x_title, CMS.x_axis_title )
+		plt.ylabel( y_title, CMS.y_axis_title )
+		plt.title( title, CMS.title )
+
+		plt.tight_layout()
+
+		plot_filepath = 'plots/binning/response/'
+		make_folder_if_not_exists(plot_filepath)
+		plot_filename = '{}_{}_FineBinResponse.pdf'.format(channel, variable)
+		plt.savefig(plot_filepath+plot_filename, bbox_inches='tight')
 	return
 
 
