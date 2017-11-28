@@ -132,6 +132,13 @@ class Measurement():
                 tree = qcd_tree_for_normalisation
             else:
                 tree = qcd_tree
+
+            # Changing muon isolation CR
+            # if '3toInf' in tree:
+            #     print 'Modifying selection '
+            #     selection += ' && lepton_isolation > 3.0'
+            #     print selection
+
             # Remove the Lepton reweighting for the datadriven qcd (SF not derived for unisolated leptons)
             for weight in weights:
                 if 'Electron' in weight: weights.remove(weight)
