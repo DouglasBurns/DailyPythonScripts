@@ -6,6 +6,7 @@ from dps.config.variable_binning import bin_edges_vis
 from dps.utils.file_utilities import make_folder_if_not_exists
 import numpy as np
 import os
+import math
 
 def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, crossSectionType ):
 	'''
@@ -60,10 +61,7 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 	latexHeader += '\t\t\hline\n'
 
 	latexHeader += '\t\t{var}'.format(var=variables_latex[variable]) + ' \t& ' + dxsec + ' \t& \ensuremath{\pm} Stat. \t& \ensuremath{\pm} Syst. \\\\ \n'
-	if 'absolute' in crossSectionType:
-		latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (N) \t& (N) \\\\ \n'
-	else:
-		latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (\%) \t& (\%) \\\\ \n'
+	latexHeader += '\t\t'+var_unit+' \t& '+xsec_unit+' \t& (\%) \t& (\%) \\\\ \n'
 	latexHeader += '\t\t\hline\n'
 
 	fullTable += latexHeader
@@ -75,34 +73,19 @@ def makeResultLatexTable( xsections_abs, xsections_rel, outputPath, variable, cr
 		precision = '{0:g}'
 		if 'abs_lepton_eta' in variable:
 			precision = '{0:.2f}'
+		edge_down = precision.format(bin_edges_vis[variable][bin])
+		edge_up = precision.format(bin_edges_vis[variable][bin+1])
+		val = to_scientific_notation(to_precision(xsections_abs['central'][bin], 3))
+		stat = to_scientific_notation(to_precision(xsections_rel['statistical'][bin], 2))
+		sys = to_scientific_notation(to_precision(xsections_rel['systematic'][bin], 2))
 
-		if 'absolute' in crossSectionType:
-			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = precision.format(bin_edges_vis[variable][bin]),
-				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
-				val = '{:.3g}'.format(xsections_abs['central'][bin]),
-				stat = '{:.3g}'.format(xsections_abs['statistical'][bin]),
-				sys = '{:.3g}'.format(xsections_abs['systematic'][bin]),
-				# tot = xsections_rel['total'][bin],
-			)
-		else:
-			line_for_bin = '\t\t{edge_down}-{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
-				edge_down = precision.format(bin_edges_vis[variable][bin]),
-				edge_up = precision.format(bin_edges_vis[variable][bin+1]),
-				val = '{:.3g}'.format(xsections_abs['central'][bin]),
-				stat = '{:.3g}'.format(xsections_rel['statistical'][bin]),
-				sys = '{:.3g}'.format(xsections_rel['systematic'][bin]),
-				# tot = xsections_rel['total'][bin],
-			)
-
-		# REPLACE e^0N WITH x10^N. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
-		# if 'e-' in line_for_bin:
-		# 	print(line_for_bin)
-		# 	power = line_for_bin[line_for_bin.find("e-")+1:].split()[0]
-		# 	new = '\ensuremath{{\\times 10^{{ {} }} }}'.format(power.replace('0', ''))
-		# 	old = 'e'+power
-		# 	line_for_bin = line_for_bin.replace(old, new)
-		# 	print(line_for_bin)
+		line_for_bin = '\t\t{edge_down}--{edge_up} \t& {val} \t& {stat} \t& {sys} \\\\ \n'.format(
+			edge_down = edge_down,
+			edge_up = edge_up,
+			val = val,
+			stat = stat,
+			sys = sys,
+		)	
 
 		fullTable += line_for_bin
 
@@ -167,7 +150,7 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 	latexHeader += '\t\t\hline\n'
 	latexHeader += '\t\t\hline\n'
 
-	latexTitle += '\t\tRelative uncertainty source$(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
+	latexTitle += '\t\tRelative uncertainty source $(\\%)$\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\t&\t{}\\\\ \n'.format(
 		variables_latex['HT'], 
 		variables_latex['ST'], 
 		variables_latex['MET'], 
@@ -198,62 +181,69 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 
 		# If less than 0.1 replace with '<0.1'
 		HT_dp_low = '{:.1f}'
-		HT_dp_high = ' - {:.1f}'
+		HT_dp_high = ' -- {:.1f}'
 		ST_dp_low = '{:.1f}'
-		ST_dp_high = ' - {:.1f}'
+		ST_dp_high = ' -- {:.1f}'
 		MET_dp_low = '{:.1f}'
-		MET_dp_high = ' - {:.1f}'
+		MET_dp_high = ' -- {:.1f}'
 		WPT_dp_low = '{:.1f}'
-		WPT_dp_high = ' - {:.1f}'
+		WPT_dp_high = ' -- {:.1f}'
 		lepton_pt_dp_low = '{:.1f}'
-		lepton_pt_dp_high = ' - {:.1f}'
+		lepton_pt_dp_high = ' -- {:.1f}'
 		abs_lepton_eta_coarse_dp_low = '{:.1f}'
-		abs_lepton_eta_coarse_dp_high = ' - {:.1f}'
+		abs_lepton_eta_coarse_dp_high = ' -- {:.1f}'
 		NJets_dp_low = '{:.1f}'
-		NJets_dp_high = ' - {:.1f}'
+		NJets_dp_high = ' -- {:.1f}'
 
 		if HT_low < 0.1:
 			HT_dp_low = '{}'
-			HT_low = '$<$0.1'
+			HT_low = '0.1'
 		if HT_high < 0.1:
+			HT_low = ''
 			HT_dp_high = '{}'
-			HT_high = ''
+			HT_high = '$<$0.1'
 		if ST_low < 0.1:
 			ST_dp_low = '{}'
-			ST_low = '$<$0.1'
+			ST_low = '0.1'
 		if ST_high < 0.1:
+			ST_low = ''
 			ST_dp_high = '{}'
-			ST_high = ''
+			ST_high = '$<$0.1'
 		if MET_low < 0.1:
 			MET_dp_low = '{}'
-			MET_low = '$<$0.1'
+			MET_low = '0.1'
 		if MET_high < 0.1:
+			MET_low = ''
 			MET_dp_high = '{}'
-			MET_high = ''
+			MET_high = '$<$0.1'
 		if WPT_low < 0.1:
 			WPT_dp_low = '{}'
-			WPT_low = '$<$0.1'
+			WPT_low = '0.1'
 		if WPT_high < 0.1:
+			WPT_low = ''
 			WPT_dp_high = '{}'
-			WPT_high = ''
+			WPT_high = '$<$0.1'
 		if lepton_pt_low < 0.1:
 			lepton_pt_dp_low = '{}'
-			lepton_pt_low = '$<$0.1'
+			lepton_pt_low = '0.1'
 		if lepton_pt_high < 0.1:
+			lepton_pt_low = ''
 			lepton_pt_dp_high = '{}'
-			lepton_pt_high = ''
+			lepton_pt_high = '$<$0.1'
 		if abs_lepton_eta_coarse_low < 0.1:
 			abs_lepton_eta_coarse_dp_low = '{}'
-			abs_lepton_eta_coarse_low = '$<$0.1'
+			abs_lepton_eta_coarse_low = '0.1'
 		if abs_lepton_eta_coarse_high < 0.1:
+			abs_lepton_eta_coarse_low = ''
 			abs_lepton_eta_coarse_dp_high = '{}'
-			abs_lepton_eta_coarse_high = ''
+			abs_lepton_eta_coarse_high = '$<$0.1'
 		if NJets_low < 0.1:
 			NJets_dp_low = '{}'
-			NJets_low = '$<$0.1'
+			NJets_low = '0.1'
 		if NJets_high < 0.1:
+			NJets_low = ''
 			NJets_dp_high = '{}'
-			NJets_high = ''
+			NJets_high = '$<$0.1'
 
 		latexContent_met = '\t\t{{}}\t&\t{{}}\t&\t{ST_dp_low}{ST_dp_high}\t&\t{MET_dp_low}{MET_dp_high}\t&\t{WPT_dp_low}{WPT_dp_high}\t&\t{{}}\t&\t{{}}\t&\t{{}}\\\\ \n'.format(
 			ST_dp_low = ST_dp_low,
@@ -314,7 +304,7 @@ def makeCondensedSystematicLatexTable(variables, inputPath, input_file_template,
 			)
 
 	latexContent += '\t\t\hline\n'
-	latexContent += '\t\t{}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\t&\t{:.1f} - {:.1f}\\\\ \n'.format(
+	latexContent += '\t\t{}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\t&\t{:.1f} -- {:.1f}\\\\ \n'.format(
 		'Total',
 		d_summarised_syst['HT']['Min']['systematic'], 
 		d_summarised_syst['HT']['Max']['systematic'], 
@@ -571,7 +561,67 @@ def makeBinningLatexTable():
 	print "Written Binning Table"
 	return
 
+def to_precision(x,p):
+	"""
+	returns a string representation of x formatted with a precision of p
+	Based on the webkit javascript implementation taken from here:
+	https://code.google.com/p/webkit-mirror/source/browse/JavaScriptCore/kjs/number_object.cpp
+	"""
+	x = float(x)
+	if x == 0.:
+		return "0." + "0"*(p-1)
+	out = []
+	if x < 0:
+		out.append("-")
+		x = -x
+	e = int(math.log10(x))
+	tens = math.pow(10, e - p + 1)
+	n = math.floor(x/tens)
+	if n < math.pow(10, p - 1):
+		e = e -1
+		tens = math.pow(10, e - p+1)
+		n = math.floor(x / tens)
+	if abs((n + 1.) * tens - x) <= abs(n * tens -x):
+		n = n + 1
+	if n >= math.pow(10,p):
+		n = n / 10.
+		e = e + 1
+	m = "%.*g" % (p, n)
+	if e <= -2 or e >= p:
+		out.append(m[0])
+		if p > 1:
+			out.append(".")
+			out.extend(m[1:p])
+		out.append('e')
+		if e > 0:
+			out.append("+")
+		out.append(str(e))
+	elif e == (p -1):
+		out.append(m)
+	elif e >= 0:
+		out.append(m[:e+1])
+		if e+1 < len(m):
+			out.append(".")
+			out.extend(m[e+1:])
+	else:
+		out.append("0.")
+		out.extend(["0"]*-(e+1))
+		out.append(m)
+	return "".join(out)
 
+def to_scientific_notation(number):
+	'''
+	Write number in Latex scientific notation
+	'''
+	# REPLACE e^ WITH x10^. ONLY WORKS FOR 1 e^ VALUE IN STRING [TO BE IMPROVED]
+	if 'e' in number:
+		power = number.split("e")[1]
+		new = '$\\times 10^{{ {} }}$'.format(power)
+		old = 'e'+power
+		number = number.replace(old, new)
+		return number
+	else:
+		return number
 
 def parse_arguments():
     parser = ArgumentParser()
@@ -590,6 +640,12 @@ def parse_arguments():
         default = 'tables/xsections/',
         help    = "Output path for chi2 tables" 
     )
+	parser.add_argument( '-v', '--variable', 
+		dest    = "variable", 
+		default = None,
+		help    = "Variable to use" 
+	)
+
     args = parser.parse_args()
     return args
 
@@ -614,6 +670,7 @@ if __name__ == '__main__':
 	path_to_output_template = '{path}/{crossSectionType}/'
 	for utype in unc_type:
 		for variable in measurement_config.variables:
+			if args.variable and variable != args.variable: continue
 			print "Writing the {type} {var} cross sections to Latex Tables".format(type = utype, var=variable)
 			path_to_output = path_to_output_template.format(
 				path=outputTablePath, 
@@ -655,6 +712,4 @@ if __name__ == '__main__':
 	### PURITY/STABILITY/RESOLUTION 
 	########################################################################################################################
 	# makeBinningLatexTable()
-
-
 
