@@ -15,7 +15,7 @@ What it needs:
 usage:
     python get_best_regularisation.py config.json
     # for 13 TeV in the visible phase space :
-    python src/unfolding_tests/get_best_regularisation_TUnfold.py config/unfolding/VisiblePS/*.json
+    python dps/analysis/unfolding_tests/01_get_best_regularisation_TUnfold.py config/unfolding/VisiblePS/*.json
 '''
 # imports
 from __future__ import division
@@ -101,23 +101,14 @@ class RegularisationSettings(object):
         self.h_fakes = asrootpy ( f )
 
         data_file = self.data['file']
-        if data_file.endswith('.root'):
-            self.h_data = get_histogram_from_file(self.data['histogram'], self.data['file'])
-        elif data_file.endswith('.json') or data_file.endswith('.txt'):
-            data_key = self.data['histogram']
-            # assume configured bin edges
-            edges = []
-            edges = reco_bin_edges_vis[self.variable]
 
-            json_input = read_tuple_from_file(data_file)
+        edges = reco_bin_edges_vis[self.variable]
+        self.h_data = asrootpy(value_error_tuplelist_to_hist( read_tuple_from_file(data_file)['TTJet'], edges ))
+        self.h_data_no_fakes = asrootpy( removeFakes( self.h_measured, self.h_fakes, self.h_data ) )
 
-            if data_key == "": # JSON file == histogram
-                self.h_data = value_error_tuplelist_to_hist(json_input, edges)
-            else:
-                self.h_data = value_error_tuplelist_to_hist(json_input[data_key], edges)
-        else:
-            print 'Unkown file extension', data_file.split('.')[-1]
-            
+        scale = self.h_data_no_fakes.integral(0,-1) / asrootpy(self.h_response.ProjectionY()).integral(0,-1)
+        self.h_response.Scale(scale)
+
     def get_histograms( self ):
         return self.h_truth, self.h_response, self.h_measured, self.h_data, self.h_fakes
     
@@ -125,7 +116,7 @@ def main():
     options, input_values_sets, json_input_files = parse_options()
     results = {}
     for input_values, json_file in zip( input_values_sets, json_input_files ):
-        print 'Processing', json_file
+        # print 'Processing', json_file
         if 'combined' in json_file: continue
         regularisation_settings = RegularisationSettings( input_values )
         variable = regularisation_settings.variable
@@ -134,21 +125,21 @@ def main():
         if not results.has_key(com): results[com] = {}
         if not results[com].has_key(channel): results[com][channel] = {}
         if not results[com][channel].has_key(variable): results[com][channel][variable] = {}
-        print 'Variable = {0}, channel = {1}, sqrt(s) = {2}'.format(variable, channel, com)
+        print 'Variable = {0}, channel = {1}'.format(variable, channel)
 
         h_truth, h_response, h_measured, h_data, h_fakes = regularisation_settings.get_histograms()
 
         unfolding = Unfolding( 
-                                h_data, 
-                                h_truth, 
-                                h_measured, 
-                                h_response,
-                                fakes = None,
-                                method = 'TUnfold', 
-                                tau = 0. 
-                            )
+            h_data, 
+            h_truth, 
+            h_measured, 
+            h_response,
+            fakes = None,
+            method = 'TUnfold', 
+            tau = 0. 
+        )
+        # print unfolding.getConditionNumber()
 
-        # get_condition_number( unfolding.unfoldObject )
         tau_results = get_best_tau( regularisation_settings )
         results[com][channel][variable] = (tau_results)
     print_results_to_screen(results)
@@ -169,32 +160,89 @@ def parse_options():
 
     return options, input_values_sets, json_input_files
 
-def tau_from_L_curve( unfoldingObject ):
+def tau_from_L_curve( unfoldingObject, regularisation_settings ):
     '''
     Get best tau via l curve method
     Not tested
     '''
+    variable = regularisation_settings.variable
+    if variable == 'NJets': return 0
+
+    nScan = 500
+    minTau = 1.E-6
+    maxTau = 1.E-0
+
+    if variable == 'abs_lepton_eta':
+        minTau = 1.E-8
+        maxTau = 1.E-3
+    elif variable == 'lepton_pt':
+        minTau = 1.E-6
+        maxTau = 1.E-2
+    elif variable == 'NJets':
+        minTau = 1.E-6
+        maxTau = 1.E-2
+    minTau = 0.
+    maxTau = 0.
+
     lCurve = TGraph()
     logTauX = TSpline3()
     logTauY = TSpline3()
-    iBest = unfoldingObject.ScanLcurve(500, 0., 0., lCurve, logTauX, logTauY);
+    logTauCurvature = TSpline3() # it should be a peaked function (similar to a Gaussian), the maximum corresponding to the final choice of tau
+    iBest = unfoldingObject.ScanLcurve(nScan, minTau, maxTau, lCurve, logTauX, logTauY, logTauCurvature)
 
     # Additional info, plots
     t = Double(0)
     x = Double(0)
     y = Double(0)
-    logTauX.GetKnot(iBest,t,x);
-    logTauY.GetKnot(iBest,t,y);
+    logTauX.GetKnot(iBest,t,x)
+    logTauY.GetKnot(iBest,t,y)
+    
+    canvas = TCanvas()
 
-    bestLcurve = Graph(1);
-    bestLcurve.SetPoint(1,x,y);
-    lCurve.SetMarkerColor(600)
-    lCurve.SetMarkerSize(1)
-    lCurve.SetMarkerStyle(5)
-
-    # lCurve.Draw("AP");
+    bestLcurve = Graph(1)
+    bestLcurve.SetPoint(1,x,y)
     bestLcurve.markercolor = 'red'
-    # bestLcurve.Draw("*");
+    bestLcurve.SetMarkerSize(1.5)
+    bestLcurve.SetMarkerStyle(34)
+    bestLcurve.GetXaxis().SetTitle('log(#tau)')
+    bestLcurve.GetYaxis().SetTitle('Something to do with the LCurve')
+    bestLcurve.SetTitle('{0} {1}'.format(variable, regularisation_settings.channel))
+    bestLcurve.Draw('AP')
+
+    lCurve.SetMarkerColor(600)
+    lCurve.SetMarkerSize(0.5)
+    lCurve.SetMarkerStyle(20)
+    lCurve.Draw('LPSAME')
+
+    bestLcurve.Draw('PSAME')
+
+    # Write to file
+    output_dir = regularisation_settings.output_folder
+    make_folder_if_not_exists(output_dir)
+    canvas.SaveAs(output_dir + '/{0}_{1}_LCurve.pdf'.format(variable, regularisation_settings.channel) )
+
+    canvas2 = TCanvas()
+    bestLcurve = Graph(1)
+    bestLcurve.SetPoint(1,x,y)
+    bestLcurve.markercolor = 'red'
+    bestLcurve.SetMarkerSize(1.5)
+    bestLcurve.SetMarkerStyle(34)
+    bestLcurve.GetXaxis().SetTitle('log(#tau)')
+    bestLcurve.GetYaxis().SetTitle('Something to do with the LCurve')
+    bestLcurve.SetTitle('{0} {1}'.format(variable, regularisation_settings.channel))
+    bestLcurve.Draw('AP')
+
+    logTauCurvature.SetMarkerColor(600)
+    logTauCurvature.SetMarkerSize(0.5)
+    logTauCurvature.SetMarkerStyle(20)
+    logTauCurvature.Draw("LPSAME")
+
+    bestLcurve.Draw('PSAME')
+
+    # Write to file
+    output_dir = regularisation_settings.output_folder
+    make_folder_if_not_exists(output_dir)
+    canvas2.SaveAs(output_dir + '/{0}_{1}_LCurveCurvature.pdf'.format(variable, regularisation_settings.channel) )
 
     return unfoldingObject.GetTau()
 
@@ -202,7 +250,6 @@ def tau_from_scan( unfoldingObject, regularisation_settings ):
     variable = regularisation_settings.variable
 
     # Plots that get outputted by the scan
-    lCurve = TGraph()
     scanResult = TSpline3()
     d = 'signal'
     a = ''
@@ -225,16 +272,13 @@ def tau_from_scan( unfoldingObject, regularisation_settings ):
 
     # Scan is performed here    
     iBest = unfoldingObject.ScanTau(nScan, minTau, maxTau, scanResult, TUnfoldDensity.kEScanTauRhoSquareAvg);
+    t = Double(0)
+    x = Double(0)
+    scanResult.GetKnot(iBest,t,x);
 
     # Plot the scan result
     # Correlation as function of log tau
     canvas = TCanvas()
-
-
-    # Add point corresponding to optimum tau
-    t = Double(0)
-    x = Double(0)
-    scanResult.GetKnot(iBest,t,x);
 
     bestTau = Graph(1)
     bestTau.SetPoint(1,t,x)
@@ -246,7 +290,6 @@ def tau_from_scan( unfoldingObject, regularisation_settings ):
     bestTau.SetTitle('{0} {1}'.format(variable, regularisation_settings.channel))
     bestTau.GetYaxis().SetRangeUser(x*0.8,0.95)
     bestTau.GetXaxis().SetLimits(log(minTau, 10), log(maxTau, 10))
-
     bestTau.Draw('AP')
 
     scanResult.SetMarkerColor(600)
@@ -256,12 +299,10 @@ def tau_from_scan( unfoldingObject, regularisation_settings ):
     # Redraw to get it to appear on top of TSpline3...
     bestTau.Draw('PSAME')
 
-
-
     # Write to file
     output_dir = regularisation_settings.output_folder
     make_folder_if_not_exists(output_dir)
-    canvas.SaveAs(output_dir + '/{0}_{1}.png'.format(variable, regularisation_settings.channel) )
+    canvas.SaveAs(output_dir + '/{0}_{1}.pdf'.format(variable, regularisation_settings.channel) )
 
     return unfoldingObject.GetTau()
 
@@ -273,8 +314,6 @@ def get_best_tau( regularisation_settings ):
     h_truth, h_response, h_measured, h_data, h_fakes = regularisation_settings.get_histograms()
     variable = regularisation_settings.variable
 
-    h_data = removeFakes( h_measured, h_fakes, h_data )
-
     unfolding = Unfolding( 
                             h_data, 
                             h_truth, 
@@ -285,11 +324,11 @@ def get_best_tau( regularisation_settings ):
                             tau = -1
                         )
 
-    # bestTau_LCurve = tau_from_L_curve( unfolding.unfoldObject )
+    # bestTau_LCurve = tau_from_L_curve( unfolding.unfoldObject, regularisation_settings  )
     # unfolding.tau = bestTau_LCurve
-
     bestTauScan = tau_from_scan( unfolding.unfoldObject, regularisation_settings )
     unfolding.tau = bestTauScan
+    # print "Tau L Curve = {}, Min Ave Global Corr Coeff = {}".format(bestTau_LCurve, bestTauScan)
 
     return unfolding.tau
 
@@ -313,7 +352,7 @@ def get_condition_number( unfoldingObject ):
     nSig = len(sig)
     sigmaMax = sig[0]
     sigmaMin = sig[nSig-2]
-    condition = sigmaMax / max(0,sigmaMin)
+    condition = sigmaMax / max(0.00001,sigmaMin)
     # condition = 1
     print condition
     return condition
