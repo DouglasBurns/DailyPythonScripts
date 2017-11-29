@@ -107,6 +107,9 @@ if __name__ == '__main__':
     if variable in measurement_config.variables_no_met:
         all_systematics = remove_MET_uncertainties(all_systematics)
 
+    # if variable in measurement_config.variables_no_met:
+    #     all_systematics = remove_MET_uncertainties(all_systematics)
+
     # Add in the PDF weights
     all_systematics = append_PDF_uncertainties(all_systematics)
     # all_systematics = append_PDF_uncertainties(all_systematics, pdfset='CT14')

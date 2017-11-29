@@ -12,8 +12,7 @@ from dps.utils.Calculation import calculate_xsection, calculate_normalised_xsect
 combine_complex_results
 from dps.utils.hist_utilities import hist_to_value_error_tuplelist, \
 value_error_tuplelist_to_hist
-from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes, \
-plot_probability_matrix
+from dps.utils.Unfolding import Unfolding, get_unfold_histogram_tuple, removeFakes
 from dps.utils.ROOT_utils import set_root_defaults
 from dps.utils.pandas_utilities import read_tuple_from_file, write_tuple_to_df, combine_complex_df, \
 create_covariance_matrix
@@ -89,6 +88,8 @@ def get_unfolding_files(measurement_config):
     unfolding_files['file_for_ElectronUp']            = File( measurement_config.unfolding_Electron_up, 'read' )
     unfolding_files['file_for_MuonDown']          = File( measurement_config.unfolding_Muon_down, 'read' )
     unfolding_files['file_for_MuonUp']            = File( measurement_config.unfolding_Muon_up, 'read' )
+    # unfolding_files['file_for_LeptonDown']          = File( measurement_config.unfolding_Lepton_down, 'read' )
+    # unfolding_files['file_for_LeptonUp']            = File( measurement_config.unfolding_Lepton_up, 'read' )
 
     unfolding_files['file_for_ElectronEnDown']      = File( measurement_config.unfolding_ElectronEn_down, 'read' )
     unfolding_files['file_for_ElectronEnUp']        = File( measurement_config.unfolding_ElectronEn_up, 'read' )
@@ -105,7 +106,7 @@ def get_unfolding_files(measurement_config):
     unfolding_files['file_for_ptreweight']          = File( measurement_config.unfolding_ptreweight, 'read' )
 
     unfolding_files['file_for_powhegPythia8']       = File( measurement_config.unfolding_powheg_pythia8, 'read')
-    unfolding_files['file_for_amcatnloPythia8']            = File( measurement_config.unfolding_amcatnlo_pythia8, 'read')
+    unfolding_files['file_for_amcatnloPythia8']     = File( measurement_config.unfolding_amcatnlo_pythia8, 'read')
     unfolding_files['file_for_madgraphMLM']         = File( measurement_config.unfolding_madgraphMLM, 'read')
     unfolding_files['file_for_powheg_herwig']       = File( measurement_config.unfolding_powheg_herwig, 'read' )
     return unfolding_files
@@ -113,6 +114,8 @@ def get_unfolding_files(measurement_config):
 
 def unfold_results( results, category, channel, tau_value, h_truth, h_measured, h_response, h_fakes, method, visiblePS ):
     global variable, path_to_DF, args
+
+    print channel
 
     edges = reco_bin_edges_full[variable]
     if visiblePS:
@@ -147,10 +150,17 @@ def unfold_results( results, category, channel, tau_value, h_truth, h_measured, 
     h_data_no_fakes = h_data_no_fakes.rebinned(2)
     covariance_matrix = None
     inputMC_covariance_matrix = None
+
+    # Return things from TUnfold
+    # unfolding.plot_probability_matrix( variable, channel, category )
+    # unfolding.plot_rhoij_matrix( variable, channel, category )
+
     if category == 'central':
-        # Return the Probabiliy Matrix
-        probability_matrix = unfolding.return_probability_matrix()
-        plot_probability_matrix(probability_matrix, variable, channel )
+        unfolding.plot_probability_matrix( variable, channel, category )
+        unfolding.plot_rhoij_matrix( variable, channel, category )
+
+        chi2a, chi2l, ndf = unfolding.get_chi2()
+        print "chi2a: ", chi2a, " chi2l: ", chi2l, " ndf: ", ndf
 
         # Return the covariance matrices (They have been normailsed)
         covariance_matrix, correlation_matrix, inputMC_covariance_matrix = unfolding.get_covariance_matrix()
@@ -174,6 +184,7 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
     global unfolding_files, additionalPDFSets
 
     files_for_systematics = {
+        # 'TTJets_hadronisation'       :  unfolding_files['file_for_powheg_herwig'],
 
         'TTJets_massdown'        	 :  unfolding_files['file_for_massdown'],
         'TTJets_massup'          	 :  unfolding_files['file_for_massup'],
@@ -233,6 +244,8 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
         'Electron_down'              :  unfolding_files['file_for_ElectronDown'],
         'Muon_up'                    :  unfolding_files['file_for_MuonUp'],
         'Muon_down'                  :  unfolding_files['file_for_MuonDown'],
+        # 'Lepton_up'                    :  unfolding_files['file_for_LeptonUp'],
+        # 'Lepton_down'                  :  unfolding_files['file_for_LeptonDown'],
 
         'PileUp_up'                  :  unfolding_files['file_for_PUUp'],
         'PileUp_down'                :  unfolding_files['file_for_PUDown'],
@@ -256,7 +269,6 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
             load_fakes = True,
             visiblePS = visiblePS,
         )
-
 
     # PDF Uncertainties
     elif category in pdf_uncertainties:
@@ -657,6 +669,8 @@ def get_unfolded_normalisation( TTJet_normalisation_results, category, channel, 
         normalisation_unfolded['TTJets_amcatnloPythia8']      = hist_to_value_error_tuplelist( h_truth_amcatnloPythia8 )
         normalisation_unfolded['TTJets_madgraphMLM']   = hist_to_value_error_tuplelist( h_truth_madgraphMLM )
         normalisation_unfolded['TTJets_powhegHerwig']  = hist_to_value_error_tuplelist( h_truth_powheg_herwig )
+        
+        # normalisation_unfolded['TTJets_hadronisation']  = hist_to_value_error_tuplelist( h_truth_powheg_herwig )
 
         normalisation_unfolded['TTJets_massdown']      = hist_to_value_error_tuplelist( h_truth_massdown )
         normalisation_unfolded['TTJets_massup']        = hist_to_value_error_tuplelist( h_truth_massup )
@@ -772,6 +786,14 @@ def calculate_xsections( normalisation, category, channel, covariance_matrix=Non
             luminosity, 
             branching_ratio 
         )
+
+        # xsection_unfolded['TTJets_hadronisation'], _, _, _ = calculate_xsection( 
+        #     normalisation['TTJets_powhegHerwig'],
+        #     binWidths[variable],
+        #     luminosity, 
+        #     branching_ratio 
+        # )
+
         # Store Systematic
         xsection_unfolded['TTJets_massdown'], _, _, _ = calculate_xsection( 
             normalisation['TTJets_massdown'],
@@ -1009,6 +1031,12 @@ def calculate_normalised_xsections( normalisation, category, channel, normalise_
             binWidths[variable], 
             normalise_to_one, 
         )
+
+        # normalised_xsection['TTJets_hadronisation'], _, _, _ = calculate_normalised_xsection( 
+        #     normalisation['TTJets_powhegHerwig'],
+        #     binWidths[variable],
+        #     normalise_to_one, 
+        # )
 
         normalised_xsection['TTJets_massdown'], _, _, _ = calculate_normalised_xsection( 
             normalisation['TTJets_massdown'], 

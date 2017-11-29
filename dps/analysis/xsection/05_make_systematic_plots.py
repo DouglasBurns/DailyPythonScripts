@@ -91,20 +91,20 @@ def plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable,
 					hist.linestyle = 'dashed'
 					hist.alpha = 0.4	
 					hist.linewidth = 2
-			# Only label systematic once
-			if plot_foreground and plot_foreground in error_hists.keys(): source = ''
-			if error_hists == error_hists_up:
+			if plot_foreground and source == plot_foreground: 
+				hist.color = 'black'
+			if error_hists == error_hists_up: 
 				rplt.hist( hist, stacked=False, label = source )
 			else:
 				rplt.hist( hist, stacked=False, label = '' )
 		if plot_foreground and plot_foreground in error_hists.keys():
 			hist = error_hists[plot_foreground]
+			hist.linewidth = 6
 			hist.color = 'black'
-			rplt.hist( hist, stacked=False, label = source )
+			rplt.hist( hist, stacked=False, label = '' )
 
 
-	leg = plt.legend(loc='upper right',prop={'size':25},ncol=3)
-	# leg = plt.legend(loc='upper right',prop={'size':20},ncol=4)
+	leg = plt.legend(loc='upper right',prop={'size':20},ncol=4)
 	leg.draw_frame(False)	
 
 	x_title = variables_NonLatex[variable]
@@ -263,6 +263,7 @@ if __name__ == '__main__':
 			l_col = measurement_config.systematic_group_colourReconnection
 			l_ss = measurement_config.systematic_group_showerScale
 			l_other = measurement_config.systematic_other
+			# l_hadronisation = measurement_config.systematic_group_hadronisation
 
 			# # Plot them
 			plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable, output_folder)
@@ -276,3 +277,4 @@ if __name__ == '__main__':
 			# plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable, output_folder,l_ss, "showerScale")
 			# plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable, output_folder,l_col, "colourReconnection", plot_foreground="TTJets_CR")
 			plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable, output_folder,l_other, "other")
+			# plot_systematic_uncertainties(systematic_uncertainties, bin_edges, variable, output_folder,l_hadronisation, "PS", plot_foreground="TTJets_hadronisation")
