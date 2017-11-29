@@ -45,9 +45,11 @@ set_root_defaults(set_batch=True, msg_ignore_level=3001)
 from .hist_utilities import hist_to_value_error_tuplelist
 from ROOT import TUnfoldDensity, TUnfold
 from ROOT import TH2D, TH1D, TGraph
-from rootpy import asrootpy
+from rootpy import asrootpy    
 from math import sqrt
 import numpy as np
+from root_numpy import hist2array
+np.set_printoptions(linewidth=1000)
 
 class Unfolding:
 
@@ -93,10 +95,11 @@ class Unfolding:
                     TUnfold.kHistMapOutputVert,
                     TUnfold.kRegModeCurvature,
                 )
+                
                 self.unfoldObject.SetInput(self.data, 1.0)
 
                 # self.unfoldObject.ScanLcurve( 30, 0, 0 )
-
+                
     def unfold(self):
         # if data is None:
         #     raise ValueError('Data histogram is None')
@@ -151,13 +154,39 @@ class Unfolding:
         ndf = self.unfoldObject.GetNdf()
         return chi2a, chi2l, ndf
 
-    def return_probability_matrix(self):
+    def plot_rhoij_matrix(self, variable, channel, category):
+        '''
+        Return the rho_ij matrix
+        '''
+        if self.unfolded_data is not None:
+            self.rhoij_matrix = asrootpy(
+                self.unfoldObject.GetRhoIJtotal('RhoIJ'))
+            plot_matrix( 
+                self.rhoij_matrix, 
+                variable,
+                channel,
+                title = "Correlation Matrix from TUnfold",
+                outpath = 'plots/unfold_output/correlation_matrices/'+category+'/',
+            )
+        else:
+            print("Data has not been unfolded.")
+        return
+
+    def plot_probability_matrix(self, variable, channel, category):
         '''
         Return the matrix of probabilities
         '''
         if self.unfolded_data is not None:
             self.prob_matrix = asrootpy(
                 self.unfoldObject.GetProbabilityMatrix('ProbMatrix'))
+            plot_matrix( 
+                self.prob_matrix, 
+                variable,
+                channel,
+                title = "Response Probability Matrix",
+                outpath = 'plots/unfold_output/probability_matrices/'+category+'/',
+                rebin = True,
+            )
         else:
             print("Data has not been unfolded.")
         return self.prob_matrix
@@ -207,6 +236,21 @@ class Unfolding:
         # Sets tau value internally, but also need to store what it is
         self.unfoldObject.ScanLcurve(100, 0.001, 0.05, g)
         self.tau = self.unfoldObject.GetTau()
+
+    def getConditionNumber(self):
+        '''
+        Get the condition number of the matrix
+        '''
+        response_matrix = hist2array(self.response)
+        U, s, V = np.linalg.svd(response_matrix, full_matrices=True)
+        print "Singular Values for response matrix {}".format(s) #Sorted in deceding order
+        c = s[0] / max(s[-1], 0)
+        # response_matrix = hist2array( asrootpy( self.unfoldObject.GetProbabilityMatrix('ProbMatrix') ) )
+        # U, s, V = np.linalg.svd(response_matrix, full_matrices=True)
+        # print "Singular Values for probability matrix {}".format(s) #Sorted in deceding order
+        # c = s[0] / max(s[-1], 0)
+        # print c
+        return c 
 
     def Reset(self):
         if self.unfoldObject:
@@ -400,7 +444,7 @@ def removeFakes(h_measured, h_fakes, h_data):
     return h_data
 
 
-def plot_probability_matrix(p_matrix, variable, channel):
+def plot_matrix(matrix, variable, channel, title='', outpath='', rebin=False):
     '''
     Plot the probability matrix
     '''
@@ -408,14 +452,12 @@ def plot_probability_matrix(p_matrix, variable, channel):
     from dps.config.latex_labels import variables_latex
     from dps.config import CMS
     from dps.utils.file_utilities import make_folder_if_not_exists
-    from root_numpy import hist2array
 
     import matplotlib as mpl
     mpl.use( 'agg' )
 
     import matplotlib.pyplot as plt
     import matplotlib.cm as cm
-    # my_cmap = cm.get_cmap( 'jet' )
     my_cmap = cm.get_cmap( 'viridis' )
     import gc
 
@@ -424,13 +466,12 @@ def plot_probability_matrix(p_matrix, variable, channel):
     rc( 'text', usetex = True )
 
     # hist to numpy array
-    values = hist2array(p_matrix)
+    values = hist2array(matrix)
     edges = bin_edges_vis[variable]
     bin_centres = [np.mean([edges[j],edges[j+1]]) for j in range(0, len(edges)-1)]
-    n_gen_bins  = len(values)
 
     # Get underflow and strip underflow/overflow bins
-    underflow = p_matrix.underflow(axis=1)[1:-1]
+    # underflow = matrix.underflow(axis=1)[1:-1]
 
     # # Fix array such that underflow is included
     # i=0
@@ -440,26 +481,27 @@ def plot_probability_matrix(p_matrix, variable, channel):
     #     values[i] = newrow
     #     i+=1
 
-    # Cant easily rebin any more so done manually
-    rebinned_values = np.zeros((n_gen_bins,n_gen_bins))
-    i=0
-    for row in values:
-        newrow = [ row[j]+row[j+1] for j in range(0, len(row), 2)]
-        rebinned_values[i] = newrow
-        i+=1
+    # Rebin if necessary (i.e. at Gen Level Binning)
+    if rebin:
+        n_gen_bins  = len(values)
+        rebinned_values = np.zeros((n_gen_bins,n_gen_bins))
+        i=0
+        for row in values:
+            newrow = [ row[j]+row[j+1] for j in range(0, len(row), 2)]
+            rebinned_values[i] = newrow
+            i+=1
+        values = rebinned_values
 
     X, Y = np.meshgrid(bin_centres, bin_centres)
     x = X.ravel()
     y = Y.ravel()
-    z = rebinned_values.ravel()
+    z = values.ravel()
 
     v_unit = '$'+variables_latex[variable]+'$'
     if variable in ['HT', 'ST', 'MET', 'lepton_pt', 'WPT']: 
         v_unit += ' [GeV]'
     x_title = 'Reconstructed ' + v_unit
     y_title = 'Generated ' + v_unit
-    # title = "channel = {}, variable = ${}$".format(channel, variables_latex[variable])
-    title = "Response Probability Matrix"
     fig = plt.figure( figsize = CMS.figsize, dpi = CMS.dpi, facecolor = CMS.facecolor )
     ax0 = fig.add_subplot(1,1,1)
     ax0.set_aspect('equal')
@@ -479,9 +521,8 @@ def plot_probability_matrix(p_matrix, variable, channel):
     plt.tight_layout()
 
     # Output folder of covariance matrices
-    covariance_matrix_output_path = 'plots/binning/probability_matrices/'
-    make_folder_if_not_exists(covariance_matrix_output_path)
-    plt.savefig(covariance_matrix_output_path+variable+'_'+channel+'.pdf')
+    make_folder_if_not_exists(outpath)
+    plt.savefig(outpath+variable+'_'+channel+'.pdf')
     fig.clf()
     plt.close()
     gc.collect()

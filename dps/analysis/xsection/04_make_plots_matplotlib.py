@@ -551,6 +551,8 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
     axes.set_ylim(ymax = ylim[1]*1.1)
     if variable == 'abs_lepton_eta' or variable == 'abs_lepton_eta_coarse':
         axes.set_ylim(ymax = ylim[1]*1.6)
+        if utype == 'absolute':
+            axes.set_ylim(ymax = 130)
 
     # Now to show either of the ratio plots
     if show_ratio:
@@ -668,7 +670,7 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
             ax1.set_ylim( ymin = 0.6, ymax = 1.4 )
             ax1.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
             ax1.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
-        if variable == 'MT':
+        elif variable == 'MT':
             ax1.set_ylim( ymin = 0.8, ymax = 1.2 )
             ax1.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
             ax1.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
@@ -689,9 +691,9 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
             ax1.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
             ax1.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
         elif variable == 'abs_lepton_eta' or variable == 'abs_lepton_eta_coarse':
-            ax1.set_ylim( ymin = 0.6, ymax = 1.4 )
-            ax1.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
-            ax1.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
+            ax1.set_ylim( ymin = 0.8, ymax = 1.2 )
+            ax1.yaxis.set_major_locator( MultipleLocator( 0.1 ) )
+            ax1.yaxis.set_minor_locator( MultipleLocator( 0.05 ) )
         elif variable == 'lepton_pt':
             ax1.set_ylim( ymin = 0.6, ymax = 1.4 )
             ax1.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
@@ -792,7 +794,7 @@ def make_plots( histograms, category, output_folder, histname, show_ratio = Fals
             ax2.set_ylim( ymin = 0.8, ymax = 1.2 )
             ax2.yaxis.set_major_locator( MultipleLocator( 0.5 ) )
             ax2.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
-        if variable == 'MT':
+        elif variable == 'MT':
             ax2.set_ylim( ymin = 0.8, ymax = 1.2 )
             ax2.yaxis.set_major_locator( MultipleLocator( 0.2 ) )
             ax2.yaxis.set_minor_locator( MultipleLocator( 0.1 ) )
