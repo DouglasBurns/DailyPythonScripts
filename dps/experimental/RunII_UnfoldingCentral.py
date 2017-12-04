@@ -25,7 +25,7 @@ def main():
 	file_for_amcatnlo_pythia   	= File(config.unfolding_amcatnlo_pythia8, 'read')
 	file_for_powhegHerwig       = File(config.unfolding_powheg_herwig, 'read')
 	file_for_madgraph 		    = File(config.unfolding_madgraphMLM, 'read')
-	file_for_data       		= 'data_beforeRoundingFix/normalisation/background_subtraction/13TeV/{var}/VisiblePS/central/normalisation_{ch}.txt'
+	file_for_data       		= '/storage/ec6821/DailyPythonScripts/new/DailyPythonScripts/data/normalisation/background_subtraction/13TeV/{var}/VisiblePS/central/normalisation_{ch}.txt'
 
 	samples_and_files_to_compare = {}
 	samples_and_files_to_compare['powhegPythia'] 	= { 'file' : file_for_powhegPythia }
@@ -43,6 +43,7 @@ def main():
 		print 'Channel : {}'.format(channel)
 		for variable in config.variables:
 			tau_value = get_tau_value(config, channel, variable) 
+			tau_value = 0
 			print 'Variable : {}'.format(variable)
 
 			d_unfoldingInfo = get_unfolding_info(config, samples_and_files_to_compare, variable, channel)
@@ -59,7 +60,7 @@ def get_unfolding_info(config, samples_and_files_to_compare, variable, channel):
 	for sample, unfolding_info in samples_and_files_to_compare.iteritems():
 		if sample == 'data': continue
 
-		h_truth, h_measured, h_response, h_fakes = get_unfold_histogram_tuple(
+		h_truth, h_smeared, h_response, h_fakes = get_unfold_histogram_tuple(
 			inputfile=unfolding_info['file'],
 			variable=variable,
 			channel=channel,
@@ -71,7 +72,7 @@ def get_unfolding_info(config, samples_and_files_to_compare, variable, channel):
 		)
 
 		samples_and_files_to_compare[sample]['response'] 	= h_response
-		samples_and_files_to_compare[sample]['measured'] 	= h_measured
+		samples_and_files_to_compare[sample]['smeared'] 	= h_smeared
 		samples_and_files_to_compare[sample]['truth'] 		= h_truth
 		samples_and_files_to_compare[sample]['fakes'] 		= h_fakes
 		samples_and_files_to_compare[sample]['integral'] 	= asrootpy(h_response.ProjectionY()).integral(0,-1)
@@ -100,25 +101,23 @@ def unfolding_shenanigans(d_unfoldingInfo, tau):
 
 def unfold_with_powhegpythia(d_unfoldingInfo, tau):
 	'''
-	Unfold the alternate measured distributions with powhegPythia response matrix
+	Unfold the alternate smeared distributions with powhegPythia response matrix
 	'''
 	for sample, unfolding_info in d_unfoldingInfo.iteritems():
 		if sample == 'data': continue
 		scale = unfolding_info['integral'] / d_unfoldingInfo['powhegPythia']['integral']
 		scale = 1
 
-		measured = unfolding_info['measured']
-		# measured.Scale(scale)
+		smeared = unfolding_info['smeared']
 		truth = unfolding_info['truth']
-		# truth.Scale(scale)
 		response = d_unfoldingInfo['powhegPythia']['response']
 		response.Scale(scale)
 
-		# Unfold, and set 'data' to 'measured' 
+		# Unfold, and set 'data' to 'smeared' 
 		unfolding = Unfolding( 
-			measured,
+			smeared,
 			truth,
-			measured,
+			smeared,
 		    response, 
 		    fakes=None,
 		    method='TUnfold',
@@ -129,25 +128,23 @@ def unfold_with_powhegpythia(d_unfoldingInfo, tau):
 
 def unfold_with_alternate(d_unfoldingInfo, tau):
 	'''
-	Unfold the measured powhegPythia distribution with alternate response matrices
+	Unfold the smeared powhegPythia distribution with alternate response matrices
 	'''
 	for sample, unfolding_info in d_unfoldingInfo.iteritems():
 		if sample == 'data': continue
 		scale = d_unfoldingInfo['powhegPythia']['integral'] / unfolding_info['integral']
 		scale = 1
 
-		measured = d_unfoldingInfo['powhegPythia']['measured']
-		# measured.Scale(scale)
+		smeared = d_unfoldingInfo['powhegPythia']['smeared']
 		truth = d_unfoldingInfo['powhegPythia']['truth']
-		# truth.Scale(scale)
 		response = unfolding_info['response']
 		response.Scale(scale)
 
-		# Unfold, and set 'data' to 'measured' 
+		# Unfold, and set 'data' to 'smeared' 
 		unfolding = Unfolding( 
-			measured,
+			smeared,
 			truth,
-			measured,
+			smeared,
 		    response, 
 		    fakes=None,
 		    method='TUnfold',
@@ -158,30 +155,28 @@ def unfold_with_alternate(d_unfoldingInfo, tau):
 
 def unfold_the_data(d_unfoldingInfo, tau):
 	'''
-	Unfold the measured powhegPythia distribution with alternate response matrices
+	Unfold the smeared powhegPythia distribution with alternate response matrices
 	'''
 	for sample, unfolding_info in d_unfoldingInfo.iteritems():
 		if sample == 'data': continue
 
-		h_data_no_fakes = removeFakes( d_unfoldingInfo[sample]['measured'], d_unfoldingInfo[sample]['fakes'],  d_unfoldingInfo['data']['hist'] )
+		h_data_no_fakes = removeFakes( d_unfoldingInfo[sample]['smeared'], d_unfoldingInfo[sample]['fakes'],  d_unfoldingInfo['data']['hist'] )
 		d_unfoldingInfo['data']['hist'] = asrootpy(h_data_no_fakes)
 		d_unfoldingInfo['data']['integral'] = d_unfoldingInfo['data']['hist'].integral(0,-1)
 
 		scale = d_unfoldingInfo['data']['integral'] / unfolding_info['integral']
 		scale = 1
 
-		measured = unfolding_info['measured']
-		# measured.Scale(scale)
+		smeared = unfolding_info['smeared']
 		truth = unfolding_info['truth']
-		# truth.Scale(scale)
 		response = unfolding_info['response']
 		response.Scale(scale)
 
-		# Unfold, and set 'data' to 'measured' 
+		# Unfold, and set 'data' to 'smeared' 
 		unfolding = Unfolding( 
 			d_unfoldingInfo['data']['hist'],
 			truth,
-			measured,
+			smeared,
 		    response, 
 		    fakes=None,
 		    method='TUnfold',
