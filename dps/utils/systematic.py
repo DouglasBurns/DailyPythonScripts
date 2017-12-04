@@ -460,6 +460,7 @@ def get_symmetrised_systematic_uncertainty( options, syst_unc_x_secs ):
     Separate uncertainty calculation for PDFs. Need to think how to calc correlation matrices. (i.e. no way to get sign yet)
     Combine PDFs and alphaS systematics
     '''
+    averagedSystematics = options['aveSyst']
     xsections_with_symmetrised_systematics = deepcopy(syst_unc_x_secs)
     xsections_with_uncertainties_and_covariance = {}
     central_measurement = syst_unc_x_secs['central']
@@ -485,105 +486,102 @@ def get_symmetrised_systematic_uncertainty( options, syst_unc_x_secs ):
 
             isTopMassSystematic = True if systematic == 'TTJets_mass' else False
 
-            # The commented code in the remainder of this function
-            # is used to calcualte the uncertainties and covariance
-            # by taking the maximum uncertainty in each bin
-            # symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(
-            #     central_measurement, 
-            #     upper_measurement, 
-            #     lower_measurement, 
-            #     options, 
-            #     isTopMassSystematic,
-            #     systematic
-            # )
+            # calculates the uncertainty and covariance by averaging the up/down variations of each source
+            # If only one variation is available (e.g. a colour reconnection sample) then it will give identical results to the previous method
+            if averagedSystematics:    
+                symmetrised_uncertainties, covariance_matrix = get_average_covariance_matrix(
+                    central_measurement,
+                    upper_measurement,
+                    lower_measurement,
+                    options,
+                    isTopMassSystematic,
+                    systematic
+                    )
 
-            # xsections_with_symmetrised_systematics[systematic] = [
-            #     symmetrised_uncertainties, 
-            #     signed_uncertainties,
-            # ]     
-
-            # This code replace the previous lines (similar for the rest of this function)
-            # and calculates the uncertainty and covariance by averaging the up/down
-            # variations of each source
-            # If only one variation is available (e.g. a colour reconnection sample)
-            # then it will give identical results to the previous method
-            symmetrised_uncertainties, covariance_matrix = get_average_covariance_matrix(
-                central_measurement,
-                upper_measurement,
-                lower_measurement,
-                options,
-                isTopMassSystematic,
-                systematic
+                xsections_with_uncertainties_and_covariance[systematic] = [
+                    symmetrised_uncertainties, 
+                    covariance_matrix,
+                ]
+                d_Cov_Cor[systematic] = [ covariance_matrix, correlation_from_covariance(covariance_matrix) ]
+            # Calcualte the uncertainties and covariance by taking the maximum uncertainty in each bin
+            else:
+                symmetrised_uncertainties, signed_uncertainties = get_symmetrised_errors(
+                    central_measurement, 
+                    upper_measurement, 
+                    lower_measurement, 
+                    options, 
+                    isTopMassSystematic,
+                    systematic
                 )
 
-            xsections_with_uncertainties_and_covariance[systematic] = [
-                symmetrised_uncertainties, 
-                covariance_matrix,
-            ]
-            d_Cov_Cor[systematic] = [ covariance_matrix, correlation_from_covariance(covariance_matrix) ]
+                xsections_with_symmetrised_systematics[systematic] = [
+                    symmetrised_uncertainties, 
+                    signed_uncertainties,
+                ] 
 
-    # Add the inputMC statistics
-    # xsections_with_symmetrised_systematics['inputMC'], _ = add_inputMC_systematic(options)
-    inputMCUncertainties, inputMCCovariance = add_inputMC_systematic(options)
-    xsections_with_uncertainties_and_covariance['inputMC'] = [ inputMCUncertainties[0], inputMCCovariance ]
-    d_Cov_Cor['inputMC'] = inputMCCovariance
+    if averagedSystematics:
+        print( "Hello")
+        inputMCUncertainties, inputMCCovariance = add_inputMC_systematic(options)
+        xsections_with_uncertainties_and_covariance['inputMC'] = [ inputMCUncertainties[0], inputMCCovariance ]
+        d_Cov_Cor['inputMC'] = inputMCCovariance
 
-    # # Generate the Covariance Matrices
-    # d_Cov_Cor = generate_covariance_matrices(
-    #     options, 
-    #     xsections_with_symmetrised_systematics
-    # )
+        if  'BJet' in xsections_with_uncertainties_and_covariance and 'LightJet' in xsections_with_uncertainties_and_covariance:
+            # Combine LightJet and BJet Systematics
+            bJet = xsections_with_uncertainties_and_covariance['BJet'][0]
+            lightJet = xsections_with_uncertainties_and_covariance['LightJet'][0]
+            bJet_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(bJet, lightJet)]
+            xsections_with_uncertainties_and_covariance['BJet'][0] = bJet_tot
+            del xsections_with_uncertainties_and_covariance['LightJet']
 
-    # Combine Covariance Matrices
-    # if  'BJet' in xsections_with_symmetrised_systematics and 'LightJet' in xsections_with_symmetrised_systematics:
-    #     # Combine LightJet and BJet Systematics
-    #     bJet = xsections_with_symmetrised_systematics['BJet'][0]
-    #     lightJet = xsections_with_symmetrised_systematics['LightJet'][0]
-    #     bJet_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(bJet, lightJet)]
-    #     xsections_with_symmetrised_systematics['BJet'][0] = bJet_tot
-    #     del xsections_with_symmetrised_systematics['LightJet']
+            # Combine the covariance matrices
+            l_Cov = [d_Cov_Cor['BJet'][0], d_Cov_Cor['LightJet'][0]]
+            d_Cov_Cor['BJet'] = combine_covariance_matrices(l_Cov)
+            del d_Cov_Cor['LightJet']
+        if 'PDF' in xsections_with_uncertainties_and_covariance and 'TTJets_alphaS' in xsections_with_uncertainties_and_covariance:
+            # Combine PDF with alphaS variations
+            pdf = xsections_with_uncertainties_and_covariance['PDF'][0]
+            alphaS = xsections_with_uncertainties_and_covariance['TTJets_alphaS'][0]
+            pdf_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(alphaS, pdf)]
+            xsections_with_uncertainties_and_covariance['PDF'][0] = pdf_tot
+            del xsections_with_uncertainties_and_covariance['TTJets_alphaS']
 
-    #     # Combine the covariance matrices
-    #     l_Cov = [d_Cov_Cor['BJet'][0], d_Cov_Cor['LightJet'][0]]
-    #     d_Cov_Cor['BJet'] = combine_covariance_matrices(l_Cov)
-    #     del d_Cov_Cor['LightJet']
-    if  'BJet' in xsections_with_uncertainties_and_covariance and 'LightJet' in xsections_with_uncertainties_and_covariance:
-        # Combine LightJet and BJet Systematics
-        bJet = xsections_with_uncertainties_and_covariance['BJet'][0]
-        lightJet = xsections_with_uncertainties_and_covariance['LightJet'][0]
-        bJet_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(bJet, lightJet)]
-        xsections_with_uncertainties_and_covariance['BJet'][0] = bJet_tot
-        del xsections_with_uncertainties_and_covariance['LightJet']
+            # Combine the covariance matrices
+            l_Cov = [d_Cov_Cor['PDF'][0], d_Cov_Cor['TTJets_alphaS'][0]]
+            d_Cov_Cor['PDF'] = combine_covariance_matrices(l_Cov)
+            del d_Cov_Cor['TTJets_alphaS']
+    else:
+        # Add the inputMC statistics
+        xsections_with_symmetrised_systematics['inputMC'], _ = add_inputMC_systematic(options)
+        d_Cov_Cor = generate_covariance_matrices(
+            options, 
+            xsections_with_symmetrised_systematics
+        )
 
-        # Combine the covariance matrices
-        l_Cov = [d_Cov_Cor['BJet'][0], d_Cov_Cor['LightJet'][0]]
-        d_Cov_Cor['BJet'] = combine_covariance_matrices(l_Cov)
-        del d_Cov_Cor['LightJet']
+        if  'BJet' in xsections_with_symmetrised_systematics and 'LightJet' in xsections_with_symmetrised_systematics:
+            # Combine LightJet and BJet Systematics
+            bJet = xsections_with_symmetrised_systematics['BJet'][0]
+            lightJet = xsections_with_symmetrised_systematics['LightJet'][0]
+            bJet_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(bJet, lightJet)]
+            xsections_with_symmetrised_systematics['BJet'][0] = bJet_tot
+            del xsections_with_symmetrised_systematics['LightJet']
 
-    # if 'PDF' in xsections_with_symmetrised_systematics and 'TTJets_alphaS' in xsections_with_symmetrised_systematics:
-    #     # Combine PDF with alphaS variations
-    #     pdf = xsections_with_symmetrised_systematics['PDF'][0]
-    #     alphaS = xsections_with_symmetrised_systematics['TTJets_alphaS'][0]
-    #     pdf_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(alphaS, pdf)]
-    #     xsections_with_symmetrised_systematics['PDF'][0] = pdf_tot
-    #     del xsections_with_symmetrised_systematics['TTJets_alphaS']
+            # Combine the covariance matrices
+            l_Cov = [d_Cov_Cor['BJet'][0], d_Cov_Cor['LightJet'][0]]
+            d_Cov_Cor['BJet'] = combine_covariance_matrices(l_Cov)
+            del d_Cov_Cor['LightJet']
 
-    #     # Combine the covariance matrices
-    #     l_Cov = [d_Cov_Cor['PDF'][0], d_Cov_Cor['TTJets_alphaS'][0]]
-    #     d_Cov_Cor['PDF'] = combine_covariance_matrices(l_Cov)
-    #     del d_Cov_Cor['TTJets_alphaS']
-    if 'PDF' in xsections_with_uncertainties_and_covariance and 'TTJets_alphaS' in xsections_with_uncertainties_and_covariance:
-        # Combine PDF with alphaS variations
-        pdf = xsections_with_uncertainties_and_covariance['PDF'][0]
-        alphaS = xsections_with_uncertainties_and_covariance['TTJets_alphaS'][0]
-        pdf_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(alphaS, pdf)]
-        xsections_with_uncertainties_and_covariance['PDF'][0] = pdf_tot
-        del xsections_with_uncertainties_and_covariance['TTJets_alphaS']
+        if 'PDF' in xsections_with_symmetrised_systematics and 'TTJets_alphaS' in xsections_with_symmetrised_systematics:
+            # Combine PDF with alphaS variations
+            pdf = xsections_with_symmetrised_systematics['PDF'][0]
+            alphaS = xsections_with_symmetrised_systematics['TTJets_alphaS'][0]
+            pdf_tot = [combine_errors_in_quadrature([e1, e2]) for e1, e2 in zip(alphaS, pdf)]
+            xsections_with_symmetrised_systematics['PDF'][0] = pdf_tot
+            del xsections_with_symmetrised_systematics['TTJets_alphaS']
 
-        # Combine the covariance matrices
-        l_Cov = [d_Cov_Cor['PDF'][0], d_Cov_Cor['TTJets_alphaS'][0]]
-        d_Cov_Cor['PDF'] = combine_covariance_matrices(l_Cov)
-        del d_Cov_Cor['TTJets_alphaS']
+            # Combine the covariance matrices
+            l_Cov = [d_Cov_Cor['PDF'][0], d_Cov_Cor['TTJets_alphaS'][0]]
+            d_Cov_Cor['PDF'] = combine_covariance_matrices(l_Cov)
+            del d_Cov_Cor['TTJets_alphaS']
 
     # Create covariance matrices
     d_Cov_Cor['Stat'] = add_covariance( options, d_Cov_Cor, addStat = True )

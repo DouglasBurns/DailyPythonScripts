@@ -47,6 +47,10 @@ def parse_arguments():
         dest = "visiblePS", 
         action = "store_true",
         help = "Unfold to visible phase space" )
+    parser.add_argument( '-a', '--averaged', 
+        dest = "useAveragedSystematics", 
+        action = "store_true",
+        help = "Use averaged systematics" )
     parser.add_argument( "-u", "--unfolding_method", 
         dest = "unfolding_method", 
         default = 'TUnfold',
@@ -67,6 +71,7 @@ if __name__ == '__main__':
     symmetrise_errors           = args.symmetrise_errors
     variable                    = args.variable
     visiblePS                   = args.visiblePS
+    useAveragedSystematics      = args.useAveragedSystematics
     met_specific_systematics    = measurement_config.met_specific_systematics
     variables_no_met            = measurement_config.variables_no_met
     topMasses                   = measurement_config.topMasses
@@ -100,6 +105,7 @@ if __name__ == '__main__':
         'topMassUncertainty' : topMassUncertainty,
         'phase_space' : phase_space,
         'mcTheoryUncertainties' : mcTheoryUncertainties,
+        'aveSyst' : useAveragedSystematics,
     }
 
     # Get list of all systematics
