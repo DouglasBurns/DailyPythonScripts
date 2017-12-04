@@ -92,7 +92,7 @@ def calculateChi2ForModels( modelsForComparing, variable, channel, path_to_input
 
 	return chi2OfModels_df
 
-def makeLatexTable( chi2, gChi2, outputPath, channel, crossSectionType ):
+def makeLatexTable( chi2, outputPath, channel, crossSectionType ):
 	'''
 	Make the chi2 latex table
 	'''
@@ -108,8 +108,8 @@ def makeLatexTable( chi2, gChi2, outputPath, channel, crossSectionType ):
 	latexHeader += '\t\\scriptsize\n'
 
 	latexContent = ''
-	latexContent += makeTableContent(chi2, gChi2, models = ["TTJets_powhegPythia8", "TTJets_powhegPythia8_withMCTheoryUnc"], spacing=True)
-	latexContent += makeTableContent(chi2, gChi2, models = ["TTJets_powhegHerwig", "TTJets_amcatnloPythia8", "TTJets_madgraphMLM"])
+	latexContent += makeTableContent(chi2, models = ["TTJets_powhegPythia8", "TTJets_powhegPythia8_withMCTheoryUnc"], spacing=True)
+	latexContent += makeTableContent(chi2, models = ["TTJets_powhegHerwig", "TTJets_amcatnloPythia8", "TTJets_madgraphMLM"])
 
 	latexFooter = '\\end{table}\n'
 	latexTable = latexHeader+latexContent+latexFooter
@@ -121,7 +121,7 @@ def makeLatexTable( chi2, gChi2, outputPath, channel, crossSectionType ):
 	output_file.write(latexTable)
 	output_file.close()
 
-def makeTableContent(chi2, gChi2, models=[], spacing=False):
+def makeTableContent(chi2, models=[], spacing=False):
 	'''
 	Add sets of chi2 tables
 	'''
@@ -135,7 +135,7 @@ def makeTableContent(chi2, gChi2, models=[], spacing=False):
 	for model in chi2[chi2.keys()[0]]['Model']:
 		if model in models:
 			model_header += ' \multicolumn{{2}}{{c}}{{{model}}} & \t'.format(model=measurements_latex[model])
-			label_header += '$\\chi^{2}$/ndf & $\\textit{p}-value &\t'
+			label_header += '$\\chi^{2}$/ndf & $\\textit{p}$-value &\t'
 	model_header = model_header.rstrip().rstrip('&')
 	model_header += '\\\\ \n'
 	# if 'TTJets_powhegPythia8_withMCTheoryUnc' in models:
@@ -166,20 +166,7 @@ def makeTableContent(chi2, gChi2, models=[], spacing=False):
 		fullTable += lineForVar
 		fullTable += '\n'
 	fullTable += '\t\t\\hline\n'
-	
-	lineForGChi2 = '\t\t All &\t'
-	for model in models:
-		pValueToPrint = gChi2[model].pValue
-		if pValueToPrint < 0.01:
-			pValueToPrint = '$<$ 0.01'
-		else:
-			pValueToPrint = '{0:.2g}'.format(pValueToPrint)
-		lineForGChi2 += '{chi2:.3g} / {ndf} &\t {pValue} &\t'.format(chi2=gChi2[model].chi2, ndf=gChi2[model].ndf, pValue=pValueToPrint)
-	lineForGChi2 = lineForGChi2.rstrip().rstrip('&')
-	lineForGChi2 += '\\\\'
 
-	fullTable += lineForGChi2
-	fullTable += '\n\t\t\hline\n'
 	if spacing:
 		fullTable += '\t\t\\vspace*{0.2cm} \n'
 		fullTable += '\t\t\\newline \n'
@@ -189,7 +176,7 @@ def makeTableContent(chi2, gChi2, models=[], spacing=False):
 	return fullTable
 
 
-def makeChi2Table( chi2, gChi2, outputPath, channel, crossSectionType ):
+def makeChi2Table( chi2, outputPath, channel, crossSectionType ):
 	'''
 	Make a nice dataframe of chi2 to print to screen for debugging
 	'''
@@ -202,11 +189,6 @@ def makeChi2Table( chi2, gChi2, outputPath, channel, crossSectionType ):
 			vs.append(v)
 			ms.append(m)
 			cs.append(round(c, 2))
-	# Adding global if required
-	for m, gcs in gChi2.iteritems():
-		vs.append('Global')
-		ms.append(m)
-		cs.append(round(gcs.chi2, 2))
 
 	df = pd.DataFrame({
 		'Model': ms,
@@ -291,7 +273,7 @@ if __name__ == '__main__':
 				chi2ForVariables[variable] = calculateChi2ForModels( modelsForComparing, variable, channel, path_to_input, utype )
 
 			# Calculate the global chi2
-			gChi2 = calculateGlobalChi2( modelsForComparing, chi2ForVariables )
+			# gChi2 = calculateGlobalChi2( modelsForComparing, chi2ForVariables )
 			path_to_output = '{path}/{crossSectionType}/'.format(path=outputTablePath, channel=channel,crossSectionType=utype )
-			makeLatexTable( chi2=chi2ForVariables, gChi2=gChi2, outputPath=path_to_output, channel=channel, crossSectionType=utype )
-			makeChi2Table( chi2=chi2ForVariables, gChi2=gChi2, outputPath=path_to_output, channel=channel, crossSectionType=utype )
+			makeLatexTable( chi2=chi2ForVariables, outputPath=path_to_output, channel=channel, crossSectionType=utype )
+			makeChi2Table( chi2=chi2ForVariables, outputPath=path_to_output, channel=channel, crossSectionType=utype )
